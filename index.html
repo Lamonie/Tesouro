@@ -1,156 +1,18 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>LAMONIÊ FLOW | SPOTIFY PREMIUM EDITION</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        :root { --primary: #1db954; --bg: #050505; --surface: #121212; }
-        * { box-sizing: border-box; touch-action: manipulation; -webkit-user-select: none; margin: 0; padding: 0; }
-        body, html { width: 100%; height: 100%; background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; overflow-x: hidden; }
-        
-        .bg-animated { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(45deg, #050505, #0a2a0a, #050505, #1a0a2a); background-size: 400% 400%; animation: aurora 10s ease infinite; z-index: -2; }
-        @keyframes aurora { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-
-        @keyframes led-loop {
-            0% { border-color: #1db954; box-shadow: 0 0 10px #1db954; }
-            33% { border-color: #00d2ff; box-shadow: 0 0 10px #00d2ff; }
-            66% { border-color: #ff00ff; box-shadow: 0 0 10px #ff00ff; }
-            100% { border-color: #1db954; box-shadow: 0 0 10px #1db954; }
-        }
-
-        @keyframes text-color-loop {
-            0% { color: #ffffff; text-shadow: 0 0 5px #ffffff; }
-            33% { color: #00d2ff; text-shadow: 0 0 5px #00d2ff; }
-            66% { color: #ff00ff; text-shadow: 0 0 5px #ff00ff; }
-            100% { color: #ffffff; text-shadow: 0 0 5px #ffffff; }
-        }
-
-        .categories-nav { display: flex; overflow-x: auto; padding: 15px 20px; gap: 10px; scrollbar-width: none; }
-        .categories-nav::-webkit-scrollbar { display: none; }
-        .cat-btn { background: rgba(255,255,255,0.05); border: 2px solid transparent; color: white; padding: 10px 18px; border-radius: 50px; white-space: nowrap; font-size: 13px; font-weight: bold; animation: led-loop 5s linear infinite; cursor: pointer; }
-
-        .search-container { padding: 0 20px 20px; }
-        .search-box { display: flex; background: rgba(0,0,0,0.6); border-radius: 50px; padding: 5px; border: 2px solid var(--primary); animation: led-loop 4s reverse infinite; }
-        .search-box input { background: none; border: none; color: white; flex: 1; padding: 12px; outline: none; font-size: 16px; width: 100%; }
-        .btn-start { background: var(--primary); border: none; color: #000; padding: 0 20px; border-radius: 50px; font-weight: 900; }
-
-        .main-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; padding: 0 20px 150px; width: 100%; }
-        .card { background: var(--surface); border-radius: 15px; padding: 10px; border: 2px solid transparent; animation: led-loop 6s linear infinite; overflow: hidden; }
-        .card img { width: 100%; border-radius: 10px; aspect-ratio: 1/1; object-fit: cover; display: block; }
-        .card h4 { margin: 10px 0 3px; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .card p { color: var(--primary); font-size: 11px; font-weight: bold; }
-
-        .full-page { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; display: none; flex-direction: column; overflow-y: auto; }
-        
-        /* PLAYER DO SPOTIFY INTEGRADO */
-        .spotify-container { width: 100%; padding: 10px 20px 100px; flex: 1; }
-        iframe { border-radius: 12px; border: 2px solid var(--primary); animation: led-loop 5s infinite; }
-    </style>
-</head>
-<body>
-    <div class="bg-animated"></div>
-
-    <div id="homePage">
-        <header style="padding: 20px;">
-            <h1 style="color: var(--primary); font-size: 26px; text-shadow: 0 0 15px var(--primary); margin: 0;">LAMONIÊ FLOW</h1>
-            <p style="font-size: 10px; letter-spacing: 1px; animation: text-color-loop 5s infinite; font-weight: bold; text-transform: uppercase;">SÓ HITS</p>
-        </header>
-
-        <div class="categories-nav">
-            <button class="cat-btn active" onclick="carregarHome()">Destaques</button>
-            <button class="cat-btn" onclick="search('Vaquejada')">Vaquejada</button>
-            <button class="cat-btn" onclick="search('Piseiro')">Piseiro</button>
-            <button class="cat-btn" onclick="search('Sertanejo')">Sertanejo</button>
-            <button class="cat-btn" onclick="search('Funk')">Funk</button>
-        </div>
-
-        <div class="search-container">
-            <div class="search-box">
-                <input type="text" id="searchInput" placeholder="Buscar no Spotify...">
-                <button class="btn-start" onclick="search()"><i class="fas fa-search"></i></button>
-            </div>
-        </div>
-
-        <div class="main-grid" id="grid"></div>
-    </div>
-
-    <div id="albumPage" class="full-page">
-        <div style="padding: 15px; display: flex; align-items: center; justify-content: space-between;">
-            <button style="background: #222; border: 1px solid var(--primary); color: white; padding: 10px 20px; border-radius: 50px; font-weight: bold;" onclick="fecharPagina('albumPage')">🔙 VOLTAR</button>
-            <span style="color: var(--primary); font-size: 10px; font-weight: bold;">MODO PREMIUM ATIVO</span>
-        </div>
-        <div class="spotify-container" id="spotifyPlayer">
-            </div>
-    </div>
-
-    <script>
-        const grid = document.getElementById('grid');
-
-        const albunsIniciais = [
-            "MC Ryan SP Casei Com a Putaria", "Henrique e Juliano Arranhão", 
-            "Jorge e Mateus Molhando o Volante", "Zé Neto e Cristiano Largado às Traças", 
-            "Gusttavo Lima Ficha Limpa", "Ana Castela Nosso Quadro", 
-            "Luísa Sonza Chico", "Pedro Sampaio Dançarina", 
-            "Veigh Novo Balanço", "Matuê Quer Voar", 
-            "Filipe Ret Good Vibe", "MC IG 3 Dias Virado", 
-            "Menos é Mais Lapada Dela"
-        ];
-
-        // Carrega a Home usando a API do iTunes para as capas (é mais rápida para as imagens)
-        async function carregarHome() {
-            grid.innerHTML = "";
-            for (const busca of albunsIniciais) {
-                const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(busca)}&entity=album&limit=1&country=BR`);
-                const data = await res.json();
-                if (data.results.length > 0) {
-                    const t = data.results[0];
-                    grid.innerHTML += `
-                        <div class="card" onclick="abrirNoSpotify('${t.artistName} ${t.collectionName}')">
-                            <img src="${t.artworkUrl100.replace('100x100', '400x400')}">
-                            <h4>${t.collectionName}</h4>
-                            <p>${t.artistName}</p>
-                        </div>
-                    `;
-                }
-            }
-        }
-
-        // Função que busca o ID do álbum no Spotify e abre o player
-        async function abrirNoSpotify(termo) {
-            document.getElementById('albumPage').style.display = 'flex';
-            document.getElementById('spotifyPlayer').innerHTML = "<p style='color:var(--primary); text-align:center; padding:20px;'>Conectando ao Spotify Premium...</p>";
-            
-            // Usamos um serviço de busca para encontrar o link do Spotify
-            const query = encodeURIComponent(termo);
-            // Aqui simulamos a busca do ID (em um app real usaríamos a API do Spotify, 
-            // mas para o seu GitHub Pages, o Embed via pesquisa funciona melhor)
-            
-            document.getElementById('spotifyPlayer').innerHTML = `
-                <iframe src="https://open.spotify.com/embed/search/${query}" 
-                        width="100%" height="100%" frameborder="0" 
-                        allowtransparency="true" allow="encrypted-media"></iframe>
-            `;
-        }
-
-        async function search(q = "") {
-            const term = q || document.getElementById('searchInput').value;
-            if(!term) return;
-            const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(term)}&entity=album&limit=20&country=BR`);
-            const data = await res.json();
-            grid.innerHTML = data.results.map(t => `
-                <div class="card" onclick="abrirNoSpotify('${t.artistName} ${t.collectionName}')">
-                    <img src="${t.artworkUrl100.replace('100x100', '400x400')}">
-                    <h4>${t.collectionName}</h4>
-                    <p>${t.artistName}</p>
-                </div>
-            `).join('');
-        }
-
-        function fecharPagina(id) { document.getElementById(id).style.display = 'none'; document.getElementById('spotifyPlayer').innerHTML = ""; }
-        
-        carregarHome();
-    </script>
-</body>
-</html>
+<script>
+async function abrirNoSpotify(termo) {
+    document.getElementById('albumPage').style.display = 'flex';
+    document.getElementById('spotifyPlayer').innerHTML = "<p style='color:var(--primary); text-align:center; padding:20px;'>Carregando Player do Spotify...</p>";
+    
+    // Mudamos o formato do link para um modelo de busca mais compatível
+    const linkSpotify = `https://open.spotify.com/embed/search/${encodeURIComponent(termo)}`;
+    
+    document.getElementById('spotifyPlayer').innerHTML = `
+        <iframe src="${linkSpotify}" 
+                width="100%" height="500px" frameborder="0" 
+                allowtransparency="true" allow="encrypted-media; clipboard-write; localized-metadata"></iframe>
+        <p style="color: #666; font-size: 12px; text-align: center; margin-top: 10px;">
+            Dica: Clique em "Entrar" no player para ativar suas músicas completas.
+        </p>
+    `;
+}
+</script>
