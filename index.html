@@ -44,11 +44,25 @@
 
         .full-page { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; display: none; flex-direction: column; overflow-y: auto; }
         .album-header { padding: 30px 20px; background: linear-gradient(180deg, rgba(29,185,84,0.4) 0%, #000 100%); text-align: center; border-bottom: 2px solid var(--primary); animation: led-loop 8s infinite; }
-        .meta-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 20px; text-align: left; }
-        .meta-item { background: rgba(255,255,255,0.05); padding: 8px 12px; border-radius: 8px; font-size: 11px; color: #ccc; }
-        .meta-item span { display: block; color: var(--primary); font-weight: bold; font-size: 12px; }
 
-        .player { position: fixed; bottom: 0; width: 100%; background: rgba(0,0,0,0.95); padding: 15px 20px 30px; border-top: 3px solid var(--primary); z-index: 10001; display: none; backdrop-filter: blur(20px); animation: led-loop 3s infinite alternate; }
+        /* PLAYER FLUTUANTE ESTILO PIP */
+        .player { 
+            position: fixed; bottom: 10px; left: 10px; right: 10px; 
+            background: rgba(18, 18, 18, 0.95); padding: 12px; 
+            border-radius: 15px; border: 2px solid var(--primary); 
+            z-index: 10001; display: none; backdrop-filter: blur(15px); 
+            animation: led-loop 4s infinite alternate;
+            transition: all 0.4s ease;
+        }
+        .player.minimized { height: 60px; overflow: hidden; bottom: 5px; }
+        .player-content { display: flex; align-items: center; justify-content: space-between; }
+        .track-info { display: flex; align-items: center; flex: 1; overflow: hidden; }
+        .mini-cover { width: 45px; height: 45px; border-radius: 8px; margin-right: 12px; border: 1px solid var(--primary); }
+        .text-scroll { overflow: hidden; white-space: nowrap; }
+        
+        .controls { display: flex; align-items: center; gap: 15px; }
+        .btn-mini { background: none; border: none; color: white; font-size: 18px; cursor: pointer; }
+        .btn-play-pip { background: white; color: black; border: none; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
@@ -66,7 +80,6 @@
             <button class="cat-btn" onclick="search('Piseiro')">Piseiro</button>
             <button class="cat-btn" onclick="search('Sertanejo')">Sertanejo</button>
             <button class="cat-btn" onclick="search('Funk')">Funk</button>
-            <button class="cat-btn" onclick="search('Trap')">Trap</button>
         </div>
 
         <div class="search-container">
@@ -85,12 +98,18 @@
     </div>
 
     <footer class="player" id="player">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-            <div style="flex: 1; overflow: hidden; margin-right: 10px;">
-                <div id="trackTitle" style="font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 14px;">Música</div>
-                <div id="trackArtist" style="font-size: 11px; color: var(--primary);">Artista</div>
+        <div class="player-content">
+            <div class="track-info">
+                <img id="pipCover" src="" class="mini-cover">
+                <div class="text-scroll">
+                    <div id="trackTitle" style="font-weight: bold; font-size: 13px;">Música</div>
+                    <div id="trackArtist" style="font-size: 10px; color: var(--primary);">Artista</div>
+                </div>
             </div>
-            <button onclick="togglePlay()" id="playBtn" style="background:white; border:none; width:50px; height:50px; border-radius:50%;"><i class="fas fa-pause"></i></button>
+            <div class="controls">
+                <button onclick="togglePlay()" id="playBtn" class="btn-play-pip"><i class="fas fa-pause"></i></button>
+                <button onclick="toggleMinimize()" class="btn-mini"><i id="minIcon" class="fas fa-chevron-down"></i></button>
+            </div>
         </div>
     </footer>
 
@@ -100,22 +119,10 @@
         const audio = document.getElementById('audioMain');
         const grid = document.getElementById('grid');
 
-        // LISTA AMPLIADA COM MUITOS ÁLBUNS DIFERENTES
         const albunsIniciais = [
-            "João Gomes De Norte a Sul", "Nadson O Ferinha Seresta", "Tarcísio do Acordeon",
-            "Iguinho e Lulinha", "Vitor Fernandes", "Nattan o Fantástico",
-            "Wesley Safadão TBT", "Xand Avião Mix", "Mari Fernandez Ao Vivo",
-            "MC Ryan SP", "MC IG Todo Mundo Odeia o IG", "Veigh Dos Prédios",
-            "KayBlack", "Matuê Máquina de Tempo", "Filipe Ret LUME",
-            "Henrique e Juliano To Be", "Jorge e Mateus É Simples Assim", "Gusttavo Lima Embaixador",
-            "Zé Neto e Cristiano Escolhas", "Ana Castela Boiadeira Internacional", "Luan Santana Luan City",
-            "Menos é Mais Confia", "Grupo Revelação", "Thiaguinho Tardezinha",
-            "Ludmilla Numanice", "Péricles Pagode do Pericão", "Ferrugem Interessante",
-            "Simone Mendes Cintilante", "Matheus e Kauan", "Maiara e Maraisa Identidade",
-            "Hugo e Guilherme", "Murilo Huff Ao Vivo", "Tierry",
-            "Kadu Martins", "Luan Pereira", "Leo Santana",
-            "Dennis DJ", "Pedro Sampaio Astro", "Luísa Sonza Escândalo Íntimo",
-            "Jão SUPER", "Marina Sena Vício Inerente", "BaianaSystem"
+            "João Gomes", "Nadson O Ferinha", "Tarcísio do Acordeon", "Henrique e Juliano", 
+            "MC Ryan SP", "Gusttavo Lima", "Ana Castela", "Zé Neto e Cristiano",
+            "Iguinho e Lulinha", "Wesley Safadão", "Nattan", "Mari Fernandez"
         ];
 
         async function carregarHome() {
@@ -134,71 +141,51 @@
                             </div>
                         `;
                     }
-                } catch (error) { console.error("Erro ao carregar álbum:", error); }
+                } catch (e) {}
             }
-        }
-
-        async function search(q = "") {
-            const term = q || document.getElementById('searchInput').value;
-            if(!term) return;
-            grid.innerHTML = "<p style='padding:20px; color:var(--primary);'>Buscando hits...</p>";
-            try {
-                const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(term)}&entity=album&limit=20&country=BR`);
-                const data = await res.json();
-                if(data.results.length === 0) { grid.innerHTML = "<p style='padding:20px;'>Nenhum hit encontrado.</p>"; return; }
-                grid.innerHTML = data.results.map(t => `
-                    <div class="card" onclick="abrirAlbum('${t.collectionId}')">
-                        <img src="${t.artworkUrl100.replace('100x100', '400x400')}">
-                        <h4>${t.collectionName}</h4>
-                        <p>${t.artistName}</p>
-                    </div>
-                `).join('');
-            } catch (error) { grid.innerHTML = "<p style='padding:20px; color:red;'>Erro na conexão.</p>"; }
         }
 
         async function abrirAlbum(id) {
             document.getElementById('albumPage').style.display = 'flex';
-            document.getElementById('albumDetailContent').innerHTML = "<p style='padding:20px; color:var(--primary);'>Carregando detalhes do álbum...</p>";
+            document.getElementById('albumDetailContent').innerHTML = "<p style='padding:20px; color:var(--primary);'>Abrindo álbum...</p>";
             try {
                 const res = await fetch(`https://itunes.apple.com/lookup?id=${id}&entity=song`);
                 const data = await res.json();
                 const album = data.results[0];
                 const tracks = data.results.slice(1);
-                const dataF = new Date(album.releaseDate).toLocaleDateString('pt-BR');
-                const gravadora = album.copyright ? album.copyright.substring(0, 30) : "Oficial";
 
                 document.getElementById('albumDetailContent').innerHTML = `
                     <div class="album-header">
-                        <img src="${album.artworkUrl100.replace('100x100', '600x600')}" style="width:180px; height:180px; border-radius:15px; border:3px solid white;">
-                        <h2 style="margin-top:20px; font-size:20px;">${album.collectionName}</h2>
-                        <p style="color:var(--primary); font-weight:bold;">${album.artistName}</p>
-                        <div class="meta-container">
-                            <div class="meta-item">Data: <span>${dataF}</span></div>
-                            <div class="meta-item">Gênero: <span>${album.primaryGenreName}</span></div>
-                            <div class="meta-item">Gravadora: <span>${gravadora}</span></div>
-                        </div>
+                        <img src="${album.artworkUrl100.replace('100x100', '600x600')}" style="width:150px; border-radius:10px;">
+                        <h2 style="margin-top:15px; font-size:18px;">${album.collectionName}</h2>
+                        <p style="color:var(--primary);">${album.artistName}</p>
                     </div>
-                    <div style="padding-bottom: 150px;">
+                    <div style="padding: 10px 0 150px;">
                         ${tracks.map((t, i) => `
-                            <div style="display:flex; align-items:center; padding:15px 20px; border-bottom:1px solid #111;" onclick="tocarTrack('${t.trackName.replace(/'/g, "\\'")}', '${t.artistName.replace(/'/g, "\\'")}', '${t.previewUrl}')">
-                                <span style="color:var(--primary); width:30px; font-weight:bold;">${i+1}</span>
-                                <div style="flex:1; overflow:hidden;">
-                                    <div style="font-size:15px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${t.trackName}</div>
-                                </div>
-                                <i class="fas fa-play-circle" style="color:var(--primary); font-size:20px;"></i>
+                            <div style="display:flex; align-items:center; padding:15px 20px; border-bottom:1px solid #111;" 
+                                 onclick="tocarTrack('${t.trackName.replace(/'/g, "\\'")}', '${t.artistName.replace(/'/g, "\\'")}', '${t.previewUrl}', '${album.artworkUrl100}')">
+                                <span style="color:var(--primary); width:30px;">${i+1}</span>
+                                <div style="flex:1;">${t.trackName}</div>
+                                <i class="fas fa-play-circle" style="color:var(--primary);"></i>
                             </div>
                         `).join('')}
                     </div>
                 `;
-            } catch (error) { document.getElementById('albumDetailContent').innerHTML = "<p style='padding:20px; color:red;'>Erro ao carregar álbum.</p>"; }
+            } catch (e) {}
         }
 
-        function tocarTrack(name, artist, url) {
-            audio.src = url; audio.play();
-            document.getElementById('player').style.display = 'block';
+        function tocarTrack(name, artist, url, cover) {
+            audio.src = url; 
+            audio.play();
+            const player = document.getElementById('player');
+            player.style.display = 'block';
+            player.classList.remove('minimized');
+            
             document.getElementById('trackTitle').innerText = name;
             document.getElementById('trackArtist').innerText = artist;
+            document.getElementById('pipCover').src = cover;
             document.getElementById('playBtn').innerHTML = '<i class="fas fa-pause"></i>';
+            document.getElementById('minIcon').className = 'fas fa-chevron-down';
         }
 
         function togglePlay() {
@@ -206,8 +193,30 @@
             else { audio.pause(); document.getElementById('playBtn').innerHTML = '<i class="fas fa-play"></i>'; }
         }
 
+        function toggleMinimize() {
+            const p = document.getElementById('player');
+            const icon = document.getElementById('minIcon');
+            p.classList.toggle('minimized');
+            icon.className = p.classList.contains('minimized') ? 'fas fa-chevron-up' : 'fas fa-chevron-down';
+        }
+
         function fecharPagina(id) { document.getElementById(id).style.display = 'none'; }
         
+        async function search(q = "") {
+            const term = q || document.getElementById('searchInput').value;
+            if(!term) return;
+            grid.innerHTML = "<p style='padding:20px; color:var(--primary);'>Buscando hits...</p>";
+            const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(term)}&entity=album&limit=20&country=BR`);
+            const data = await res.json();
+            grid.innerHTML = data.results.map(t => `
+                <div class="card" onclick="abrirAlbum('${t.collectionId}')">
+                    <img src="${t.artworkUrl100.replace('100x100', '400x400')}">
+                    <h4>${t.collectionName}</h4>
+                    <p>${t.artistName}</p>
+                </div>
+            `).join('');
+        }
+
         carregarHome();
     </script>
 </body>
