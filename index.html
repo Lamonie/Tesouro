@@ -2,33 +2,41 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>LAMONIÊ FLOW | LED EDITION</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+    <title>LAMONIÊ FLOW | GLOBAL LED</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { 
             --primary: #1db954; 
             --bg: #050505; 
             --surface: #121212;
-            --led-shadow: 0 0 10px rgba(29, 185, 84, 0.5);
         }
 
-        /* RESET E TRAVA DE PINÇA */
+        /* BLOQUEIO DE ZOOM E PINÇA EM TODO O SITE */
         * { 
             box-sizing: border-box; 
-            touch-action: manipulation; 
+            touch-action: pan-x pan-y; 
             -webkit-user-select: none; 
             -webkit-touch-callout: none;
+            -webkit-text-size-adjust: none;
         }
 
         body, html { 
             margin: 0; padding: 0; width: 100%; height: 100%; 
             background: var(--bg); color: white; 
             font-family: 'Segoe UI', sans-serif; 
-            overflow: hidden; 
+            overflow: hidden;
+            /* Trava final contra pinça */
+            touch-action: none; 
         }
 
-        /* FUNDO ANIMADO EM LOOP */
+        /* Permite scroll apenas onde necessário */
+        #homePage, .full-page, .main-grid, .categories-nav {
+            touch-action: pan-y;
+        }
+        .categories-nav { touch-action: pan-x; }
+
+        /* FUNDO ANIMADO */
         .bg-animated { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: linear-gradient(45deg, #050505, #0a2a0a, #050505, #1a0a2a); 
@@ -38,7 +46,7 @@
         }
         @keyframes aurora { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
-        /* ANIMAÇÃO DE LED RGB */
+        /* ANIMAÇÃO LED RGB */
         @keyframes led-loop {
             0% { border-color: #1db954; box-shadow: 0 0 8px #1db954; }
             33% { border-color: #00d2ff; box-shadow: 0 0 8px #00d2ff; }
@@ -46,7 +54,7 @@
             100% { border-color: #1db954; box-shadow: 0 0 8px #1db954; }
         }
 
-        /* CATEGORIAS LED */
+        /* BARRA DE GÊNEROS MUNDIAIS */
         .categories-nav { display: flex; overflow-x: auto; padding: 15px 20px; gap: 12px; scrollbar-width: none; }
         .categories-nav::-webkit-scrollbar { display: none; }
         
@@ -56,12 +64,11 @@
             color: white; padding: 10px 22px; 
             border-radius: 50px; white-space: nowrap; 
             font-size: 14px; font-weight: bold; 
-            transition: 0.3s;
             animation: led-loop 5s linear infinite;
         }
-        .cat-btn.active { background: var(--primary); color: black; transform: scale(1.1); }
+        .cat-btn.active { background: var(--primary); color: black; transform: scale(1.05); }
 
-        /* BUSCA LED */
+        /* BUSCA */
         .search-box { 
             display: flex; background: rgba(0,0,0,0.6); 
             border-radius: 50px; margin: 0 20px 20px; padding: 5px; 
@@ -71,20 +78,18 @@
         .search-box input { background: none; border: none; color: white; flex: 1; padding: 12px; outline: none; font-size: 16px; }
         .btn-start { background: var(--primary); border: none; color: #000; padding: 0 25px; border-radius: 50px; font-weight: 900; }
 
-        /* GRID PRINCIPAL COM EFEITO LOOP NOS ÁLBUNS */
+        /* GRID */
         .main-grid { height: calc(100vh - 260px); overflow-y: auto; display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; padding: 10px 20px 150px; }
         
         .card { 
-            position: relative; background: var(--surface); 
+            background: var(--surface); 
             border-radius: 18px; padding: 10px; 
             border: 2px solid transparent;
-            transition: transform 0.3s;
             animation: led-loop 6s linear infinite;
         }
-        .card:active { transform: scale(0.95); }
         .card img { width: 100%; border-radius: 12px; aspect-ratio: 1/1; object-fit: cover; }
 
-        /* PLAYER LED */
+        /* PLAYER */
         .player { 
             position: fixed; bottom: 0; width: 100%; 
             background: rgba(0,0,0,0.95); padding: 15px 20px 35px; 
@@ -94,25 +99,14 @@
             animation: led-loop 3s infinite alternate;
         }
 
-        /* PÁGINAS FULL */
-        .full-page { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: #000; z-index: 9999; display: none; 
-            flex-direction: column; overflow-y: auto; 
-        }
-
+        .full-page { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; display: none; flex-direction: column; overflow-y: auto; }
+        
         .album-info-box { 
             padding: 25px; 
             background: linear-gradient(180deg, rgba(29,185,84,0.2) 0%, #000 100%); 
             border-bottom: 2px solid var(--primary);
             animation: led-loop 8s infinite;
         }
-
-        .track-item { 
-            display: flex; align-items: center; padding: 15px 20px; 
-            border-bottom: 1px solid rgba(255,255,255,0.05); 
-        }
-        .track-item:active { background: rgba(29,185,84,0.1); }
     </style>
 </head>
 <body>
@@ -125,15 +119,27 @@
         </header>
 
         <div class="categories-nav">
-            <button class="cat-btn active" onclick="search('Lançamentos 2026')">🔥 NOVIDADES</button>
-            <button class="cat-btn" onclick="search('Vaquejada')">🐎 VAQUEJADA</button>
-            <button class="cat-btn" onclick="search('Piseiro')">🎹 PISEIRO</button>
-            <button class="cat-btn" onclick="search('Sertanejo')">🤠 SERTANEJO</button>
-            <button class="cat-btn" onclick="search('Arrocha')">🍺 ARROCHA</button>
+            <button class="cat-btn active" onclick="search('Lançamentos 2026')">🌍 MUNDO</button>
+            <button class="cat-btn" onclick="search('Forró Vaquejada')">🐎 VAQUEJADA</button>
+            <button class="cat-btn" onclick="search('Piseiro 2026')">🎹 PISEIRO</button>
+            <button class="cat-btn" onclick="search('Sertanejo Universitário')">🤠 SERTANEJO</button>
+            <button class="cat-btn" onclick="search('Rock Classics')">🎸 ROCK</button>
+            <button class="cat-btn" onclick="search('Pop Hits')">🎤 POP</button>
+            <button class="cat-btn" onclick="search('Reggaeton')">💃 REGGAETON</button>
+            <button class="cat-btn" onclick="search('K-Pop')">🇰🇷 K-POP</button>
+            <button class="cat-btn" onclick="search('Hip Hop')">🎧 HIP HOP</button>
+            <button class="cat-btn" onclick="search('Jazz Classics')">🎷 JAZZ</button>
+            <button class="cat-btn" onclick="search('Reggae')">🇯🇲 REGGAE</button>
+            <button class="cat-btn" onclick="search('Electronic Dance')">⚡ TECHNO</button>
+            <button class="cat-btn" onclick="search('Afrobeats')">🇳🇬 AFROBEATS</button>
+            <button class="cat-btn" onclick="search('Country Music')">🇺🇸 COUNTRY</button>
+            <button class="cat-btn" onclick="search('Classical Music')">🎻 CLÁSSICA</button>
+            <button class="cat-btn" onclick="search('Pagode')">🍻 PAGODE</button>
+            <button class="cat-btn" onclick="search('Lo-fi')">☕ LO-FI</button>
         </div>
 
         <div class="search-box">
-            <input type="text" id="searchInput" placeholder="Pesquisar música ou artista...">
+            <input type="text" id="searchInput" placeholder="O que o mundo está ouvindo?">
             <button class="btn-start" onclick="search()"><i class="fas fa-search"></i></button>
         </div>
 
@@ -142,7 +148,6 @@
 
     <div id="albumPage" class="full-page">
         <button style="margin: 15px; background: #222; border: 1px solid var(--primary); color: white; padding: 10px 20px; border-radius: 50px;" onclick="fecharPagina('albumPage')">🔙 VOLTAR</button>
-        
         <div class="album-info-box">
             <div style="display: flex; gap: 20px; align-items: center;">
                 <img id="albumCoverImg" style="width: 120px; height: 120px; border-radius: 15px; border: 2px solid white;">
@@ -151,11 +156,11 @@
                     <p id="albumArtistDisplay" style="color: var(--primary); margin: 5px 0; font-weight: bold;"></p>
                 </div>
             </div>
-            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 20px; font-size: 12px; opacity: 0.8;">
-                <div style="background: #111; padding: 10px; border-radius: 8px;">📅 ANO: <span id="metaYear"></span></div>
-                <div style="background: #111; padding: 10px; border-radius: 8px;">🏷️ GÊNERO: <span id="metaGenre"></span></div>
-                <div style="background: #111; padding: 10px; border-radius: 8px;">⏳ DURAÇÃO: <span id="metaDuration"></span></div>
-                <div style="background: #111; padding: 10px; border-radius: 8px;">📀 GRAVADORA: <span id="metaLabel"></span></div>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 20px; font-size: 11px; opacity: 0.9;">
+                <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px;">📅 ANO: <span id="metaYear"></span></div>
+                <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px;">🏷️ GÊNERO: <span id="metaGenre"></span></div>
+                <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px;">⏳ DURAÇÃO: <span id="metaDuration"></span></div>
+                <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px;">📀 GRAVADORA: <span id="metaLabel"></span></div>
             </div>
         </div>
         <div id="trackListContainer"></div>
@@ -177,7 +182,7 @@
         const audio = document.getElementById('audioMain');
 
         async function search(q = "") {
-            const term = q || document.getElementById('searchInput').value || "Tarcisio do Acordeon";
+            const term = q || document.getElementById('searchInput').value || "Mundo";
             const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(term)}&entity=song&limit=20&country=BR`);
             const data = await res.json();
             
@@ -202,17 +207,17 @@
             document.getElementById('albumArtistDisplay').innerText = album.artistName;
             document.getElementById('metaYear').innerText = new Date(album.releaseDate).getFullYear();
             document.getElementById('metaGenre').innerText = album.primaryGenreName;
-            document.getElementById('metaLabel').innerText = album.copyright?.split(' ').slice(0,3).join(' ') || "Oficial";
+            document.getElementById('metaLabel').innerText = album.copyright?.split(' ').slice(0,3).join(' ') || "Universal Music";
             
             let totalMs = tracks.reduce((acc, t) => acc + (t.trackTimeMillis || 0), 0);
             document.getElementById('metaDuration').innerText = Math.floor(totalMs/60000) + " min";
 
             document.getElementById('trackListContainer').innerHTML = tracks.map((t, i) => `
-                <div class="track-item" onclick="tocarTrack('${t.trackName.replace(/'/g, "\\'")}', '${t.artistName.replace(/'/g, "\\'")}', '${t.previewUrl}')">
-                    <span style="margin-right:15px; color:var(--primary);">${i+1}</span>
+                <div style="display:flex; align-items:center; padding:15px 20px; border-bottom:1px solid #111;" onclick="tocarTrack('${t.trackName.replace(/'/g, "\\'")}', '${t.artistName.replace(/'/g, "\\'")}', '${t.previewUrl}')">
+                    <span style="color:var(--primary); margin-right:15px;">${i+1}</span>
                     <div style="flex:1">
-                        <div style="font-size:15px;">${t.trackName}</div>
-                        <div style="font-size:12px; opacity:0.5;">${t.artistName}</div>
+                        <div>${t.trackName}</div>
+                        <div style="font-size:11px; opacity:0.5;">${t.artistName}</div>
                     </div>
                     <i class="fas fa-play-circle" style="color:var(--primary)"></i>
                 </div>
