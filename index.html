@@ -3,180 +3,150 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>LAMONIÊ FLOW | PRO 2026</title>
+    <title>LAMONIÊ FLOW | OFICIAL</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { 
-            --primary: #00ff88; 
-            --bg-gradient: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-            --glass: rgba(255, 255, 255, 0.1);
-        }
-
-        /* TRAVA DE PINÇA SEM MEXER NA ROLAGEM */
-        * { 
-            box-sizing: border-box; 
-            -webkit-user-select: none;
-            /* touch-action: pan-x pan-y permite rolar para os lados e para cima, mas ignora o zoom */
-            touch-action: pan-x pan-y; 
-        }
+        :root { --primary: #00ff88; --bg: #0a0a0a; }
+        
+        /* Reset para garantir que o clique funcione e a rolagem seja suave */
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body, html { 
             margin: 0; padding: 0; width: 100%; height: 100%; 
-            font-family: 'Segoe UI', Roboto, sans-serif; 
-            color: white;
-            background: #000; /* Fundo base */
+            background: var(--bg); color: white; font-family: sans-serif;
+            overflow-x: hidden; /* Garante que não sambe para os lados */
         }
 
-        /* FUNDO DEGRADÊ ESTILO PALCO / GRID DE FESTA */
-        .main-container {
-            width: 100%;
-            height: 100%;
-            overflow-y: auto; /* ROLAGEM LIBERADA AQUI */
-            background: var(--bg-gradient);
-            background-attachment: fixed;
+        /* Container Principal com rolagem livre */
+        .app-container { height: 100%; overflow-y: auto; padding-bottom: 120px; }
+
+        header { padding: 25px 20px; }
+        .logo { font-size: 26px; font-weight: 900; color: #fff; margin: 0; }
+        .logo span { color: var(--primary); }
+
+        /* Categorias */
+        .tabs { display: flex; overflow-x: auto; padding: 10px 20px; gap: 10px; }
+        .tab-btn { 
+            background: #1a1a1a; border: none; color: white; padding: 10px 20px; 
+            border-radius: 8px; font-weight: bold; white-space: nowrap; cursor: pointer;
+        }
+        .tab-btn.active { background: var(--primary); color: #000; box-shadow: 0 0 15px var(--primary); }
+
+        /* Busca */
+        .search-box { padding: 20px; display: flex; gap: 10px; }
+        .search-box input { 
+            flex: 1; background: #1a1a1a; border: 1px solid #333; 
+            padding: 12px; border-radius: 8px; color: white; outline: none;
+        }
+        .btn-buscar { background: var(--primary); border: none; padding: 0 20px; border-radius: 8px; font-weight: bold; }
+
+        /* Grid de Álbuns - Corrigido para o clique */
+        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; padding: 0 20px; }
+        .card { background: #151515; border-radius: 12px; padding: 10px; cursor: pointer; transition: 0.2s; }
+        .card:active { transform: scale(0.95); }
+        .card img { width: 100%; border-radius: 8px; display: block; margin-bottom: 10px; }
+        .card h4 { margin: 5px 0; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .card p { margin: 0; font-size: 11px; color: var(--primary); }
+
+        /* Player Fixo */
+        .player { 
+            position: fixed; bottom: 0; width: 100%; background: rgba(0,0,0,0.9); 
+            backdrop-filter: blur(10px); padding: 15px 20px; border-top: 2px solid var(--primary); 
+            display: none; z-index: 100;
         }
 
-        header { padding: 30px 20px 10px; text-align: left; }
-        .logo-pro { font-size: 24px; font-weight: 900; letter-spacing: 1px; }
-        .logo-pro span { color: var(--primary); }
-
-        /* GÊNEROS LIMPOS (SÓ TEXTO) */
-        .genres-bar { 
-            display: flex; overflow-x: auto; padding: 15px 20px; gap: 10px; 
-            scrollbar-width: none;
-        }
-        .genres-bar::-webkit-scrollbar { display: none; }
-        .genre-btn { 
-            background: var(--glass); border: 1px solid rgba(255,255,255,0.1); 
-            color: #fff; padding: 10px 20px; border-radius: 5px; 
-            white-space: nowrap; font-size: 12px; font-weight: 700; 
-            text-transform: uppercase;
-        }
-        .genre-btn.active { background: var(--primary); color: #000; border: none; }
-
-        /* BUSCA PRO */
-        .search-wrapper { padding: 10px 20px; }
-        .search-input-group { 
-            display: flex; background: rgba(0,0,0,0.3); 
-            border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); padding: 5px;
-        }
-        .search-input-group input { background: none; border: none; color: white; flex: 1; padding: 12px; outline: none; }
-        .btn-go { background: var(--primary); border: none; color: #000; padding: 0 20px; border-radius: 8px; font-weight: 800; }
-
-        /* GRID DE ÁLBUNS 2025 */
-        .album-grid { 
-            display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; 
-            padding: 20px; padding-bottom: 120px;
-        }
-        .album-card { 
-            background: rgba(255,255,255,0.05); border-radius: 12px; padding: 10px; 
-            border: 1px solid rgba(255,255,255,0.05);
-        }
-        .album-card img { width: 100%; border-radius: 8px; aspect-ratio: 1/1; object-fit: cover; }
-        .album-card h3 { font-size: 13px; margin: 10px 0 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .album-card p { font-size: 11px; color: var(--primary); margin: 0; }
-
-        /* PLAYER FLUTUANTE */
-        .pro-player { 
-            position: fixed; bottom: 0; left: 0; width: 100%; 
-            background: rgba(0,0,0,0.9); backdrop-filter: blur(15px);
-            padding: 15px 20px 30px; border-top: 2px solid var(--primary);
-            display: none; z-index: 999;
-        }
+        /* Bloqueio de zoom via CSS para iOS */
+        body { touch-action: pan-y; } 
     </style>
 </head>
 <body>
 
-    <div class="main-container">
+    <div class="app-container">
         <header>
-            <div class="logo-pro">LAMONIÊ <span>FLOW</span></div>
-            <div style="font-size: 9px; letter-spacing: 2px; opacity: 0.6;">PROFESSIONAL AUDIO STATION</div>
+            <h1 class="logo">LAMONIÊ <span>FLOW</span></h1>
+            <p style="font-size: 10px; opacity: 0.5;">PROFESSIONAL EXPERIENCE</p>
         </header>
 
-        <div class="genres-bar">
-            <button class="genre-btn active" onclick="fetch2025('Top 2025 Albums')">Destaques 2025</button>
-            <button class="genre-btn" onclick="fetch2025('Vaquejada 2025')">Vaquejada</button>
-            <button class="genre-btn" onclick="fetch2025('Sertanejo 2025')">Sertanejo</button>
-            <button class="genre-btn" onclick="fetch2025('Piseiro 2025')">Piseiro</button>
-            <button class="genre-btn" onclick="fetch2025('Pop Hits')">Pop</button>
-            <button class="genre-btn" onclick="fetch2025('Rock')">Rock</button>
+        <div class="tabs">
+            <button class="tab-btn active" onclick="search('2025')">DESTAQUES 2025</button>
+            <button class="tab-btn" onclick="search('Vaquejada')">VAQUEJADA</button>
+            <button class="tab-btn" onclick="search('Piseiro')">PISEIRO</button>
+            <button class="tab-btn" onclick="search('Sertanejo')">SERTANEJO</button>
         </div>
 
-        <div class="search-wrapper">
-            <div class="search-input-group">
-                <input type="text" id="q" placeholder="Buscar álbuns ou artistas...">
-                <button class="btn-go" onclick="fetch2025()">OK</button>
-            </div>
+        <div class="search-box">
+            <input type="text" id="inp" placeholder="Buscar álbum ou artista...">
+            <button class="btn-buscar" onclick="search()">BUSCAR</button>
         </div>
 
-        <div class="album-grid" id="display">
+        <div class="grid" id="grid">
             </div>
     </div>
 
-    <footer class="pro-player" id="player">
+    <div class="player" id="player">
         <div style="display: flex; align-items: center; justify-content: space-between;">
-            <div style="flex: 1; overflow: hidden;">
-                <div id="m-title" style="font-weight: 800; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Música</div>
-                <div id="m-artist" style="font-size: 11px; color: var(--primary);">Artista</div>
+            <div>
+                <b id="p-title" style="font-size: 14px; display: block;"></b>
+                <span id="p-artist" style="font-size: 11px; color: var(--primary);"></span>
             </div>
-            <button onclick="control()" style="background:var(--primary); border:none; width:45px; height:45px; border-radius:50%; margin-left:15px;">
-                <i class="fas fa-pause" id="ctrl-icon"></i>
+            <button onclick="toggle()" id="btn-p" style="background:white; border:none; width:45px; height:45px; border-radius:50%; font-size: 20px;">
+                <i class="fas fa-pause"></i>
             </button>
         </div>
-    </footer>
+    </div>
 
-    <audio id="mainAudio"></audio>
+    <audio id="audio"></audio>
 
     <script>
-        const audio = document.getElementById('mainAudio');
+        const audio = document.getElementById('audio');
 
-        async function fetch2025(query = "") {
-            const term = query || document.getElementById('q').value || "Hits 2025";
-            const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(term)}&entity=album&limit=20&country=BR`);
+        async function search(termo = "") {
+            const q = termo || document.getElementById('inp').value || "Zezé Di Camargo";
+            const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(q)}&entity=album&limit=20&country=BR`);
             const data = await res.json();
             
-            document.getElementById('display').innerHTML = data.results.map(a => `
-                <div class="album-card" onclick="playAlbum('${a.collectionId}')">
-                    <img src="${a.artworkUrl100.replace('100x100', '600x600')}">
-                    <h3>${a.collectionName}</h3>
+            const grid = document.getElementById('grid');
+            grid.innerHTML = data.results.map(a => `
+                <div class="card" onclick="tocar('${a.collectionId}', '${a.collectionName.replace(/'/g, "")}', '${a.artistName.replace(/'/g, "")}')">
+                    <img src="${a.artworkUrl100.replace('100x100', '400x400')}">
+                    <h4>${a.collectionName}</h4>
                     <p>${a.artistName}</p>
                 </div>
             `).join('');
         }
 
-        async function playAlbum(id) {
+        async function tocar(id, album, artista) {
             const res = await fetch(`https://itunes.apple.com/lookup?id=${id}&entity=song&limit=1`);
             const data = await res.json();
-            const song = data.results[1];
-            if(song) {
-                audio.src = song.previewUrl;
+            if(data.results[1]) {
+                const track = data.results[1];
+                audio.src = track.previewUrl;
                 audio.play();
                 document.getElementById('player').style.display = 'block';
-                document.getElementById('m-title').innerText = song.trackName;
-                document.getElementById('m-artist').innerText = song.artistName;
-                document.getElementById('ctrl-icon').className = 'fas fa-pause';
+                document.getElementById('p-title').innerText = track.trackName;
+                document.getElementById('p-artist').innerText = artista;
+                document.getElementById('btn-p').innerHTML = '<i class="fas fa-pause"></i>';
             }
         }
 
-        function control() {
-            const icon = document.getElementById('ctrl-icon');
-            if(audio.paused) { audio.play(); icon.className = 'fas fa-pause'; }
-            else { audio.pause(); icon.className = 'fas fa-play'; }
+        function toggle() {
+            if(audio.paused) {
+                audio.play();
+                document.getElementById('btn-p').innerHTML = '<i class="fas fa-pause"></i>';
+            } else {
+                audio.pause();
+                document.getElementById('btn-p').innerHTML = '<i class="fas fa-play"></i>';
+            }
         }
 
-        // --- SCRIPT PARA TRAVAR PINÇA SEM TRAVAR ROLAGEM ---
-        document.addEventListener('touchstart', function (e) {
-            if (e.touches.length > 1) {
-                e.preventDefault(); // Bloqueia se tiver mais de 1 dedo (pinça)
-            }
+        // --- Bloqueio de pinça definitivo sem estragar o clique ---
+        document.addEventListener('touchstart', (e) => {
+            if (e.touches.length > 1) e.preventDefault();
         }, { passive: false });
 
-        document.addEventListener('gesturestart', function (e) {
-            e.preventDefault(); // Bloqueia gestos de escala nativos do iOS
-        });
+        document.addEventListener('gesturestart', (e) => e.preventDefault());
 
-        // Início
-        fetch2025('Top Albums 2025');
+        search(); // Carrega inicial
     </script>
 </body>
 </html>
