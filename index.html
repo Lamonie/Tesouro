@@ -9,20 +9,13 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
 <style>
-:root {
---primary:#1db954;
---bg:#0a0a0a;
-}
+:root {--primary:#1db954;}
 
 *{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif;}
 
-body{
-background:black;
-color:white;
-overflow-x:hidden;
-}
+body{background:black;color:white;overflow-x:hidden;}
 
-/* FUNDO ANIMADO MELHORADO */
+/* FUNDO ANIMADO */
 body::before{
 content:"";
 position:fixed;
@@ -52,7 +45,7 @@ z-index:-1;
 
 /* HEADER */
 .header{text-align:center;padding:40px;}
-h1{color:#1db954;letter-spacing:4px;}
+h1{color:#1db954;}
 
 .search{
 display:flex;
@@ -62,19 +55,8 @@ background:#111;
 border-radius:50px;
 overflow:hidden;
 }
-.search input{
-flex:1;
-padding:12px;
-background:none;
-border:none;
-color:white;
-}
-.search button{
-background:#1db954;
-border:none;
-padding:0 20px;
-cursor:pointer;
-}
+.search input{flex:1;padding:12px;background:none;border:none;color:white;}
+.search button{background:#1db954;border:none;padding:0 20px;cursor:pointer;}
 
 /* GRID */
 .grid{
@@ -104,113 +86,9 @@ padding:10px;
 text-align:center;
 }
 
-.progress{
-height:5px;
-background:#333;
-cursor:pointer;
-}
-.bar{
-height:5px;
-background:#1db954;
-width:0%;
-}
+.progress{height:5px;background:#333;cursor:pointer;}
+.bar{height:5px;background:#1db954;width:0%;}
 
-button{
-margin:5px;
-padding:10px;
-border:none;
-background:#1db954;
-cursor:pointer;
-}
+button{margin:5px;padding:10px;border:none;background:#1db954;cursor:pointer;}
 
 </style>
-</head>
-<body>
-<div class="header">
-<h1>LAMONIÊ FLOW</h1>
-<div class="search">
-<input id="search" placeholder="Buscar artista...">
-<button onclick="buscar()">Buscar</button>
-</div>
-</div>
-<div class="player">
-<div class="progress" onclick="seek(event)">
-<div class="bar" id="bar"></div>
-</div>
-<div class="grid" id="grid"></div>
-</div>
-<script>
-let lista=[];
-let index=0;
-const audio=document.getElementById("audio");
-
-async function buscar(){
-let q=document.getElementById("search").value||"Gusttavo Lima";
-let res=await fetch(`https://itunes.apple.com/search?term=${q}&entity=song&limit=30`);
-let data=await res.json();
-lista=data.results;
-render();
-}
-
-function render(){
-let grid=document.getElementById("grid");
-grid.innerHTML=lista.map((m,i)=>`
-<div class="card" onclick="play(${i})">
-<img src="${m.artworkUrl100}">
-<p>${m.trackName}</p>
-</div>
-`).join("");
-}
-
-function play(i){
-index=i;
-audio.src=lista[i].previewUrl;
-audio.play();
-}
-
-function playPause(){
-if(audio.paused){audio.play()}else{audio.pause()}
-}
-
-function next(){
-index=(index+1)%lista.length;
-play(index);
-}
-
-function prev(){
-index=(index-1+lista.length)%lista.length;
-play(index);
-}
-
-audio.ontimeupdate=()=>{
-let pct=(audio.currentTime/audio.duration)*100;
-document.getElementById("bar").style.width=pct+"%";
-};
-
-function seek(e){
-let rect=e.currentTarget.getBoundingClientRect();
-let pct=(e.clientX-rect.left)/rect.width;
-audio.currentTime=pct*audio.duration;
-}
-
-buscar();
-
-/* BOTÃO COPIAR */
-function copyCode(){
-let text=document.getElementById("codeBox");
-text.select();
-document.execCommand("copy");
-alert("Copiado com sucesso!");
-}
-</script>
-</body>
-</html>
-</textarea>
-<script>
-function copyCode(){
-let text=document.getElementById("codeBox");
-text.select();
-document.execCommand("copy");
-alert("Copiado com sucesso!");
-}
-</script>
