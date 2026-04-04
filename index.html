@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>LAMONIÊ FLOW | ÁLBUNS COMPLETOS</title>
+    <title>LAMONIÊ FLOW | PREMIUM</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --primary: #1db954; --bg: #050505; }
+        :root { --primary: #1db954; --bg: #050505; --surface: #121212; }
         * { box-sizing: border-box; touch-action: pan-x pan-y; -webkit-user-select: none; }
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
 
@@ -14,112 +14,111 @@
         .bg-animated { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(45deg, #050505, #1a4a1a, #050505, #001a00); background-size: 400% 400%; animation: aurora 15s ease infinite; z-index: -2; }
         @keyframes aurora { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
-        /* INTERFACE BASE */
-        .search-box { display: flex; background: rgba(255,255,255,0.08); border-radius: 50px; margin: 10px 20px; padding: 5px; border: 1px solid rgba(255,255,255,0.1); }
+        /* CATEGORIAS (GÊNEROS) DESLIZÁVEIS */
+        .categories-nav { display: flex; overflow-x: auto; padding: 10px 20px; gap: 10px; scrollbar-width: none; -ms-overflow-style: none; }
+        .categories-nav::-webkit-scrollbar { display: none; }
+        .cat-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 8px 20px; border-radius: 50px; white-space: nowrap; font-size: 13px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .cat-btn:active, .cat-btn.active { background: var(--primary); color: black; border-color: var(--primary); }
+
+        /* BUSCA */
+        .search-box { display: flex; background: rgba(255,255,255,0.08); border-radius: 50px; margin: 5px 20px 15px; padding: 5px; border: 1px solid rgba(255,255,255,0.1); }
         .search-box input { background: none; border: none; color: white; flex: 1; padding: 12px; outline: none; }
-        .btn-start { background: var(--primary); border: none; color: #000; padding: 0 25px; border-radius: 50px; font-weight: 900; }
+        .btn-start { background: var(--primary); border: none; color: #000; padding: 0 20px; border-radius: 50px; font-weight: 900; }
 
-        .main-grid { height: calc(100vh - 200px); overflow-y: auto; display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; padding: 15px 20px 150px; scrollbar-width: none; }
-        .card { position: relative; background: rgba(255,255,255,0.03); border-radius: 20px; padding: 10px; border: 1px solid transparent; transition: 0.3s; }
-        .card img { width: 100%; border-radius: 15px; display: block; }
+        /* GRID PRINCIPAL */
+        .main-grid { height: calc(100vh - 250px); overflow-y: auto; display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; padding: 15px 20px 150px; scrollbar-width: none; }
+        .card { position: relative; background: var(--surface); border-radius: 15px; padding: 12px; transition: 0.3s; border: 1px solid rgba(255,255,255,0.05); }
+        .card img { width: 100%; border-radius: 10px; aspect-ratio: 1/1; object-fit: cover; }
+        .btn-play-card { position: absolute; bottom: 65px; right: 20px; background: var(--primary); border: none; width: 40px; height: 40px; border-radius: 50%; color: black; display: flex; align-items: center; justify-content: center; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
 
-        /* BOTÃO PLAY NO CARD (Item Individual) */
-        .btn-card-play { 
-            position: absolute; 
-            bottom: 50px; 
-            right: 15px; 
-            background: var(--primary); 
-            border: none; 
-            width: 35px; 
-            height: 35px; 
-            border-radius: 50%; 
-            color: black; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-            opacity: 0.9;
-        }
-
-        /* TELAS SOBREPOSTAS */
+        /* PÁGINAS FULL */
         .full-page { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; display: none; flex-direction: column; overflow-y: auto; }
-        
-        /* BOTÃO VOLTAR OTIMIZADO */
-        .btn-back { 
-            margin: 20px; 
-            background: var(--primary); 
-            border: none; 
-            padding: 12px 24px; 
-            border-radius: 50px; 
-            font-weight: bold; 
-            color: #ffffff !important; /* Cor branca para máxima visibilidade */
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-            width: fit-content; 
-            align-self: flex-start; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-            cursor: pointer;
-        }
+        .btn-back { margin: 15px; background: var(--primary); border: none; padding: 10px 20px; border-radius: 50px; font-weight: bold; color: white !important; align-self: flex-start; z-index: 10; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
 
-        /* LISTA DE MÚSICAS DO ÁLBUM */
-        .track-list { padding: 0 20px 150px; }
-        .track-item { display: flex; align-items: center; justify-content: space-between; padding: 15px 10px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .track-item:active { background: rgba(29, 185, 84, 0.1); }
-        .track-info { display: flex; align-items: center; gap: 15px; }
-        .track-number { color: #666; font-size: 14px; min-width: 20px; }
-        .track-duration { color: #888; font-size: 12px; }
+        /* INFO DO ÁLBUM */
+        .album-info-box { padding: 20px; background: linear-gradient(to bottom, #1a1a1a, #000); border-bottom: 1px solid #222; }
+        .album-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; font-size: 11px; color: #aaa; }
+        .meta-item { background: rgba(255,255,255,0.05); padding: 8px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); }
+        .meta-item b { color: var(--primary); display: block; font-size: 10px; text-transform: uppercase; margin-bottom: 2px; }
 
-        /* PLAYER INFERIOR */
-        .player { position: fixed; bottom: 0; width: 100%; background: rgba(0,0,0,0.95); padding: 15px 20px; border-top: 1px solid var(--primary); z-index: 10001; display: none; backdrop-filter: blur(10px); }
-        #progressBar { width: 0%; height: 4px; background: var(--primary); position: absolute; top: 0; left: 0; transition: 0.1s; }
+        /* LISTA DE TRACKS */
+        .track-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .track-info { display: flex; align-items: center; gap: 15px; flex: 1; }
+        .play-icon-list { color: var(--primary); font-size: 14px; }
 
-        /* BOTÃO COPIAR (Apenas para o desenvolvedor) */
-        .copy-container { position: fixed; top: 10px; right: 10px; z-index: 100000; }
-        .btn-copy { background: #333; color: white; border: 1px solid #555; padding: 8px 15px; border-radius: 5px; font-size: 12px; cursor: pointer; }
+        /* PLAYER */
+        .player { position: fixed; bottom: 0; width: 100%; background: rgba(0,0,0,0.98); padding: 15px 20px 30px; border-top: 1px solid var(--primary); z-index: 10001; display: none; backdrop-filter: blur(15px); }
+        #progressBar { width: 0%; height: 4px; background: var(--primary); position: absolute; top: 0; left: 0; }
+
+        /* UTILITÁRIOS */
+        .copy-btn { position: fixed; top: 10px; right: 10px; z-index: 100000; background: #333; color: white; border: none; padding: 5px 10px; border-radius: 5px; font-size: 10px; opacity: 0.7; }
     </style>
 </head>
 <body>
 
-    <div class="copy-container">
-        <button class="btn-copy" onclick="copyCode()">COPIAR TUDO</button>
-    </div>
-
+    <button class="copy-btn" onclick="copyFullCode()">COPIAR TUDO</button>
     <div class="bg-animated"></div>
 
     <div id="homePage">
-        <header style="padding: 20px; text-align: center;"><h1 style="color: var(--primary); margin: 0;">LAMONIÊ FLOW</h1></header>
-        <div class="search-box">
-            <input type="text" id="searchInput" placeholder="Zezé, Tarcísio, Safadão...">
-            <button class="btn-start" onclick="search()">BUSCAR</button>
+        <header style="padding: 15px 20px 5px; text-align: left;">
+            <h1 style="color: var(--primary); margin: 0; font-size: 24px; letter-spacing: -1px;">LAMONIÊ FLOW</h1>
+        </header>
+
+        <div class="categories-nav">
+            <button class="cat-btn active" onclick="search('Lançamentos 2026')">Novidades</button>
+            <button class="cat-btn" onclick="search('Sertanejo 2026')">Sertanejo</button>
+            <button class="cat-btn" onclick="search('Forró')">Forró</button>
+            <button class="cat-btn" onclick="search('Piseiro')">Piseiro</button>
+            <button class="cat-btn" onclick="search('Arrocha')">Arrocha</button>
+            <button class="cat-btn" onclick="search('Gospel')">Gospel</button>
+            <button class="cat-btn" onclick="search('Pagode')">Pagode</button>
         </div>
+
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="O que vamos ouvir hoje?">
+            <button class="btn-start" onclick="search()"><i class="fas fa-search"></i></button>
+        </div>
+
         <div class="main-grid" id="grid"></div>
     </div>
 
     <div id="artistPage" class="full-page">
-        <button class="btn-back" onclick="fecharPagina('artistPage')"><i class="fas fa-chevron-left"></i> VOLTAR AO INÍCIO</button>
-        <div id="artistHeader" style="padding: 0 20px 20px;"><h1 id="artistTitle" style="font-size: 32px; margin:0;"></h1></div>
+        <button class="btn-back" onclick="fecharPagina('artistPage')"><i class="fas fa-arrow-left"></i> VOLTAR AO INÍCIO</button>
+        <h2 id="artistTitle" style="padding: 0 20px; margin: 0 0 10px;"></h2>
         <div id="artistAlbums" class="main-grid"></div>
     </div>
 
     <div id="albumPage" class="full-page" style="z-index: 10000;">
-        <button class="btn-back" onclick="fecharPagina('albumPage')"><i class="fas fa-chevron-left"></i> VOLTAR AO ÁLBUM</button>
-        <div style="display: flex; padding: 20px; gap: 20px; align-items: center;">
-            <img id="albumCoverImg" style="width: 120px; height: 120px; border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
-            <div>
-                <h2 id="albumTitleDisplay" style="margin: 0; font-size: 20px;"></h2>
-                <p id="albumArtistDisplay" style="color: var(--primary); margin: 5px 0 0;"></p>
+        <button class="btn-back" onclick="fecharPagina('albumPage')"><i class="fas fa-arrow-left"></i> VOLTAR</button>
+        
+        <div class="album-info-box">
+            <div style="display: flex; gap: 20px; align-items: center;">
+                <img id="albumCoverImg" style="width: 130px; height: 130px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.8);">
+                <div style="flex:1;">
+                    <h2 id="albumTitleDisplay" style="margin: 0; font-size: 20px; line-height: 1.2;"></h2>
+                    <p id="albumArtistDisplay" style="color: var(--primary); margin: 5px 0 0; font-weight: bold;"></p>
+                </div>
+            </div>
+
+            <div class="album-meta">
+                <div class="meta-item"><b>Lançamento</b><span id="metaYear">--</span></div>
+                <div class="meta-item"><b>Gênero</b><span id="metaGenre">--</span></div>
+                <div class="meta-item"><b>Duração</b><span id="metaDuration">--</span></div>
+                <div class="meta-item"><b>Gravadora</b><span id="metaLabel" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block;">--</span></div>
             </div>
         </div>
+
         <div id="trackListContainer" class="track-list"></div>
     </div>
 
     <footer class="player" id="player">
         <div id="progressBar"></div>
         <div style="display: flex; justify-content: space-between; align-items: center;">
-            <div style="flex: 1; overflow: hidden;">
-                <div id="trackTitle" style="font-weight: bold; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"></div>
-                <div id="trackArtist" style="font-size: 11px; color: var(--primary);"></div>
+            <div style="flex: 1; overflow: hidden; margin-right: 15px;">
+                <div id="trackTitle" style="font-weight: bold; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Música</div>
+                <div id="trackArtist" style="font-size: 11px; color: var(--primary);">Artista</div>
             </div>
-            <button onclick="togglePlay()" id="playBtn" style="background:white; border:none; width:45px; height:45px; border-radius:50%; flex-shrink: 0;"><i class="fas fa-pause"></i></button>
+            <button onclick="togglePlay()" id="playBtn" style="background:white; border:none; width:50px; height:50px; border-radius:50%; flex-shrink: 0;"><i class="fas fa-pause"></i></button>
         </div>
     </footer>
 
@@ -127,31 +126,28 @@
 
     <script>
         const audio = document.getElementById('audioMain');
-        const playBtn = document.getElementById('playBtn');
 
-        // Função para Copiar o Código
-        function copyCode() {
-            const el = document.createElement('textarea');
-            el.value = document.documentElement.outerHTML;
-            document.body.appendChild(el);
-            el.select();
-            document.execCommand('copy');
-            document.body.removeChild(el);
-            alert('Código copiado com sucesso!');
-        }
-
+        // BUSCA INICIAL
         async function search(q = "") {
-            const term = q || document.getElementById('searchInput').value || "Zezé Di Camargo";
+            const term = q || document.getElementById('searchInput').value || "Tarcisio do Acordeon";
+            
+            // Highlight categoria ativa
+            document.querySelectorAll('.cat-btn').forEach(b => {
+                if(b.innerText === q) b.classList.add('active');
+                else b.classList.remove('active');
+            });
+
             const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(term)}&entity=song&limit=20&country=BR`);
             const data = await res.json();
+            
             document.getElementById('grid').innerHTML = data.results.map(t => `
                 <div class="card">
                     <img src="${t.artworkUrl100.replace('100x100', '400x400')}" onclick="abrirArtista('${t.artistName.replace(/'/g, "\\'")}', '${t.artistId}')">
-                    <button class="btn-card-play" onclick="tocarTrack('${t.trackName.replace(/'/g, "\\'")}', '${t.artistName.replace(/'/g, "\\'")}', '${t.previewUrl}')">
+                    <button class="btn-play-card" onclick="tocarTrack('${t.trackName.replace(/'/g, "\\'")}', '${t.artistName.replace(/'/g, "\\'")}', '${t.previewUrl}')">
                         <i class="fas fa-play"></i>
                     </button>
-                    <h4 style="margin:10px 0 0; font-size:13px;">${t.trackName}</h4>
-                    <p style="color:var(--primary); font-size:11px; margin:3px 0;">${t.artistName}</p>
+                    <h4 style="margin:10px 0 2px; font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${t.trackName}</h4>
+                    <p style="color:var(--primary); font-size:10px; margin:0;">${t.artistName}</p>
                 </div>
             `).join('');
         }
@@ -162,47 +158,52 @@
             const res = await fetch(`https://itunes.apple.com/lookup?id=${id}&entity=album&limit=20`);
             const data = await res.json();
             document.getElementById('artistAlbums').innerHTML = data.results.slice(1).map(a => `
-                <div class="card" onclick="abrirAlbum('${a.collectionName.replace(/'/g, "\\'")}', '${a.collectionId}', '${a.artworkUrl100}', '${a.artistName.replace(/'/g, "\\'")}')">
+                <div class="card" onclick="abrirAlbum('${a.collectionId}')">
                     <img src="${a.artworkUrl100.replace('100x100', '400x400')}">
-                    <h4 style="font-size:12px; margin-top:10px;">${a.collectionName}</h4>
+                    <h4 style="font-size:11px; margin-top:8px; height:2.4em; overflow:hidden;">${a.collectionName}</h4>
                 </div>
             `).join('');
         }
 
-        async function abrirAlbum(title, id, cover, artist) {
+        async function abrirAlbum(albumId) {
             document.getElementById('albumPage').style.display = 'flex';
-            document.getElementById('albumCoverImg').src = cover.replace('100x100', '400x400');
-            document.getElementById('albumTitleDisplay').innerText = title;
-            document.getElementById('albumArtistDisplay').innerText = artist;
-
-            const res = await fetch(`https://itunes.apple.com/lookup?id=${id}&entity=song`);
+            
+            // Busca dados do álbum + músicas
+            const res = await fetch(`https://itunes.apple.com/lookup?id=${albumId}&entity=song`);
             const data = await res.json();
+            const album = data.results[0];
             const tracks = data.results.slice(1);
 
-            document.getElementById('trackListContainer').innerHTML = tracks.map((t, index) => {
-                const durMin = Math.floor(t.trackTimeMillis / 60000);
-                const durSec = ((t.trackTimeMillis % 60000) / 1000).toFixed(0).padStart(2, '0');
-                return `
-                <div class="track-item">
-                    <div class="track-info" onclick="tocarTrack('${t.trackName.replace(/'/g, "\\'")}', '${t.artistName.replace(/'/g, "\\'")}', '${t.previewUrl}')">
-                        <span class="track-number">${index + 1}</span>
+            // Preenche Metadados
+            document.getElementById('albumCoverImg').src = album.artworkUrl100.replace('100x100', '600x600');
+            document.getElementById('albumTitleDisplay').innerText = album.collectionName;
+            document.getElementById('albumArtistDisplay').innerText = album.artistName;
+            document.getElementById('metaYear').innerText = new Date(album.releaseDate).getFullYear();
+            document.getElementById('metaGenre').innerText = album.primaryGenreName;
+            document.getElementById('metaLabel').innerText = album.copyright || "Independente";
+            
+            // Calcula duração total aproximada
+            let totalMs = tracks.reduce((acc, t) => acc + (t.trackTimeMillis || 0), 0);
+            document.getElementById('metaDuration').innerText = Math.floor(totalMs/60000) + " min";
+
+            document.getElementById('trackListContainer').innerHTML = tracks.map((t, i) => `
+                <div class="track-item" onclick="tocarTrack('${t.trackName.replace(/'/g, "\\'")}', '${t.artistName.replace(/'/g, "\\'")}', '${t.previewUrl}')">
+                    <div class="track-info">
+                        <span style="color:#555; width:20px;">${i+1}</span>
                         <div>
                             <div style="font-size:14px; font-weight:500;">${t.trackName}</div>
-                            <div style="font-size:11px; opacity:0.6;">${t.artistName}</div>
+                            <div style="font-size:11px; opacity:0.5;">${t.artistName}</div>
                         </div>
                     </div>
-                    <div style="display: flex; align-items: center; gap: 15px;">
-                        <span class="track-duration">${durMin}:${durSec}</span>
-                        <i class="fas fa-play" style="color: var(--primary)" onclick="tocarTrack('${t.trackName.replace(/'/g, "\\'")}', '${t.artistName.replace(/'/g, "\\'")}', '${t.previewUrl}')"></i>
-                    </div>
+                    <i class="fas fa-play-circle play-icon-list"></i>
                 </div>
-            `}).join('');
+            `).join('');
         }
 
         function tocarTrack(name, artist, url) {
-            // Se clicar na mesma música que já está tocando, alterna pause/play
-            if (audio.src === url) {
-                togglePlay();
+            if (audio.src === url && !audio.paused) {
+                audio.pause();
+                document.getElementById('playBtn').innerHTML = '<i class="fas fa-play"></i>';
                 return;
             }
             audio.src = url;
@@ -210,17 +211,13 @@
             document.getElementById('player').style.display = 'block';
             document.getElementById('trackTitle').innerText = name;
             document.getElementById('trackArtist').innerText = artist;
-            playBtn.innerHTML = '<i class="fas fa-pause"></i>';
+            document.getElementById('playBtn').innerHTML = '<i class="fas fa-pause"></i>';
         }
 
         function togglePlay() {
-            if(audio.paused) { 
-                audio.play(); 
-                playBtn.innerHTML = '<i class="fas fa-pause"></i>'; 
-            } else { 
-                audio.pause(); 
-                playBtn.innerHTML = '<i class="fas fa-play"></i>'; 
-            }
+            const btn = document.getElementById('playBtn');
+            if(audio.paused) { audio.play(); btn.innerHTML = '<i class="fas fa-pause"></i>'; }
+            else { audio.pause(); btn.innerHTML = '<i class="fas fa-play"></i>'; }
         }
 
         function fecharPagina(id) { document.getElementById(id).style.display = 'none'; }
@@ -230,12 +227,13 @@
             document.getElementById('progressBar').style.width = p + "%";
         };
 
-        // Ao terminar a música, volta o ícone para play
-        audio.onended = () => {
-            playBtn.innerHTML = '<i class="fas fa-play"></i>';
-        };
+        function copyFullCode() {
+            const code = document.documentElement.outerHTML;
+            navigator.clipboard.writeText(code).then(() => alert("Código copiado!"));
+        }
 
-        search();
+        // Iniciar com uma busca padrão
+        search('Lançamentos 2026');
     </script>
 </body>
 </html>
