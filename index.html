@@ -2,215 +2,285 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MusicFlow Pro | Benedito</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MusicFlow | Bibiu Galdino</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        /* CSS - DESIGN MODERNO E RESPONSIVO */
         :root {
             --primary: #1db954;
-            --bg-dark: #050505;
-            --glass: rgba(255, 255, 255, 0.1);
+            --bg: #000000;
+            --card-bg: rgba(255, 255, 255, 0.08);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, sans-serif; }
 
-        body { background: var(--bg-dark); color: white; overflow: hidden; height: 100vh; }
+        body { 
+            background: var(--bg); 
+            color: white; 
+            height: 100vh; 
+            overflow: hidden; 
+        }
 
-        /* FUNDO ANIMADO COM CORES E FOTOS EM LOOP */
-        .bg-container {
+        /* FUNDO ANIMADO COM CORES */
+        .bg-gradient {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -2; background: linear-gradient(45deg, #0f0c29, #302b63, #1db95422);
+            background: linear-gradient(125deg, #0f0c29, #302b63, #24243e, #1db95422);
             background-size: 400% 400%;
-            animation: gradientMove 15s ease infinite;
+            animation: moveBG 15s ease infinite;
+            z-index: -2;
         }
 
-        .bg-artists-loop {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -1; opacity: 0.15; pointer-events: none;
+        @keyframes moveBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
-        .artist-bg-img {
-            position: absolute; width: 300px; height: 300px; border-radius: 50%;
-            filter: blur(20px); animation: float 20s infinite linear;
+        /* LAYOUT PRINCIPAL */
+        .app {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            backdrop-filter: blur(20px);
         }
 
-        @keyframes gradientMove { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
-        @keyframes float { 
-            0% { transform: translate(-100%, -100%) rotate(0deg); }
-            100% { transform: translate(200%, 200%) rotate(360deg); }
+        header {
+            padding: 20px;
+            text-align: center;
         }
 
-        /* LAYOUT */
-        .app-container { display: grid; grid-template-columns: 240px 1fr; grid-template-rows: 1fr 110px; height: 100vh; backdrop-filter: blur(40px); }
-
-        .sidebar { background: rgba(0,0,0,0.7); padding: 25px; border-right: 1px solid var(--glass); }
-        .logo { font-size: 24px; font-weight: bold; color: var(--primary); margin-bottom: 40px; }
-
-        .main-content { overflow-y: auto; padding: 30px; padding-bottom: 150px; }
-        
-        .search-box {
-            background: var(--glass); display: flex; align-items: center;
-            padding: 15px 25px; border-radius: 40px; margin-bottom: 40px; border: 1px solid rgba(255,255,255,0.1);
+        .search-container {
+            background: rgba(255,255,255,0.1);
+            padding: 12px 20px;
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            margin-top: 15px;
         }
-        .search-box input { background: none; border: none; color: white; margin-left: 15px; width: 100%; outline: none; font-size: 16px; }
 
-        /* CARDS */
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 25px; }
+        .search-container input {
+            background: none; border: none; color: white; margin-left: 10px; width: 100%; outline: none;
+        }
+
+        /* LISTA DE ARTISTAS (ROLAGEM SUAVE) */
+        main {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px 20px 120px 20px;
+        }
+
+        .artist-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
         .card {
-            background: rgba(255, 255, 255, 0.05); padding: 20px; border-radius: 15px;
-            transition: 0.4s; cursor: pointer; text-align: center; border: 1px solid transparent;
+            background: var(--card-bg);
+            padding: 15px;
+            border-radius: 15px;
+            text-align: center;
+            transition: 0.3s;
+            border: 1px solid rgba(255,255,255,0.05);
         }
-        .card:hover { background: rgba(255, 255, 255, 0.1); transform: scale(1.05); border-color: var(--primary); }
-        .card img { width: 100%; aspect-ratio: 1; border-radius: 50%; object-fit: cover; margin-bottom: 15px; }
 
-        /* PLAYER */
-        .player {
-            grid-column: 1 / -1; background: rgba(10, 10, 10, 0.95);
-            display: flex; align-items: center; justify-content: space-between; padding: 0 30px;
-            border-top: 1px solid var(--glass);
+        .card img {
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
         }
-        .info { display: flex; align-items: center; gap: 15px; width: 300px; }
-        .info img { width: 60px; height: 60px; border-radius: 8px; border: 2px solid var(--primary); }
-        
-        .controls { flex: 1; max-width: 600px; text-align: center; }
-        .btns { display: flex; align-items: center; justify-content: center; gap: 30px; margin-bottom: 10px; }
-        .btns button { background: none; border: none; color: white; font-size: 20px; cursor: pointer; transition: 0.2s; }
-        .play-btn { background: white !important; color: black !important; width: 45px; height: 45px; border-radius: 50%; }
-        .play-btn:hover { transform: scale(1.1); }
 
-        .progress-bar { width: 100%; height: 5px; background: #333; border-radius: 5px; cursor: pointer; position: relative; }
-        .progress-fill { height: 100%; background: var(--primary); width: 0%; border-radius: 5px; }
-        .time { display: flex; justify-content: space-between; font-size: 12px; color: #aaa; margin-top: 5px; }
+        .card h3 { font-size: 14px; margin-bottom: 5px; }
+        .card p { font-size: 11px; color: #b3b3b3; }
+
+        /* PLAYER FIXO EMBAIXO */
+        footer {
+            position: fixed;
+            bottom: 0; width: 100%;
+            background: rgba(10, 10, 10, 0.95);
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding: 15px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .player-info { display: flex; align-items: center; gap: 12px; }
+        .player-info img { width: 45px; height: 45px; border-radius: 5px; }
+        .player-info b { font-size: 14px; display: block; }
+        .player-info span { font-size: 12px; color: #aaa; }
+
+        .player-controls {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .progress-container {
+            flex: 1;
+            height: 4px;
+            background: #333;
+            margin: 0 15px;
+            border-radius: 2px;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--primary);
+            width: 0%;
+            border-radius: 2px;
+        }
+
+        .play-circle {
+            background: white;
+            color: black;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        .timer { font-size: 10px; color: #888; font-family: monospace; }
     </style>
 </head>
 <body>
-    <div class="bg-container"></div>
-    <div class="bg-artists-loop" id="bg-loop"></div>
+    <div class="bg-gradient"></div>
 
-    <div class="app-container">
-        <aside class="sidebar">
-            <div class="logo"><i class="fas fa-play-circle"></i> MusicFlow</div>
-            <p style="font-size: 12px; color: #666;">Olá, Benedito!</p>
-        </aside>
-
-        <main class="main-content">
-            <div class="search-box">
+    <div class="app">
+        <header>
+            <h2 style="color: var(--primary);"><i class="fas fa-play-circle"></i> MusicFlow</h2>
+            <div class="search-container">
                 <i class="fas fa-search"></i>
-                <input type="text" id="busca" placeholder="Busque artistas ou músicas reais...">
+                <input type="text" id="searchInput" placeholder="O que vamos ouvir, Benedito?">
             </div>
-            <h2>Artistas em Destaque</h2>
-            <div class="grid" id="grid"></div>
+        </header>
+
+        <main>
+            <h4 style="margin-bottom: 15px;">Artistas Sugeridos</h4>
+            <div class="artist-grid" id="grid">
+                </div>
         </main>
 
-        <footer class="player">
-            <div class="info">
-                <img src="https://cdn-icons-png.flaticon.com/512/3844/3844724.png" id="p-img">
+        <footer>
+            <div class="player-info">
+                <img src="https://via.placeholder.com/50" id="p-img">
                 <div>
-                    <b id="p-nome">Selecione um artista</b><br>
-                    <small id="p-track" style="color: #aaa;">Pronto para tocar</small>
+                    <b id="p-nome">Selecione um artista</b>
+                    <span id="p-status">Aguardando...</span>
                 </div>
             </div>
-            <div class="controls">
-                <div class="btns">
-                    <button onclick="voltar()"><i class="fas fa-step-backward"></i></button>
-                    <button onclick="toggle()" class="play-btn" id="playBtn"><i class="fas fa-play"></i></button>
-                    <button onclick="proxima()"><i class="fas fa-step-forward"></i></button>
-                </div>
-                <div class="progress-bar" id="bar-container">
+            
+            <div class="player-controls">
+                <div class="timer" id="time-curr">00:00:00</div>
+                <div class="progress-container">
                     <div class="progress-fill" id="fill"></div>
                 </div>
-                <div class="time">
-                    <span id="curr-time">00:00:00</span>
-                    <span id="total-time">00:30:00</span>
+                <div class="play-circle" onclick="togglePlay()" id="btnPlay">
+                    <i class="fas fa-play"></i>
                 </div>
             </div>
-            <div style="width: 150px; text-align: right;"><i class="fas fa-volume-up"></i></div>
         </footer>
     </div>
 
-    <audio id="audio-player"></audio>
+    <audio id="playerCore"></audio>
 
     <script>
-        // DADOS REAIS DE EXEMPLO (Imagens e Sons Diretos)
-        const artistas = [
+        // JAVASCRIPT - LÓGICA CORRIGIDA
+        const database = [
             { 
-                nome: "Alok", 
+                id: 0, nome: "Alok", 
                 foto: "https://www.cnnbrasil.com.br/wp-content/uploads/sites/12/2023/08/alok-show-do-seculo.jpg", 
-                musica: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" 
+                mp3: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" 
             },
             { 
-                nome: "Luiz Gonzaga", 
-                foto: "https://m.extra.globo.com/incoming/24131557-0bc-434/w640h360-PROP/luiz-gonzaga.jpg", 
-                musica: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" 
+                id: 1, nome: "Luiz Gonzaga", 
+                foto: "https://upload.wikimedia.org/wikipedia/commons/e/e0/Luiz_Gonzaga_1950.jpg", 
+                mp3: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" 
             },
             { 
-                nome: "The Weeknd", 
+                id: 2, nome: "The Weeknd", 
                 foto: "https://p2.trrsf.com/image/fget/cf/1200/1200/middle/images.terra.com/2023/10/08/1313791090-the-weeknd.jpg", 
-                musica: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3" 
+                mp3: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3" 
+            },
+            {
+                id: 3, nome: "Zezé Di Camargo",
+                foto: "https://veja.abril.com.br/wp-content/uploads/2016/10/zeze-di-camargo-e-luciano-20120521-002-copy.jpg",
+                mp3: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3"
             }
         ];
 
         const grid = document.getElementById('grid');
-        const audio = document.getElementById('audio-player');
-        const bgLoop = document.getElementById('bg-loop');
+        const audio = document.getElementById('playerCore');
+        const btnPlay = document.getElementById('btnPlay');
 
-        // Criar artistas flutuando no fundo
-        artistas.forEach((a, index) => {
-            const img = document.createElement('img');
-            img.src = a.foto;
-            img.className = 'artist-bg-img';
-            img.style.left = (Math.random() * 80) + "%";
-            img.style.top = (Math.random() * 80) + "%";
-            img.style.animationDelay = (index * 5) + "s";
-            bgLoop.appendChild(img);
-        });
-
-        function carregar(filtro = "") {
+        function render(filtro = "") {
             grid.innerHTML = "";
-            artistas.filter(a => a.nome.toLowerCase().includes(filtro.toLowerCase())).forEach(a => {
+            const filtrados = database.filter(a => a.nome.toLowerCase().includes(filtro.toLowerCase()));
+            
+            filtrados.forEach(art => {
                 grid.innerHTML += `
-                    <div class="card" onclick="play('${a.nome}', '${a.foto}', '${a.musica}')">
-                        <img src="${a.foto}">
-                        <h3>${a.nome}</h3>
-                        <p style="font-size: 12px; color: #888;">Tocar Música</p>
+                    <div class="card" onclick="tocarMusica(${art.id})">
+                        <img src="${art.foto}">
+                        <h3>${art.nome}</h3>
+                        <p>Tocar agora</p>
                     </div>
                 `;
             });
         }
 
-        function play(nome, foto, link) {
-            document.getElementById('p-nome').innerText = nome;
-            document.getElementById('p-track').innerText = "Tocando agora...";
-            document.getElementById('p-img').src = foto;
-            audio.src = link;
-            audio.play();
-            document.getElementById('playBtn').innerHTML = '<i class="fas fa-pause"></i>';
+        function tocarMusica(id) {
+            const artista = database.find(a => a.id === id);
+            
+            // Atualiza Interface
+            document.getElementById('p-nome').innerText = artista.nome;
+            document.getElementById('p-status').innerText = "Tocando...";
+            document.getElementById('p-img').src = artista.foto;
+            
+            // Toca Áudio
+            audio.src = artista.mp3;
+            audio.play().catch(e => console.log("Clique no play para iniciar"));
+            btnPlay.innerHTML = '<i class="fas fa-pause"></i>';
         }
 
-        function toggle() {
-            if (audio.paused) {
-                audio.play();
-                document.getElementById('playBtn').innerHTML = '<i class="fas fa-pause"></i>';
-            } else {
-                audio.pause();
-                document.getElementById('playBtn').innerHTML = '<i class="fas fa-play"></i>';
+        function togglePlay() {
+            if(audio.src) {
+                if(audio.paused) {
+                    audio.play();
+                    btnPlay.innerHTML = '<i class="fas fa-pause"></i>';
+                } else {
+                    audio.pause();
+                    btnPlay.innerHTML = '<i class="fas fa-play"></i>';
+                }
             }
         }
 
-        // Atualizar Barra de Progresso e Milissegundos
+        // Monitor de tempo e barra
         audio.ontimeupdate = () => {
-            const pct = (audio.currentTime / audio.duration) * 100;
-            document.getElementById('fill').style.width = pct + "%";
+            const prog = (audio.currentTime / audio.duration) * 100;
+            document.getElementById('fill').style.width = prog + "%";
             
-            const cur = audio.currentTime;
-            const m = Math.floor(cur / 60).toString().padStart(2, '0');
-            const s = Math.floor(cur % 60).toString().padStart(2, '0');
-            const ms = Math.floor((cur % 1) * 100).toString().padStart(2, '0');
-            document.getElementById('curr-time').innerText = `${m}:${s}:${ms}`;
+            let cur = audio.currentTime;
+            let m = Math.floor(cur / 60).toString().padStart(2, '0');
+            let s = Math.floor(cur % 60).toString().padStart(2, '0');
+            let ms = Math.floor((cur % 1) * 100).toString().padStart(2, '0');
+            document.getElementById('time-curr').innerText = `${m}:${s}:${ms}`;
         };
 
-        carregar();
-        document.getElementById('busca').oninput = (e) => carregar(e.target.value);
+        // Busca
+        document.getElementById('searchInput').oninput = (e) => render(e.target.value);
+
+        // Inicializa
+        render();
     </script>
 </body>
 </html>
