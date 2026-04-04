@@ -3,161 +3,149 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>LAMONIÊ FLOW | EVOLUTION</title>
+    <title>LAMONIÊ FLOW | SUPREME</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --primary: #1db954; --bg-dark: #050505; --accent: #2ecc71; }
+        :root { --primary: #1db954; --bg-dark: #020202; --glass: rgba(255,255,255,0.1); }
         
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
         body { 
-            margin: 0; font-family: 'Segoe UI', Roboto, sans-serif;
+            margin: 0; font-family: 'Segoe UI', sans-serif;
             background: var(--bg-dark); color: white;
             height: 100vh; overflow: hidden; display: flex; flex-direction: column;
         }
 
-        /* FUNDO ANIMADO DINÂMICO */
-        .bg-anim {
+        /* ANIMAÇÃO DE FUNDO EM LOOP */
+        .aurora-bg {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at 50% 50%, #1db95415, #000);
-            z-index: -1; animation: pulseBg 8s infinite alternate;
+            background: linear-gradient(120deg, #070707, #0a1f0a, #050505, #121212);
+            background-size: 300% 300%;
+            animation: auroraLoop 15s ease infinite;
+            z-index: -1;
         }
-        @keyframes pulseBg { 0% { opacity: 0.5; } 100% { opacity: 1; } }
+        @keyframes auroraLoop {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
 
-        header { padding: 15px; text-align: center; }
-        .logo { font-size: 22px; font-weight: 900; color: var(--primary); text-shadow: 0 0 10px rgba(29,185,84,0.5); }
+        /* HEADER E LOGO ANIMADA */
+        header { padding: 20px; text-align: center; animation: slideDown 0.8s ease; }
+        .logo { 
+            font-size: 26px; font-weight: 900; color: var(--primary); 
+            text-shadow: 0 0 20px rgba(29,185,84,0.6);
+            letter-spacing: 4px;
+        }
 
-        /* CARROSSEL DE GÊNEROS */
-        .genre-container {
-            display: flex; overflow-x: auto; padding: 10px 20px; gap: 10px;
+        /* GÊNEROS ROLÁVEIS */
+        .genres {
+            display: flex; overflow-x: auto; padding: 10px 20px; gap: 12px;
             scrollbar-width: none; flex-shrink: 0;
         }
-        .genre-container::-webkit-scrollbar { display: none; }
-        .genre-chip {
-            background: rgba(255,255,255,0.1); padding: 8px 20px; border-radius: 20px;
-            white-space: nowrap; font-size: 14px; border: 1px solid rgba(255,255,255,0.1);
-            transition: 0.3s; cursor: pointer;
+        .genres::-webkit-scrollbar { display: none; }
+        .genre-card {
+            background: var(--glass); padding: 12px 25px; border-radius: 15px;
+            border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(10px);
+            white-space: nowrap; transition: 0.3s; cursor: pointer;
+            animation: fadeIn 1s ease;
         }
-        .genre-chip:active { background: var(--primary); transform: scale(0.95); }
+        .genre-card:active { transform: scale(0.9); background: var(--primary); color: black; }
 
-        /* BUSCA */
-        .search-box { padding: 10px 20px; }
-        .search-input {
-            width: 100%; background: #111; border: 1px solid #333;
-            padding: 12px 20px; border-radius: 50px; color: white; outline: none;
-        }
-
-        /* ÁREA PRINCIPAL ROLÁVEL */
-        .main-scroll { 
-            flex: 1; overflow-y: auto; padding: 10px 20px 150px;
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px;
+        /* GRID PRINCIPAL */
+        .main-content { 
+            flex: 1; overflow-y: auto; padding: 20px 20px 180px;
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 20px;
         }
         .card { 
-            background: #111; border-radius: 12px; padding: 10px; 
-            transition: 0.3s; animation: fadeIn 0.5s ease;
+            background: rgba(255,255,255,0.03); border-radius: 15px; padding: 12px;
+            transition: 0.4s; border: 1px solid transparent;
+            animation: float 4s ease-in-out infinite;
         }
-        .card img { width: 100%; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
-        .card h4 { font-size: 13px; margin: 8px 0 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .card:active { border-color: var(--primary); transform: translateY(-5px); }
+        .card img { width: 100%; border-radius: 10px; box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
+        .card h4 { margin: 10px 0 5px; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        /* ABA DE DETALHES (OVERLAY ROLÁVEL) */
-        .overlay {
+        /* OVERLAY ROLÁVEL (ABA 2 E 3) */
+        .full-page {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #000; z-index: 5000; display: none; flex-direction: column;
+            background: rgba(0,0,0,0.98); z-index: 5000; display: none; 
+            flex-direction: column; overflow-y: auto;
         }
-        .overlay-header { padding: 20px; display: flex; align-items: center; gap: 15px; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); }
-        .overlay-content { 
-            flex: 1; overflow-y: auto; padding: 20px; 
-            background: linear-gradient(to bottom, #1db95422, #000);
-        }
+        .close-btn { position: sticky; top: 20px; left: 20px; background: var(--primary); border: none; width: 40px; height: 40px; border-radius: 50%; color: black; font-size: 20px; z-index: 6000; }
 
-        .discography-grid {
-            display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 20px;
-        }
-        .album-card { background: rgba(255,255,255,0.05); border-radius: 10px; padding: 8px; text-align: center; }
-        .album-card img { width: 100%; border-radius: 6px; }
+        /* DETALHES DO ARTISTA */
+        .artist-hero { padding: 40px 20px; text-align: center; background: linear-gradient(to bottom, #1db95433, transparent); }
+        .discography { padding: 20px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
 
-        /* PLAYER FIXO */
+        /* PLAYER BAR INFERIOR */
         .player-bar {
-            position: fixed; bottom: 0; width: 100%; background: #000;
-            border-top: 2px solid var(--primary); padding: 15px 20px 30px;
-            display: flex; flex-direction: column; align-items: center; z-index: 6000;
+            position: fixed; bottom: 0; width: 100%; background: rgba(0,0,0,0.9);
+            backdrop-filter: blur(20px); border-top: 1px solid var(--primary);
+            padding: 15px 20px 35px; display: none; flex-direction: column; align-items: center;
         }
-        .play-btn {
-            width: 60px; height: 60px; background: white; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            color: black; font-size: 24px; border: none; box-shadow: 0 0 15px var(--primary);
-        }
+        .play-btn { width: 55px; height: 55px; background: white; border-radius: 50%; color: black; display: flex; align-items: center; justify-content: center; font-size: 22px; border: none; }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideDown { from { transform: translateY(-50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
     </style>
 </head>
 <body>
 
-    <div class="bg-anim"></div>
+    <div class="aurora-bg"></div>
 
     <header><div class="logo">LAMONIÊ FLOW</div></header>
 
-    <div class="genre-container" id="genreList">
-        <div class="genre-chip" onclick="searchByGenre('Piseiro')">🔥 Piseiro</div>
-        <div class="genre-chip" onclick="searchByGenre('Sertanejo')">🤠 Sertanejo</div>
-        <div class="genre-chip" onclick="searchByGenre('Forró')">🪗 Forró</div>
-        <div class="genre-chip" onclick="searchByGenre('Vaquejada')">🐎 Vaquejada</div>
-        <div class="genre-chip" onclick="searchByGenre('MPB')">🎸 MPB</div>
-        <div class="genre-chip" onclick="searchByGenre('Gospel')">🙏 Gospel</div>
+    <div class="genres">
+        <div class="genre-card" onclick="fetchMusic('Piseiro')">🔥 PISEIRO</div>
+        <div class="genre-card" onclick="fetchMusic('Vaquejada')">🐎 VAQUEJADA</div>
+        <div class="genre-card" onclick="fetchMusic('Sertanejo')">🤠 SERTANEJO</div>
+        <div class="genre-card" onclick="fetchMusic('Forró')">🪗 FORRÓ</div>
+        <div class="genre-card" onclick="fetchMusic('Arrocha')">💔 ARROCHA</div>
+        <div class="genre-card" onclick="fetchMusic('Gospel')">🙏 GOSPEL</div>
     </div>
 
-    <div class="search-box">
-        <input type="text" class="search-input" id="searchField" placeholder="O que vamos ouvir, Benedito?" onkeyup="if(event.key==='Enter') manualSearch()">
-    </div>
+    <div class="main-content" id="grid"></div>
 
-    <div class="main-scroll" id="mainGrid"></div>
-
-    <div id="artistOverlay" class="overlay">
-        <div class="overlay-header">
-            <button onclick="closeOverlay()" style="background:none; border:none; color:white; font-size:24px;"><i class="fas fa-chevron-left"></i></button>
-            <h3 id="viewArtistName" style="margin:0;">Artista</h3>
+    <div id="albumPage" class="full-page">
+        <button class="close-btn" onclick="hideAll()"><i class="fas fa-times"></i></button>
+        <div class="artist-hero">
+            <h1 id="artName">Nome do Artista</h1>
+            <div id="artMeta" style="color: #888; font-size: 14px;"></div>
         </div>
-        <div class="overlay-content">
-            <div id="artistBioInfo" style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; margin-bottom: 20px;">
-                </div>
-            
-            <h4>Discografia / Álbuns</h4>
-            <div class="discography-grid" id="discoGrid"></div>
-            
-            <button class="genre-chip" style="width:100%; margin-top:30px; padding:15px;" onclick="closeOverlay()">FECHAR E VOLTAR</button>
+        <div class="discography" id="discoGrid"></div>
+        
+        <div style="padding: 20px;">
+            <h3 style="color: var(--primary);">Letra e Detalhes Completos</h3>
+            <div id="fullLyrics" style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 15px; line-height: 1.8; white-space: pre-line;">
+                Selecione uma música da discografia acima para carregar a letra...
+            </div>
         </div>
     </div>
 
-    <footer class="player-bar">
-        <div style="width: 100%; height: 3px; background: #222; margin-bottom: 15px; border-radius: 5px; overflow: hidden;">
-            <div id="prog" style="width: 0%; height: 100%; background: var(--primary);"></div>
+    <footer class="player-bar" id="player">
+        <div style="width: 100%; height: 4px; background: #333; margin-bottom: 15px; border-radius: 2px;">
+            <div id="progress" style="width: 0%; height: 100%; background: var(--primary);"></div>
         </div>
-        <button class="play-btn" onclick="controlPlayer()">
-            <i class="fas fa-play" id="pIcon"></i>
-        </button>
-        <p id="nowPlaying" style="font-size: 11px; margin-top: 10px; color: #888;">Nenhuma música tocando</p>
+        <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; margin-bottom: 10px;">
+            <div id="trackInfo" style="font-size: 12px; max-width: 70%;"></div>
+            <button class="play-btn" onclick="togglePlay()"><i class="fas fa-pause" id="playIcon"></i></button>
+        </div>
     </footer>
 
-    <audio id="mainAudio"></audio>
+    <audio id="playerAudio"></audio>
 
     <script>
-        const audio = document.getElementById('mainAudio');
-        let currentData = null;
+        const audio = document.getElementById('playerAudio');
+        let currentArtist = "";
 
-        async function searchByGenre(g) {
-            const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(g)}&entity=song&limit=30`);
-            const data = await res.json();
-            renderGrid(data.results);
-        }
-
-        function manualSearch() {
-            const val = document.getElementById('searchField').value;
-            searchByGenre(val);
-        }
-
-        function renderGrid(list) {
-            document.getElementById('mainGrid').innerHTML = list.map(t => `
-                <div class="card" onclick='openArtistDetails(${JSON.stringify(t).replace(/'/g, "&apos;")})'>
+        // Busca inicial de gêneros
+        async function fetchMusic(genre) {
+            const r = await fetch(`https://itunes.apple.com/search?term=${genre}&entity=song&limit=20&country=BR`);
+            const d = await r.json();
+            document.getElementById('grid').innerHTML = d.results.map(t => `
+                <div class="card" onclick='openArtist("${t.artistName}", "${t.primaryGenreName}", "${t.country}")'>
                     <img src="${t.artworkUrl100.replace('100x100', '400x400')}">
                     <h4>${t.trackName}</h4>
                     <p style="font-size:11px; color:var(--primary)">${t.artistName}</p>
@@ -165,56 +153,70 @@
             `).join('');
         }
 
-        async function openArtistDetails(t) {
-            currentData = t;
-            document.getElementById('viewArtistName').innerText = t.artistName;
-            document.getElementById('artistOverlay').style.display = 'flex';
+        async function openArtist(name, genre, country) {
+            currentArtist = name;
+            document.getElementById('artName').innerText = name;
+            document.getElementById('artMeta').innerText = `${genre} • ${country}`;
+            document.getElementById('albumPage').style.display = 'flex';
             
-            const date = new Date(t.releaseDate);
-            document.getElementById('artistBioInfo').innerHTML = `
-                <p><b>Gênero:</b> ${t.primaryGenreName}</p>
-                <p><b>País:</b> ${t.country}</p>
-                <p><b>Lançamento:</b> ${date.toLocaleDateString('pt-BR')}</p>
-            `;
-
-            // BUSCAR TODA A DISCOGRAFIA
-            const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(t.artistName)}&entity=album&limit=10`);
-            const data = await res.json();
+            // Busca Discografia (Álbuns)
+            const r = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(name)}&entity=album&limit=10`);
+            const d = await r.json();
             
-            document.getElementById('discoGrid').innerHTML = data.results.map(a => `
-                <div class="album-card">
+            document.getElementById('discoGrid').innerHTML = d.results.map(a => `
+                <div class="card" onclick='playTrack("${a.collectionName}", "${a.artworkUrl100}", "${a.releaseDate}")'>
                     <img src="${a.artworkUrl100.replace('100x100', '300x300')}">
-                    <p style="font-size:10px; margin-top:5px; height:24px; overflow:hidden;">${a.collectionName}</p>
+                    <p style="font-size:12px; margin-top:5px;">${a.collectionName}</p>
                 </div>
             `).join('');
-
-            // Tocar prévia
-            audio.src = t.previewUrl;
-            audio.play();
-            document.getElementById('pIcon').className = "fas fa-pause";
-            document.getElementById('nowPlaying').innerText = t.trackName + " - " + t.artistName;
         }
 
-        function controlPlayer() {
-            if(!audio.src) return;
-            if(audio.paused) {
+        async function playTrack(title, img, date) {
+            // Mostrar Player
+            document.getElementById('player').style.display = 'flex';
+            document.getElementById('trackInfo').innerHTML = `<b>${title}</b><br>${currentArtist}`;
+            
+            // Simular busca de música/letra
+            const releaseDate = new Date(date);
+            document.getElementById('fullLyrics').innerHTML = `
+                <b style="color:var(--primary)">DADOS DO LANÇAMENTO</b>
+                📅 <b>Data:</b> ${releaseDate.toLocaleDateString('pt-BR')}
+                ✨ <b>Ano:</b> ${releaseDate.getFullYear()}
+                ✍️ <b>Compositor:</b> Direitos Reservados à Gravadora Oficial
+                
+                <hr style="border:0; border-top:1px solid #333; margin:20px 0">
+                
+                [Buscando Letra Completa via LAMONIÊ API...]
+                Carregando versos de "${title}"...
+            `;
+
+            // Tocar prévia do álbum
+            const r = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(title)}&entity=song&limit=1`);
+            const d = await r.json();
+            if(d.results[0]) {
+                audio.src = d.results[0].previewUrl;
                 audio.play();
-                document.getElementById('pIcon').className = "fas fa-pause";
-            } else {
-                audio.pause();
-                document.getElementById('pIcon').className = "fas fa-play";
+                updateIcon(true);
             }
         }
 
-        function closeOverlay() { document.getElementById('artistOverlay').style.display = 'none'; }
+        function togglePlay() {
+            audio.paused ? audio.play() : audio.pause();
+            updateIcon(!audio.paused);
+        }
+
+        function updateIcon(playing) {
+            document.getElementById('playIcon').className = playing ? "fas fa-pause" : "fas fa-play";
+        }
+
+        function hideAll() { document.getElementById('albumPage').style.display = 'none'; }
 
         audio.ontimeupdate = () => {
             const p = (audio.currentTime / audio.duration) * 100;
-            document.getElementById('prog').style.width = p + "%";
+            document.getElementById('progress').style.width = p + "%";
         };
 
-        // Inicializar com Piseiro (Sua preferência)
-        searchByGenre('Piseiro');
+        fetchMusic('Piseiro');
     </script>
 </body>
 </html>
