@@ -258,6 +258,17 @@
         };
 
         search();
-    </script>
+  const player = document.getElementById('audio-player');
+const btnPlayPause = document.getElementById('btn-play-pause');
+
+btnPlayPause.addEventListener('click', () => {
+    if (player.paused) {
+        player.play();
+        btnPlayPause.innerHTML = '<i class="fa fa-pause"></i>'; // Troca ícone para Pause
+    } else {
+        player.pause();
+        btnPlayPause.innerHTML = '<i class="fa fa-play"></i>'; // Troca ícone para Play
+    }
+});  </script>
 </body>
 </html>
