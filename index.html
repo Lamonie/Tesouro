@@ -3,16 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>LAMONIÊ FLOW | LED EDITION</title>
+    <title>LAMONIÊ FLOW | LED ARRASTÁVEL</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --primary: #1db954; --bg: #050505; --surface: #121212; }
         * { box-sizing: border-box; touch-action: manipulation; -webkit-user-select: none; margin: 0; padding: 0; }
-        body, html { width: 100%; height: 100%; background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; overflow-x: hidden; }
+        body, html { width: 100%; height: 100%; background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
         
+        /* Fundo Animado Neon (Aurora Jaíbaras) */
         .bg-animated { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(45deg, #050505, #0a2a0a, #050505, #1a0a2a); background-size: 400% 400%; animation: aurora 10s ease infinite; z-index: -2; }
         @keyframes aurora { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
+        /* Animação de LED RGB para as bordas */
         @keyframes led-loop {
             0% { border-color: #1db954; box-shadow: 0 0 10px #1db954; }
             33% { border-color: #00d2ff; box-shadow: 0 0 10px #00d2ff; }
@@ -36,33 +38,43 @@
         .search-box input { background: none; border: none; color: white; flex: 1; padding: 12px; outline: none; font-size: 16px; width: 100%; }
         .btn-start { background: var(--primary); border: none; color: #000; padding: 0 20px; border-radius: 50px; font-weight: 900; }
 
-        .main-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; padding: 0 20px 150px; width: 100%; }
+        /* Grade Principal com Fundo Preto */
+        .main-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; padding: 0 20px 150px; width: 100%; background: rgba(0,0,0,0.8); }
         .card { background: var(--surface); border-radius: 15px; padding: 10px; border: 2px solid transparent; animation: led-loop 6s linear infinite; overflow: hidden; }
         .card img { width: 100%; border-radius: 10px; aspect-ratio: 1/1; object-fit: cover; display: block; }
         .card h4 { margin: 10px 0 3px; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .card p { color: var(--primary); font-size: 11px; font-weight: bold; }
 
+        /* Página Cheia Dinâmica (Sem recarregar) */
         .full-page { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; display: none; flex-direction: column; overflow-y: auto; }
         .album-header { padding: 30px 20px; background: linear-gradient(180deg, rgba(29,185,84,0.4) 0%, #000 100%); text-align: center; border-bottom: 2px solid var(--primary); animation: led-loop 8s infinite; }
-
-        /* PLAYER FLUTUANTE ESTILO PIP */
-        .player { 
-            position: fixed; bottom: 10px; left: 10px; right: 10px; 
+        
+        /* --- NOVO MINI PLAYER ARRASTÁVEL (ESTILO image_6.png) --- */
+        .player-custom-pip { 
+            position: fixed; bottom: 80px; left: 10px; 
             background: rgba(18, 18, 18, 0.95); padding: 12px; 
             border-radius: 15px; border: 2px solid var(--primary); 
             z-index: 10001; display: none; backdrop-filter: blur(15px); 
             animation: led-loop 4s infinite alternate;
-            transition: all 0.4s ease;
+            transition: transform 0.1s linear, box-shadow 0.2s ease;
+            touch-action: none; /* Crucial para o arraste */
+            cursor: move;
         }
-        .player.minimized { height: 60px; overflow: hidden; bottom: 5px; }
-        .player-content { display: flex; align-items: center; justify-content: space-between; }
-        .track-info { display: flex; align-items: center; flex: 1; overflow: hidden; }
-        .mini-cover { width: 45px; height: 45px; border-radius: 8px; margin-right: 12px; border: 1px solid var(--primary); }
-        .text-scroll { overflow: hidden; white-space: nowrap; }
         
-        .controls { display: flex; align-items: center; gap: 15px; }
-        .btn-mini { background: none; border: none; color: white; font-size: 18px; cursor: pointer; }
-        .btn-play-pip { background: white; color: black; border: none; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        /* Borda Rosa Vibrante quando ativo (como na image_6.png) */
+        .player-custom-pip.active-border { animation: led-pink 1.5s infinite alternate; }
+        @keyframes led-pink {
+            0% { border-color: #ff00ff; box-shadow: 0 0 15px #ff00ff; }
+            100% { border-color: #ff00ff; box-shadow: 0 0 20px #ff00ff; }
+        }
+
+        .player-content-pip { display: flex; align-items: center; gap: 12px; width: 100%; }
+        .pip-cover { width: 45px; height: 45px; border-radius: 8px; border: 1px solid var(--primary); }
+        .pip-info { flex: 1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+        
+        .pip-controls { display: flex; align-items: center; gap: 10px; }
+        .btn-play-pip { background: white; color: black; border: none; width: 35px; height: 35px; border-radius: 50%; font-size: 16px; cursor: pointer; }
+        .btn-mini { background: none; border: none; color: #666; font-size: 18px; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -71,11 +83,11 @@
     <div id="homePage">
         <header style="padding: 20px;">
             <h1 style="color: var(--primary); font-size: 26px; text-shadow: 0 0 15px var(--primary); margin: 0;">LAMONIÊ FLOW</h1>
-            <p style="font-size: 10px; letter-spacing: 1px; animation: text-color-loop 5s infinite; font-weight: bold; text-transform: uppercase;">SÓ HITS</p>
+            <p style="font-size: 10px; letter-spacing: 1px; animation: text-color-loop 5s infinite; font-weight: bold; text-transform: uppercase;">STREAMING PROFESSIONAL EXPERIENCE</p>
         </header>
 
         <div class="categories-nav">
-            <button class="cat-btn active">Destaques</button>
+            <button class="cat-btn active">Lançamentos</button>
             <button class="cat-btn" onclick="search('Vaquejada')">Vaquejada</button>
             <button class="cat-btn" onclick="search('Piseiro')">Piseiro</button>
             <button class="cat-btn" onclick="search('Sertanejo')">Sertanejo</button>
@@ -97,18 +109,16 @@
         <div id="albumDetailContent"></div>
     </div>
 
-    <footer class="player" id="player">
-        <div class="player-content">
-            <div class="track-info">
-                <img id="pipCover" src="" class="mini-cover">
-                <div class="text-scroll">
-                    <div id="trackTitle" style="font-weight: bold; font-size: 13px;">Música</div>
-                    <div id="trackArtist" style="font-size: 10px; color: var(--primary);">Artista</div>
-                </div>
+    <footer class="player-custom-pip" id="customPipPlayer">
+        <div class="player-content-pip">
+            <img id="pipCoverImg" src="" class="pip-cover">
+            <div class="pip-info">
+                <div id="pipTrackTitle" style="font-weight: bold; font-size: 13px;">Música</div>
+                <div id="pipTrackArtist" style="font-size: 10px; color: var(--primary);">Artista</div>
             </div>
-            <div class="controls">
-                <button onclick="togglePlay()" id="playBtn" class="btn-play-pip"><i class="fas fa-pause"></i></button>
-                <button onclick="toggleMinimize()" class="btn-mini"><i id="minIcon" class="fas fa-chevron-down"></i></button>
+            <div class="pip-controls">
+                <button onclick="togglePlay()" id="pipPlayBtn" class="btn-play-pip"><i class="fas fa-pause"></i></button>
+                <button onclick="fecharPip()" class="btn-mini"><i class="fas fa-times"></i></button>
             </div>
         </div>
     </footer>
@@ -119,10 +129,11 @@
         const audio = document.getElementById('audioMain');
         const grid = document.getElementById('grid');
 
+        // Álbuns baseados nas imagens que você curte
         const albunsIniciais = [
             "João Gomes", "Nadson O Ferinha", "Tarcísio do Acordeon", "Henrique e Juliano", 
-            "MC Ryan SP", "Gusttavo Lima", "Ana Castela", "Zé Neto e Cristiano",
-            "Iguinho e Lulinha", "Wesley Safadão", "Nattan", "Mari Fernandez"
+            "Wesley Safadão", "Nattan", "Gusttavo Lima Embaixador", "Ana Castela", 
+            "Zé Neto e Cristiano", "Iguinho e Lulinha", "Xand Avião Mix"
         ];
 
         async function carregarHome() {
@@ -160,13 +171,13 @@
                         <h2 style="margin-top:15px; font-size:18px;">${album.collectionName}</h2>
                         <p style="color:var(--primary);">${album.artistName}</p>
                     </div>
-                    <div style="padding: 10px 0 150px;">
+                    <div style="padding: 10px 0 180px;">
                         ${tracks.map((t, i) => `
                             <div style="display:flex; align-items:center; padding:15px 20px; border-bottom:1px solid #111;" 
                                  onclick="tocarTrack('${t.trackName.replace(/'/g, "\\'")}', '${t.artistName.replace(/'/g, "\\'")}', '${t.previewUrl}', '${album.artworkUrl100}')">
                                 <span style="color:var(--primary); width:30px;">${i+1}</span>
                                 <div style="flex:1;">${t.trackName}</div>
-                                <i class="fas fa-play-circle" style="color:var(--primary);"></i>
+                                <i class="fas fa-play-circle" style="color:var(--primary); font-size:18px;"></i>
                             </div>
                         `).join('')}
                     </div>
@@ -174,47 +185,111 @@
             } catch (e) {}
         }
 
+        // Ativa o MiniPlayer Customizado ao clicar na música
         function tocarTrack(name, artist, url, cover) {
             audio.src = url; 
             audio.play();
-            const player = document.getElementById('player');
+            const player = document.getElementById('customPipPlayer');
             player.style.display = 'block';
-            player.classList.remove('minimized');
+            player.classList.add('active-border'); // Borda rosa ao iniciar
             
-            document.getElementById('trackTitle').innerText = name;
-            document.getElementById('trackArtist').innerText = artist;
-            document.getElementById('pipCover').src = cover;
-            document.getElementById('playBtn').innerHTML = '<i class="fas fa-pause"></i>';
-            document.getElementById('minIcon').className = 'fas fa-chevron-down';
+            document.getElementById('pipTrackTitle').innerText = name;
+            document.getElementById('pipTrackArtist').innerText = artist;
+            document.getElementById('pipCoverImg').src = cover;
+            document.getElementById('pipPlayBtn').innerHTML = '<i class="fas fa-pause"></i>';
+            
+            // Remove a borda rosa após 2 segundos
+            setTimeout(() => { player.classList.remove('active-border'); }, 2000);
         }
 
         function togglePlay() {
-            if(audio.paused) { audio.play(); document.getElementById('playBtn').innerHTML = '<i class="fas fa-pause"></i>'; }
-            else { audio.pause(); document.getElementById('playBtn').innerHTML = '<i class="fas fa-play"></i>'; }
+            const btn = document.getElementById('pipPlayBtn');
+            if(audio.paused) { audio.play(); btn.innerHTML = '<i class="fas fa-pause"></i>'; }
+            else { audio.pause(); btn.innerHTML = '<i class="fas fa-play"></i>'; }
         }
 
-        function toggleMinimize() {
-            const p = document.getElementById('player');
-            const icon = document.getElementById('minIcon');
-            p.classList.toggle('minimized');
-            icon.className = p.classList.contains('minimized') ? 'fas fa-chevron-up' : 'fas fa-chevron-down';
-        }
-
+        function fecharPip() { document.getElementById('customPipPlayer').style.display = 'none'; audio.pause(); }
         function fecharPagina(id) { document.getElementById(id).style.display = 'none'; }
-        
+
+        // --- SISTEMA DE ARRASTE DO MINI PLAYER (TOQUE DO DEDO) ---
+        const dragElement = document.getElementById('customPipPlayer');
+        let isDragging = false;
+        let startX, startY;
+        let lastX = dragElement.offsetLeft, lastY = dragElement.offsetTop;
+
+        dragElement.addEventListener('touchstart', dragStart);
+        document.addEventListener('touchmove', drag, { passive: false });
+        document.addEventListener('touchend', dragEnd);
+
+        function dragStart(e) {
+            if (e.target.closest('.pip-controls')) return; // Não arrasta pelos botões
+            isDragging = true;
+            startX = e.touches[0].clientX - dragElement.offsetLeft;
+            startY = e.touches[0].clientY - dragElement.offsetTop;
+            
+            // Ativa borda neon rosa ao tocar
+            dragElement.classList.add('active-border');
+            
+            if (e.cancelable) e.preventDefault(); // Impede rolagem da página atrás
+        }
+
+        function drag(e) {
+            if (!isDragging) return;
+            if (e.cancelable) e.preventDefault();
+
+            let x = e.touches[0].clientX - startX;
+            let y = e.touches[0].clientY - startY;
+
+            // Limites da tela (Jaíbaras Safe Zone)
+            const margin = 10;
+            const minX = margin;
+            const minY = margin;
+            const maxX = window.innerWidth - dragElement.offsetWidth - margin;
+            const maxY = window.innerHeight - dragElement.offsetHeight - margin;
+
+            if (x < minX) x = minX; if (y < minY) y = minY;
+            if (x > maxX) x = maxX; if (y > maxY) y = maxY;
+
+            // Aplica o movimento usando Translate para suavidade
+            dragElement.style.transform = `translate(${x - dragElement.offsetLeft}px, ${y - dragElement.offsetTop}px)`;
+            lastX = x; lastY = y;
+        }
+
+        function dragEnd() {
+            if (!isDragging) return;
+            isDragging = false;
+            
+            // Transforma o translate em offset fixo ao soltar (suaviza o final)
+            const curTranslate = dragElement.style.transform.match(/translate\((.+)px,\s*(.+)px\)/);
+            if (curTranslate) {
+                const transX = parseFloat(curTranslate[1]);
+                const transY = parseFloat(curTranslate[2]);
+                dragElement.style.left = `${dragElement.offsetLeft + transX}px`;
+                dragElement.style.top = `${dragElement.offsetTop + transY}px`;
+                dragElement.style.transform = ''; // Limpa o translate
+                dragElement.style.bottom = 'auto'; // Impede conflito com bottom fixo inicial
+            }
+            
+            // Remove borda rosa ao soltar
+            dragElement.classList.remove('active-border');
+        }
+
+        // Função de busca simples
         async function search(q = "") {
             const term = q || document.getElementById('searchInput').value;
             if(!term) return;
             grid.innerHTML = "<p style='padding:20px; color:var(--primary);'>Buscando hits...</p>";
-            const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(term)}&entity=album&limit=20&country=BR`);
-            const data = await res.json();
-            grid.innerHTML = data.results.map(t => `
-                <div class="card" onclick="abrirAlbum('${t.collectionId}')">
-                    <img src="${t.artworkUrl100.replace('100x100', '400x400')}">
-                    <h4>${t.collectionName}</h4>
-                    <p>${t.artistName}</p>
-                </div>
-            `).join('');
+            try {
+                const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(term)}&entity=album&limit=20&country=BR`);
+                const data = await res.json();
+                grid.innerHTML = data.results.map(t => `
+                    <div class="card" onclick="abrirAlbum('${t.collectionId}')">
+                        <img src="${t.artworkUrl100.replace('100x100', '400x400')}">
+                        <h4>${t.collectionName}</h4>
+                        <p>${t.artistName}</p>
+                    </div>
+                `).join('');
+            } catch (e) {}
         }
 
         carregarHome();
