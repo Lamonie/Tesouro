@@ -3,61 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>LAMONIÊ FLOW | MINI YOUTUBE STYLE</title>
+    <title>LAMONIÊ FLOW | LED EDITION</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --primary: #1db954; --bg: #050505; --surface: #121212; }
-        * { box-sizing: border-box; touch-action: none; -webkit-user-select: none; margin: 0; padding: 0; }
-        body, html { width: 100%; height: 100%; background: var(--bg); color: white; font-family: sans-serif; overflow-x: hidden; }
+        * { box-sizing: border-box; touch-action: pan-y; -webkit-user-select: none; margin: 0; padding: 0; }
+        body, html { width: 100%; height: 100%; background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; overflow-x: hidden; }
         
-        .bg-animated { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(45deg, #050505, #0a2a0a); z-index: -2; }
+        /* Seu Layout Original Neon */
+        .bg-animated { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(45deg, #050505, #0a2a0a, #050505, #1a0a2a); background-size: 400% 400%; animation: aurora 10s ease infinite; z-index: -2; }
+        @keyframes aurora { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
-        /* Estilo dos Cards da Home */
-        .main-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; padding: 20px; padding-bottom: 150px; }
-        .card { background: var(--surface); border-radius: 12px; padding: 10px; border: 1px solid #222; }
-        .card img { width: 100%; border-radius: 8px; aspect-ratio: 1/1; object-fit: cover; }
+        .categories-nav { display: flex; overflow-x: auto; padding: 15px 20px; gap: 10px; scrollbar-width: none; }
+        .cat-btn { background: rgba(255,255,255,0.05); border: 2px solid var(--primary); color: white; padding: 10px 18px; border-radius: 50px; white-space: nowrap; font-size: 13px; font-weight: bold; }
 
-        /* --- MINI PLAYER ESTILO YOUTUBE (IGUAL À IMAGEM) --- */
+        .main-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; padding: 0 20px 150px; }
+        .card { background: var(--surface); border-radius: 15px; padding: 10px; border: 1px solid #222; }
+        .card img { width: 100%; border-radius: 10px; aspect-ratio: 1/1; object-fit: cover; }
+
+        /* --- MINI PLAYER ESTILO YOUTUBE (O QUE VOCÊ PEDIU) --- */
         #customPipPlayer { 
-            position: fixed; 
-            bottom: 100px; 
-            left: 10px;
-            width: 160px; /* Tamanho compacto retangular */
-            height: 90px;
-            background: #181818; 
-            border-radius: 8px; 
-            border: 1px solid rgba(255,255,255,0.1);
-            z-index: 10001; 
-            display: none; 
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), height 0.3s cubic-bezier(0.4, 0, 0.2, 1), border-radius 0.3s ease, left 0.3s ease, top 0.3s ease;
+            position: fixed; bottom: 100px; left: 10px; 
+            width: 170px; height: 95px; 
+            background: #181818; border-radius: 12px; 
+            border: 1px solid rgba(255,255,255,0.2);
+            z-index: 10001; display: none; overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            touch-action: none; /* Permite o arraste 360 */
         }
 
-        /* Layout interno do Miniplayer */
-        .pip-container { width: 100%; height: 100%; position: relative; display: flex; flex-direction: column; }
-        .pip-video-area { flex: 1; background: #000; display: flex; align-items: center; justify-content: center; position: relative; }
-        .pip-video-area img { width: 100%; height: 100%; object-fit: cover; opacity: 0.6; }
+        .pip-video-area { width: 100%; height: 100%; position: relative; background: #000; }
+        .pip-video-area img { width: 100%; height: 100%; object-fit: cover; opacity: 0.7; }
         
-        /* Botões de Play e X (Marcados em verde na sua imagem) */
-        .pip-btn-play { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-size: 24px; z-index: 2; }
-        .pip-btn-close { position: absolute; top: 5px; right: 5px; color: white; font-size: 18px; background: rgba(0,0,0,0.5); width: 25px; height: 25px; border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 2; }
+        /* Botões Play e X exatamente como na sua imagem */
+        .pip-play-btn { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-size: 28px; text-shadow: 0 0 10px rgba(0,0,0,1); }
+        .pip-close-btn { position: absolute; top: 8px; right: 8px; color: white; font-size: 20px; background: rgba(0,0,0,0.6); width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
 
-        .pip-info { background: #181818; padding: 5px 8px; font-size: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-        /* --- MODO MINIMIZADO (O BOTÃO QUE VOCÊ MARCOU) --- */
+        /* Estilo para quando ele minimiza na direita */
         #customPipPlayer.minimized { 
-            width: 50px; 
-            height: 50px; 
-            border-radius: 50%; 
-            left: calc(100% - 60px) !important; 
-            border: 2px solid var(--primary);
+            width: 55px; height: 55px; border-radius: 50%; 
+            left: calc(100% - 65px) !important; border: 2px solid var(--primary);
         }
-        #customPipPlayer.minimized .pip-container { display: none; }
-        #customPipPlayer.minimized .mini-icon { display: flex; }
+        #customPipPlayer.minimized .pip-video-area { display: none; }
+        #customPipPlayer.minimized .mini-trigger { display: flex; width: 100%; height: 100%; align-items: center; justify-content: center; color: var(--primary); font-size: 22px; }
 
-        .mini-icon { display: none; width: 100%; height: 100%; align-items: center; justify-content: center; font-size: 20px; color: var(--primary); }
-
+        .mini-trigger { display: none; }
         .full-page { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; display: none; flex-direction: column; }
     </style>
 </head>
@@ -65,51 +55,60 @@
     <div class="bg-animated"></div>
 
     <div id="homePage">
-        <header style="padding: 20px;"><h1 style="color:var(--primary)">LAMONIÊ FLOW</h1></header>
-        <div class="main-grid" id="grid"></div>
+        <header style="padding: 20px;">
+            <h1 style="color: var(--primary); font-size: 26px;">LAMONIÊ FLOW</h1>
+            <p style="font-size: 10px; color: #888;">STREAMING PROFESSIONAL EXPERIENCE</p>
+        </header>
+
+        <div class="categories-nav">
+            <button class="cat-btn">Vaquejada</button>
+            <button class="cat-btn">Piseiro</button>
+            <button class="cat-btn">Sertanejo</button>
+        </div>
+
+        <div class="main-grid" id="grid">
+            </div>
     </div>
 
     <div id="albumPage" class="full-page">
-        <button style="margin:20px; padding:10px; background:var(--primary); border:none; border-radius:5px;" onclick="document.getElementById('albumPage').style.display='none'">VOLTAR</button>
+        <button style="margin:20px; padding:12px; background:#222; color:white; border:1px solid var(--primary); border-radius:50px;" onclick="document.getElementById('albumPage').style.display='none'">🔙 VOLTAR</button>
         <div id="albumDetailContent"></div>
     </div>
 
-    <div id="customPipPlayer" onclick="expandirPlayer()">
-        <div class="pip-container">
-            <div class="pip-video-area">
-                <img id="pipCover" src="">
-                <div class="pip-btn-play" onclick="event.stopPropagation(); togglePlay();">
-                    <i id="pipPlayIcon" class="fas fa-pause"></i>
-                </div>
-                <div class="pip-btn-close" onclick="event.stopPropagation(); fecharPip();">
-                    <i class="fas fa-times"></i>
-                </div>
+    <div id="customPipPlayer" onclick="restaurarPlayer()">
+        <div class="pip-video-area" id="pipMainContent">
+            <img id="pipCover" src="">
+            <div class="pip-play-btn" onclick="event.stopPropagation(); alternarPlay();">
+                <i id="pipIcon" class="fas fa-pause"></i>
             </div>
-            <div class="pip-info" id="pipTrackTitle">Música</div>
+            <div class="pip-close-btn" onclick="event.stopPropagation(); fecharPlayer();">
+                <i class="fas fa-times"></i>
+            </div>
         </div>
-        <div class="mini-icon"><i class="fas fa-play"></i></div>
+        <div class="mini-trigger"><i class="fas fa-music"></i></div>
     </div>
 
-    <audio id="audioMain"></audio>
+    <audio id="meuAudio"></audio>
 
     <script>
-        const audio = document.getElementById('audioMain');
+        const audio = document.getElementById('meuAudio');
         const player = document.getElementById('customPipPlayer');
 
-        // Carregar alguns álbuns para teste
-        async function carregarHome() {
-            const termos = ["Wesley Safadão", "Nattanzinho", "Mari Fernandez"];
-            for (const t of termos) {
-                const res = await fetch(`https://itunes.apple.com/search?term=${t}&entity=album&limit=2`);
+        // Carregamento da Home (Jaíbaras Style)
+        async function iniciarApp() {
+            const artistas = ["Wesley Safadão", "Nattan", "Mari Fernandez", "Henrique e Juliano"];
+            const grid = document.getElementById('grid');
+            for (const nome of artistas) {
+                const res = await fetch(`https://itunes.apple.com/search?term=${nome}&entity=album&limit=1`);
                 const data = await res.json();
-                data.results.forEach(alb => {
-                    document.getElementById('grid').innerHTML += `
+                if(data.results[0]) {
+                    const alb = data.results[0];
+                    grid.innerHTML += `
                         <div class="card" onclick="abrirAlbum('${alb.collectionId}')">
                             <img src="${alb.artworkUrl100.replace('100x100', '400x400')}">
-                            <p style="margin-top:5px; font-size:12px;">${alb.collectionName}</p>
-                        </div>
-                    `;
-                });
+                            <h4 style="margin-top:10px; font-size:13px;">${alb.collectionName}</h4>
+                        </div>`;
+                }
             }
         }
 
@@ -117,75 +116,69 @@
             document.getElementById('albumPage').style.display = 'flex';
             const res = await fetch(`https://itunes.apple.com/lookup?id=${id}&entity=song`);
             const data = await res.json();
-            const tracks = data.results.slice(1);
-            document.getElementById('albumDetailContent').innerHTML = tracks.map(t => `
-                <div style="padding:15px; border-bottom:1px solid #222;" onclick="tocar('${t.trackName}', '${t.previewUrl}', '${data.results[0].artworkUrl100}')">
-                    ${t.trackName}
+            const musicas = data.results.slice(1);
+            document.getElementById('albumDetailContent').innerHTML = musicas.map(m => `
+                <div style="padding:15px 20px; border-bottom:1px solid #111;" onclick="tocarMusica('${m.trackName}', '${m.previewUrl}', '${data.results[0].artworkUrl100}')">
+                    ${m.trackName}
                 </div>
             `).join('');
         }
 
-        function tocar(nome, url, capa) {
+        function tocarMusica(nome, url, capa) {
             audio.src = url; audio.play();
             player.style.display = 'block';
             player.classList.remove('minimized');
-            document.getElementById('pipTrackTitle').innerText = nome;
             document.getElementById('pipCover').src = capa;
-            document.getElementById('pipPlayIcon').className = 'fas fa-pause';
+            document.getElementById('pipIcon').className = 'fas fa-pause';
         }
 
-        function togglePlay() {
-            if(audio.paused) { audio.play(); document.getElementById('pipPlayIcon').className = 'fas fa-pause'; }
-            else { audio.pause(); document.getElementById('pipPlayIcon').className = 'fas fa-play'; }
+        function alternarPlay() {
+            if(audio.paused) { audio.play(); document.getElementById('pipIcon').className = 'fas fa-pause'; }
+            else { audio.pause(); document.getElementById('pipIcon').className = 'fas fa-play'; }
         }
 
-        function fecharPip() { player.style.display = 'none'; audio.pause(); }
-        
-        function expandirPlayer() {
+        function fecharPlayer() { player.style.display = 'none'; audio.pause(); }
+
+        function restaurarPlayer() {
             if(player.classList.contains('minimized')) {
                 player.classList.remove('minimized');
                 player.style.left = '10px';
-                player.style.top = 'auto';
                 player.style.bottom = '100px';
+                player.style.top = 'auto';
             }
         }
 
-        // --- LÓGICA DE ARRASTE 360º E MINIMIZAR NA BORDA ---
-        let isDragging = false;
-        let startX, startY;
+        // --- ARRASTE 360º E MINIMIZAR NA DIREITA ---
+        let arrastando = false;
+        let offsetX, offsetY;
 
         player.addEventListener('touchstart', (e) => {
             if(player.classList.contains('minimized')) return;
-            isDragging = true;
-            startX = e.touches[0].clientX - player.offsetLeft;
-            startY = e.touches[0].clientY - player.offsetTop;
+            arrastando = true;
+            offsetX = e.touches[0].clientX - player.offsetLeft;
+            offsetY = e.touches[0].clientY - player.offsetTop;
             player.style.transition = 'none';
         });
 
         document.addEventListener('touchmove', (e) => {
-            if (!isDragging) return;
-            let x = e.touches[0].clientX - startX;
-            let y = e.touches[0].clientY - startY;
-
-            // Movimento livre por toda a tela
-            player.style.left = x + 'px';
-            player.style.top = y + 'px';
+            if (!arrastando) return;
+            player.style.left = (e.touches[0].clientX - offsetX) + 'px';
+            player.style.top = (e.touches[0].clientY - offsetY) + 'px';
             player.style.bottom = 'auto';
         });
 
-        document.addEventListener('touchend', (e) => {
-            if (!isDragging) return;
-            isDragging = false;
-            player.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
-
-            // Se soltar perto da borda direita, ele minimiza igual ao ícone do YouTube
-            const threshold = window.innerWidth - 80;
-            if (player.offsetLeft > threshold) {
+        document.addEventListener('touchend', () => {
+            if (!arrastando) return;
+            arrastando = false;
+            player.style.transition = 'all 0.3s ease';
+            
+            // Se soltar na borda direita (estilo YouTube), ele encolhe
+            if (player.offsetLeft > (window.innerWidth - 100)) {
                 player.classList.add('minimized');
             }
         });
 
-        carregarHome();
+        iniciarApp();
     </script>
 </body>
 </html>
