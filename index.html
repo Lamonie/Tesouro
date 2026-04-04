@@ -3,176 +3,154 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
-    <title>LAMONIÊ FLOW | GLOBAL LED</title>
+    <title>LAMONIÊ FLOW | PRO EDITION</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { 
-            --primary: #1db954; 
-            --bg: #050505; 
-            --surface: #121212;
+            --primary: #00ff88; 
+            --accent: #60efff;
+            --surface: rgba(255, 255, 255, 0.1);
         }
 
-        /* BLOQUEIO DE ZOOM E PINÇA EM TODO O SITE */
+        /* TRAVA DE PINÇA EM TODO O SITE */
         * { 
             box-sizing: border-box; 
-            touch-action: pan-x pan-y; 
             -webkit-user-select: none; 
             -webkit-touch-callout: none;
-            -webkit-text-size-adjust: none;
+            touch-action: none; /* Impede qualquer movimento não programado */
         }
 
         body, html { 
             margin: 0; padding: 0; width: 100%; height: 100%; 
-            background: var(--bg); color: white; 
-            font-family: 'Segoe UI', sans-serif; 
+            font-family: 'Inter', 'Segoe UI', sans-serif; 
             overflow: hidden;
-            /* Trava final contra pinça */
-            touch-action: none; 
+            background: #000;
         }
 
-        /* Permite scroll apenas onde necessário */
-        #homePage, .full-page, .main-grid, .categories-nav {
-            touch-action: pan-y;
-        }
-        .categories-nav { touch-action: pan-x; }
-
-        /* FUNDO ANIMADO */
-        .bg-animated { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: linear-gradient(45deg, #050505, #0a2a0a, #050505, #1a0a2a); 
-            background-size: 400% 400%; 
-            animation: aurora 10s ease infinite; 
-            z-index: -2; 
-        }
-        @keyframes aurora { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-
-        /* ANIMAÇÃO LED RGB */
-        @keyframes led-loop {
-            0% { border-color: #1db954; box-shadow: 0 0 8px #1db954; }
-            33% { border-color: #00d2ff; box-shadow: 0 0 8px #00d2ff; }
-            66% { border-color: #ff00ff; box-shadow: 0 0 8px #ff00ff; }
-            100% { border-color: #1db954; box-shadow: 0 0 8px #1db954; }
+        /* FUNDO DEGRADÊ INTUITIVO (GRID DE FESTA/PALCO) */
+        .stage-bg {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            z-index: -2;
         }
 
-        /* BARRA DE GÊNEROS MUNDIAIS */
-        .categories-nav { display: flex; overflow-x: auto; padding: 15px 20px; gap: 12px; scrollbar-width: none; }
+        .stage-lights {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(0, 255, 136, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(96, 239, 255, 0.15) 0%, transparent 40%);
+            animation: pulse-light 8s ease-in-out infinite alternate;
+            z-index: -1;
+        }
+
+        @keyframes pulse-light {
+            0% { opacity: 0.5; transform: scale(1); }
+            100% { opacity: 1; transform: scale(1.2); }
+        }
+
+        /* BARRA DE GÊNEROS (SOMENTE TEXTO) */
+        .categories-nav { 
+            display: flex; overflow-x: auto; padding: 15px 20px; gap: 10px; 
+            scrollbar-width: none; touch-action: pan-x; 
+        }
         .categories-nav::-webkit-scrollbar { display: none; }
         
         .cat-btn { 
-            background: rgba(255,255,255,0.05); 
-            border: 2px solid transparent; 
-            color: white; padding: 10px 22px; 
-            border-radius: 50px; white-space: nowrap; 
-            font-size: 14px; font-weight: bold; 
-            animation: led-loop 5s linear infinite;
+            background: var(--surface); 
+            border: 1px solid rgba(255,255,255,0.1); 
+            color: #fff; padding: 8px 20px; 
+            border-radius: 4px; white-space: nowrap; 
+            font-size: 13px; font-weight: 600; text-transform: uppercase;
+            letter-spacing: 1px; transition: 0.3s;
         }
-        .cat-btn.active { background: var(--primary); color: black; transform: scale(1.05); }
+        .cat-btn.active { 
+            background: var(--primary); color: #000; border-color: var(--primary); 
+            box-shadow: 0 0 15px var(--primary);
+        }
 
-        /* BUSCA */
+        /* BUSCA PRO */
         .search-box { 
-            display: flex; background: rgba(0,0,0,0.6); 
-            border-radius: 50px; margin: 0 20px 20px; padding: 5px; 
-            border: 2px solid var(--primary);
-            animation: led-loop 4s reverse infinite;
+            display: flex; background: rgba(255,255,255,0.05); 
+            border-radius: 8px; margin: 0 20px 20px; padding: 5px; 
+            border: 1px solid rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
         }
-        .search-box input { background: none; border: none; color: white; flex: 1; padding: 12px; outline: none; font-size: 16px; }
-        .btn-start { background: var(--primary); border: none; color: #000; padding: 0 25px; border-radius: 50px; font-weight: 900; }
+        .search-box input { background: none; border: none; color: white; flex: 1; padding: 12px; outline: none; font-size: 15px; }
+        .btn-start { background: var(--primary); border: none; color: #000; padding: 0 20px; border-radius: 4px; font-weight: bold; }
 
-        /* GRID */
-        .main-grid { height: calc(100vh - 260px); overflow-y: auto; display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; padding: 10px 20px 150px; }
+        /* GRID DE ÁLBUNS */
+        .main-grid { 
+            height: calc(100vh - 260px); overflow-y: auto; 
+            display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; 
+            padding: 10px 20px 150px; touch-action: pan-y;
+        }
         
         .card { 
-            background: var(--surface); 
-            border-radius: 18px; padding: 10px; 
-            border: 2px solid transparent;
-            animation: led-loop 6s linear infinite;
+            background: rgba(0,0,0,0.4); border-radius: 12px; padding: 10px; 
+            border: 1px solid rgba(255,255,255,0.1); transition: 0.3s;
         }
-        .card img { width: 100%; border-radius: 12px; aspect-ratio: 1/1; object-fit: cover; }
+        .card img { width: 100%; border-radius: 8px; aspect-ratio: 1/1; object-fit: cover; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+        .card h4 { margin: 10px 0 2px; font-size: 13px; color: #fff; }
 
-        /* PLAYER */
+        /* PLAYER PRO */
         .player { 
             position: fixed; bottom: 0; width: 100%; 
-            background: rgba(0,0,0,0.95); padding: 15px 20px 35px; 
-            border-top: 3px solid var(--primary); 
-            z-index: 10001; display: none; 
-            backdrop-filter: blur(20px);
-            animation: led-loop 3s infinite alternate;
+            background: rgba(10, 10, 20, 0.95); padding: 15px 20px 35px; 
+            border-top: 2px solid var(--primary); z-index: 10001; 
+            display: none; backdrop-filter: blur(20px);
         }
 
-        .full-page { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; display: none; flex-direction: column; overflow-y: auto; }
-        
-        .album-info-box { 
-            padding: 25px; 
-            background: linear-gradient(180deg, rgba(29,185,84,0.2) 0%, #000 100%); 
-            border-bottom: 2px solid var(--primary);
-            animation: led-loop 8s infinite;
+        .full-page { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: #0a0a14; z-index: 9999; display: none; 
+            flex-direction: column; overflow-y: auto; touch-action: pan-y;
+        }
+
+        .album-header {
+            padding: 40px 20px;
+            background: linear-gradient(to bottom, rgba(0, 255, 136, 0.2), transparent);
+            text-align: center;
         }
     </style>
 </head>
 <body>
 
-    <div class="bg-animated"></div>
+    <div class="stage-bg"></div>
+    <div class="stage-lights"></div>
 
     <div id="homePage">
-        <header style="padding: 20px 20px 10px;">
-            <h1 style="color: var(--primary); margin: 0; font-size: 28px; text-shadow: 0 0 15px var(--primary);">LAMONIÊ FLOW</h1>
+        <header style="padding: 30px 20px 10px;">
+            <h1 style="color: #fff; margin: 0; font-size: 24px; letter-spacing: 2px; font-weight: 900;">LAMONIÊ <span style="color: var(--primary);">FLOW</span></h1>
+            <p style="color: var(--primary); font-size: 10px; margin: 5px 0 0; opacity: 0.8; text-transform: uppercase;">Streaming Professional Experience</p>
         </header>
 
         <div class="categories-nav">
-            <button class="cat-btn active" onclick="search('Lançamentos 2026')">🌍 MUNDO</button>
-            <button class="cat-btn" onclick="search('Forró Vaquejada')">🐎 VAQUEJADA</button>
-            <button class="cat-btn" onclick="search('Piseiro 2026')">🎹 PISEIRO</button>
-            <button class="cat-btn" onclick="search('Sertanejo Universitário')">🤠 SERTANEJO</button>
-            <button class="cat-btn" onclick="search('Rock Classics')">🎸 ROCK</button>
-            <button class="cat-btn" onclick="search('Pop Hits')">🎤 POP</button>
-            <button class="cat-btn" onclick="search('Reggaeton')">💃 REGGAETON</button>
-            <button class="cat-btn" onclick="search('K-Pop')">🇰🇷 K-POP</button>
-            <button class="cat-btn" onclick="search('Hip Hop')">🎧 HIP HOP</button>
-            <button class="cat-btn" onclick="search('Jazz Classics')">🎷 JAZZ</button>
-            <button class="cat-btn" onclick="search('Reggae')">🇯🇲 REGGAE</button>
-            <button class="cat-btn" onclick="search('Electronic Dance')">⚡ TECHNO</button>
-            <button class="cat-btn" onclick="search('Afrobeats')">🇳🇬 AFROBEATS</button>
-            <button class="cat-btn" onclick="search('Country Music')">🇺🇸 COUNTRY</button>
-            <button class="cat-btn" onclick="search('Classical Music')">🎻 CLÁSSICA</button>
-            <button class="cat-btn" onclick="search('Pagode')">🍻 PAGODE</button>
-            <button class="cat-btn" onclick="search('Lo-fi')">☕ LO-FI</button>
+            <button class="cat-btn active" onclick="search('Melhores álbuns 2025')">Destaques 2025</button>
+            <button class="cat-btn" onclick="search('Vaquejada 2025')">Vaquejada</button>
+            <button class="cat-btn" onclick="search('Piseiro 2025')">Piseiro</button>
+            <button class="cat-btn" onclick="search('Sertanejo')">Sertanejo</button>
+            <button class="cat-btn" onclick="search('Pop World')">Pop</button>
+            <button class="cat-btn" onclick="search('Rock')">Rock</button>
+            <button class="cat-btn" onclick="search('Electronic')">Eletrônica</button>
+            <button class="cat-btn" onclick="search('Hip Hop')">Hip Hop</button>
+            <button class="cat-btn" onclick="search('Pagode')">Pagode</button>
         </div>
 
         <div class="search-box">
-            <input type="text" id="searchInput" placeholder="O que o mundo está ouvindo?">
-            <button class="btn-start" onclick="search()"><i class="fas fa-search"></i></button>
+            <input type="text" id="searchInput" placeholder="Buscar álbum, artista ou gênero...">
+            <button class="btn-start" onclick="search()">BUSCAR</button>
         </div>
 
         <div class="main-grid" id="grid"></div>
     </div>
 
-    <div id="albumPage" class="full-page">
-        <button style="margin: 15px; background: #222; border: 1px solid var(--primary); color: white; padding: 10px 20px; border-radius: 50px;" onclick="fecharPagina('albumPage')">🔙 VOLTAR</button>
-        <div class="album-info-box">
-            <div style="display: flex; gap: 20px; align-items: center;">
-                <img id="albumCoverImg" style="width: 120px; height: 120px; border-radius: 15px; border: 2px solid white;">
-                <div>
-                    <h2 id="albumTitleDisplay" style="margin: 0; font-size: 22px;"></h2>
-                    <p id="albumArtistDisplay" style="color: var(--primary); margin: 5px 0; font-weight: bold;"></p>
-                </div>
-            </div>
-            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 20px; font-size: 11px; opacity: 0.9;">
-                <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px;">📅 ANO: <span id="metaYear"></span></div>
-                <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px;">🏷️ GÊNERO: <span id="metaGenre"></span></div>
-                <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px;">⏳ DURAÇÃO: <span id="metaDuration"></span></div>
-                <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px;">📀 GRAVADORA: <span id="metaLabel"></span></div>
-            </div>
-        </div>
-        <div id="trackListContainer"></div>
-    </div>
-
     <footer class="player" id="player">
         <div style="display: flex; justify-content: space-between; align-items: center;">
             <div style="flex: 1; overflow: hidden;">
-                <div id="trackTitle" style="font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Música</div>
+                <div id="trackTitle" style="font-weight: bold; color: #fff;">Música</div>
                 <div id="trackArtist" style="font-size: 12px; color: var(--primary);">Artista</div>
             </div>
-            <button onclick="togglePlay()" id="playBtn" style="background:white; border:none; width:55px; height:55px; border-radius:50%;"><i class="fas fa-pause"></i></button>
+            <button onclick="togglePlay()" id="playBtn" style="background:var(--primary); border:none; width:50px; height:50px; border-radius:50%;"><i class="fas fa-pause"></i></button>
         </div>
     </footer>
 
@@ -181,47 +159,29 @@
     <script>
         const audio = document.getElementById('audioMain');
 
+        // Busca inicial focada nos sucessos de 2025
         async function search(q = "") {
-            const term = q || document.getElementById('searchInput').value || "Mundo";
-            const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(term)}&entity=song&limit=20&country=BR`);
+            const term = q || document.getElementById('searchInput').value || "Top álbuns 2025";
+            const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(term)}&entity=album&limit=20&country=BR`);
             const data = await res.json();
             
-            document.getElementById('grid').innerHTML = data.results.map(t => `
-                <div class="card" onclick="abrirAlbum('${t.collectionId}')">
-                    <img src="${t.artworkUrl100.replace('100x100', '400x400')}">
-                    <h4 style="margin:10px 0 2px; font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${t.trackName}</h4>
-                    <p style="color:var(--primary); font-size:11px; margin:0;">${t.artistName}</p>
+            document.getElementById('grid').innerHTML = data.results.map(a => `
+                <div class="card" onclick="abrirAlbum('${a.collectionId}')">
+                    <img src="${a.artworkUrl100.replace('100x100', '600x600')}">
+                    <h4 style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${a.collectionName}</h4>
+                    <p style="color:var(--primary); font-size:11px; margin:0;">${a.artistName}</p>
                 </div>
             `).join('');
         }
 
         async function abrirAlbum(id) {
-            document.getElementById('albumPage').style.display = 'flex';
+            // Lógica para abrir as faixas do álbum (simplificada para o exemplo)
             const res = await fetch(`https://itunes.apple.com/lookup?id=${id}&entity=song`);
             const data = await res.json();
-            const album = data.results[0];
             const tracks = data.results.slice(1);
-
-            document.getElementById('albumCoverImg').src = album.artworkUrl100.replace('100x100', '600x600');
-            document.getElementById('albumTitleDisplay').innerText = album.collectionName;
-            document.getElementById('albumArtistDisplay').innerText = album.artistName;
-            document.getElementById('metaYear').innerText = new Date(album.releaseDate).getFullYear();
-            document.getElementById('metaGenre').innerText = album.primaryGenreName;
-            document.getElementById('metaLabel').innerText = album.copyright?.split(' ').slice(0,3).join(' ') || "Universal Music";
-            
-            let totalMs = tracks.reduce((acc, t) => acc + (t.trackTimeMillis || 0), 0);
-            document.getElementById('metaDuration').innerText = Math.floor(totalMs/60000) + " min";
-
-            document.getElementById('trackListContainer').innerHTML = tracks.map((t, i) => `
-                <div style="display:flex; align-items:center; padding:15px 20px; border-bottom:1px solid #111;" onclick="tocarTrack('${t.trackName.replace(/'/g, "\\'")}', '${t.artistName.replace(/'/g, "\\'")}', '${t.previewUrl}')">
-                    <span style="color:var(--primary); margin-right:15px;">${i+1}</span>
-                    <div style="flex:1">
-                        <div>${t.trackName}</div>
-                        <div style="font-size:11px; opacity:0.5;">${t.artistName}</div>
-                    </div>
-                    <i class="fas fa-play-circle" style="color:var(--primary)"></i>
-                </div>
-            `).join('');
+            if(tracks.length > 0) {
+                tocarTrack(tracks[0].trackName, tracks[0].artistName, tracks[0].previewUrl);
+            }
         }
 
         function tocarTrack(name, artist, url) {
@@ -238,9 +198,12 @@
             else { audio.pause(); document.getElementById('playBtn').innerHTML = '<i class="fas fa-play"></i>'; }
         }
 
-        function fecharPagina(id) { document.getElementById(id).style.display = 'none'; }
-        
-        search('Lançamentos 2026');
+        // Bloqueio manual de zoom via JS para reforçar
+        document.addEventListener('touchstart', (e) => {
+            if (e.touches.length > 1) e.preventDefault();
+        }, { passive: false });
+
+        search('Melhores álbuns 2025');
     </script>
 </body>
 </html>
