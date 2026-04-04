@@ -3,177 +3,203 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MusicFlow PRO | Benedito</title>
+    <title>LAMONIE FLOW | Music</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --primary: #1db954; --bg: #090909; }
+        :root { --primary: #1db954; --bg: #050505; --accent: #222; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
         
         body { background: var(--bg); color: white; height: 100vh; overflow: hidden; }
 
-        /* FUNDO ANIMADO */
-        .bg-gradient {
+        /* FUNDO ANIMADO COM CORES EM MOVIMENTO */
+        .bg-animated {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(135deg, #0f0c29, #302b63, #1db95411);
-            background-size: 400% 400%; animation: move 15s infinite; z-index: -1;
+            background: linear-gradient(45deg, #0f0c29, #302b63, #1db95415, #24243e);
+            background-size: 400% 400%;
+            animation: gradientMove 12s ease infinite;
+            z-index: -1;
         }
-        @keyframes move { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
-
-        .app { display: flex; flex-direction: column; height: 100vh; }
-
-        header { padding: 20px; background: rgba(0,0,0,0.5); backdrop-filter: blur(10px); }
-        .search-box {
-            background: rgba(255,255,255,0.1); padding: 12px; border-radius: 30px;
-            display: flex; align-items: center; border: 1px solid rgba(255,255,255,0.1);
+        @keyframes gradientMove { 
+            0% { background-position: 0% 50%; } 
+            50% { background-position: 100% 50%; } 
+            100% { background-position: 0% 50%; } 
         }
-        .search-box input { background: none; border: none; color: white; margin-left: 10px; width: 100%; outline: none; }
 
-        /* LISTA COM ROLAGEM */
-        main { flex: 1; overflow-y: auto; padding: 20px; padding-bottom: 150px; -webkit-overflow-scrolling: touch; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; }
+        .app { display: flex; flex-direction: column; height: 100vh; position: relative; }
+
+        /* HEADER COM NOME PERSONALIZADO */
+        header { padding: 20px; background: rgba(0,0,0,0.8); backdrop-filter: blur(15px); text-align: center; border-bottom: 1px solid #1db95433; }
+        .brand { font-size: 22px; font-weight: 800; color: var(--primary); letter-spacing: 2px; margin-bottom: 15px; text-transform: uppercase; }
+
+        .search-container {
+            background: var(--accent); padding: 12px 20px; border-radius: 50px;
+            display: flex; align-items: center; border: 1px solid #333; transition: 0.3s;
+        }
+        .search-container:focus-within { border-color: var(--primary); box-shadow: 0 0 15px rgba(29, 185, 84, 0.3); }
+        .search-container input { background: none; border: none; color: white; margin-left: 10px; width: 100%; outline: none; font-size: 16px; }
+
+        /* LISTA DE ÁLBUNS */
+        main { flex: 1; overflow-y: auto; padding: 20px; padding-bottom: 180px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; }
 
         .card {
-            background: rgba(255,255,255,0.05); padding: 15px; border-radius: 15px;
-            text-align: center; transition: 0.3s; animation: fadeIn 0.5s ease;
+            background: rgba(255,255,255,0.03); padding: 15px; border-radius: 12px;
+            transition: 0.3s; position: relative; overflow: hidden;
         }
-        @keyframes fadeIn { from{opacity:0; transform:scale(0.9)} to{opacity:1; transform:scale(1)} }
-        
-        .card img { width: 100%; aspect-ratio: 1; border-radius: 10px; object-fit: cover; margin-bottom: 10px; }
+        .card:hover { background: rgba(255,255,255,0.1); transform: translateY(-5px); }
+        .card img { width: 100%; aspect-ratio: 1; border-radius: 8px; object-fit: cover; margin-bottom: 12px; }
         .card h3 { font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .card p { font-size: 11px; color: var(--primary); font-weight: bold; margin-top: 5px; }
+        .card .artist { font-size: 12px; color: var(--primary); margin: 4px 0; }
+        .card .date { font-size: 10px; color: #777; font-weight: bold; }
 
-        /* PLAYER FIXO */
+        /* PLAYER MODERNO (IGUAL À SUA REFERÊNCIA) */
         footer {
-            position: fixed; bottom: 0; width: 100%; background: rgba(15,15,15,0.98);
-            padding: 15px 20px; border-top: 1px solid #333; z-index: 100;
+            position: fixed; bottom: 0; width: 100%; background: #0a0a0a;
+            padding: 20px; border-top: 1px solid #222; z-index: 100;
         }
-        .p-info { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
-        .p-info img { width: 45px; height: 45px; border-radius: 5px; border: 1px solid var(--primary); }
-        
-        .p-controls { display: flex; align-items: center; gap: 15px; }
-        .progress-bg { flex: 1; height: 4px; background: #333; border-radius: 2px; position: relative; }
-        .progress-bar { height: 100%; background: var(--primary); width: 0%; border-radius: 2px; }
-        
-        .play-btn {
-            background: white; color: black; width: 45px; height: 45px;
-            border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px;
-        }
-        .time { font-size: 10px; color: #888; font-family: monospace; }
+
+        .progress-wrapper { width: 100%; margin-bottom: 15px; }
+        .bar-bg { width: 100%; height: 4px; background: #333; border-radius: 10px; cursor: pointer; position: relative; }
+        .bar-fill { height: 100%; background: var(--primary); width: 0%; border-radius: 10px; transition: 0.1s; }
+        .time-info { display: flex; justify-content: space-between; color: #888; font-size: 11px; margin-top: 8px; }
+
+        .controls-main { display: flex; align-items: center; justify-content: space-around; max-width: 400px; margin: 0 auto; }
+        .btn-adv { background: none; border: none; color: white; font-size: 20px; cursor: pointer; transition: 0.2s; }
+        .btn-adv:active { transform: scale(0.9); opacity: 0.7; }
+        .play-main { background: white; color: black; width: 55px; height: 55px; border-radius: 50%; font-size: 22px; display: flex; align-items: center; justify-content: center; }
+
+        /* INFO DA MÚSICA NO PLAYER */
+        .now-playing { display: flex; align-items: center; gap: 12px; margin-bottom: 15px; }
+        .now-playing img { width: 50px; height: 50px; border-radius: 4px; border: 1px solid #333; }
+        .now-playing div { overflow: hidden; }
+        .now-playing b { font-size: 14px; display: block; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
+        .now-playing span { font-size: 12px; color: #888; }
     </style>
 </head>
 <body>
-    <div class="bg-gradient"></div>
+    <div class="bg-animated"></div>
+
     <div class="app">
         <header>
-            <h2 style="color: var(--primary); text-align: center; margin-bottom: 15px;"><i class="fas fa-compact-disc"></i> MusicFlow</h2>
-            <div class="search-box">
-                <i class="fas fa-search"></i>
-                <input type="text" id="inputBusca" placeholder="Busque qualquer artista (ex: Zezé, Alok...)">
+            <div class="brand">LAMONIE FLOW</div>
+            <div class="search-container">
+                <i class="fas fa-search" style="color: #888;"></i>
+                <input type="text" id="searchInput" placeholder="Buscar CDs, artistas ou lançamentos...">
             </div>
         </header>
 
-        <main id="scrollArea">
-            <h4 id="statusTitulo" style="margin-bottom: 15px;">Artistas em Destaque</h4>
-            <div class="grid" id="gridArtistas">
+        <main>
+            <div class="grid" id="musicGrid">
                 </div>
         </main>
 
         <footer>
-            <div class="p-info">
-                <img src="https://via.placeholder.com/50" id="p-capa">
-                <div style="overflow: hidden;">
-                    <b id="p-nome" style="font-size: 14px; white-space: nowrap;">Selecione uma música</b><br>
-                    <small id="p-artista" style="color: #888;">Busque acima...</small>
+            <div class="now-playing">
+                <img src="https://via.placeholder.com/50" id="current-img">
+                <div>
+                    <b id="current-title">Nenhuma música</b>
+                    <span id="current-artist">Selecione para ouvir</span>
                 </div>
             </div>
-            <div class="p-controls">
-                <div class="time" id="p-tempo">00:00:00</div>
-                <div class="progress-bg"><div class="progress-bar" id="p-barra"></div></div>
-                <div class="play-btn" onclick="controlarAudio()"><i class="fas fa-play" id="p-icon"></i></div>
+
+            <div class="progress-wrapper">
+                <div class="bar-bg" id="bar-seek"><div class="bar-fill" id="bar-fill"></div></div>
+                <div class="time-info">
+                    <span id="time-start">0:00</span>
+                    <span id="time-end">-0:00</span>
+                </div>
+            </div>
+
+            <div class="controls-main">
+                <button class="btn-adv"><i class="fas fa-random"></i></button>
+                <button class="btn-adv" onclick="pular(-1)"><i class="fas fa-step-backward"></i></button>
+                <button class="btn-adv play-main" onclick="togglePlay()"><i class="fas fa-play" id="play-icon"></i></button>
+                <button class="btn-adv" onclick="pular(1)"><i class="fas fa-step-forward"></i></button>
+                <button class="btn-adv"><i class="fas fa-redo"></i></button>
             </div>
         </footer>
     </div>
 
-    <audio id="playerPrincipal"></audio>
+    <audio id="audioPlayer"></audio>
 
     <script>
-        const grid = document.getElementById('gridArtistas');
-        const audio = document.getElementById('playerPrincipal');
-        const input = document.getElementById('inputBusca');
+        const audio = document.getElementById('audioPlayer');
+        const grid = document.getElementById('musicGrid');
+        const input = document.getElementById('searchInput');
 
-        // FUNÇÃO QUE BUSCA NA API REAL DO ITUNES
-        async function buscarMusica(termo) {
-            if(!termo) termo = "Brasil"; 
-            document.getElementById('statusTitulo').innerText = "Buscando: " + termo + "...";
-            
+        async function buscar(termo = "Gleydson Gavião") {
             try {
-                const resposta = await fetch(`https://itunes.apple.com/search?term=${termo}&entity=song&limit=30&country=BR`);
-                const dados = await resposta.json();
-                exibirResultados(dados.results);
-            } catch (erro) {
-                alert("Erro ao buscar músicas. Verifique a conexão.");
-            }
+                const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(termo)}&entity=song&limit=40&country=BR`);
+                const data = await res.json();
+                renderizar(data.results);
+            } catch (e) { console.error("Erro na busca"); }
         }
 
-        function exibirResultados(lista) {
+        function renderizar(musicas) {
             grid.innerHTML = "";
-            lista.forEach(item => {
-                // Ajusta a imagem para alta qualidade
-                const foto = item.artworkUrl100.replace("100x100bb", "400x400bb");
+            musicas.forEach(m => {
+                const ano = new Date(m.releaseDate).getFullYear();
+                const dataFormatada = new Date(m.releaseDate).toLocaleDateString('pt-BR');
                 const card = document.createElement('div');
                 card.className = 'card';
                 card.innerHTML = `
-                    <img src="${foto}" loading="lazy">
-                    <h3>${item.trackName}</h3>
-                    <p>${item.artistName}</p>
+                    <img src="${m.artworkUrl100.replace('100x100', '400x400')}" loading="lazy">
+                    <h3>${m.trackName}</h3>
+                    <p class="artist">${m.artistName}</p>
+                    <p class="date"><i class="far fa-calendar-alt"></i> ${ano} (${dataFormatada})</p>
                 `;
-                card.onclick = () => tocar(item.previewUrl, item.trackName, item.artistName, foto);
+                card.onclick = () => tocar(m);
                 grid.appendChild(card);
             });
-            document.getElementById('statusTitulo').innerText = "Resultados encontrados";
         }
 
-        function tocar(url, titulo, artista, capa) {
-            document.getElementById('p-nome').innerText = titulo;
-            document.getElementById('p-artista').innerText = artista;
-            document.getElementById('p-capa').src = capa;
+        function tocar(m) {
+            document.getElementById('current-title').innerText = m.trackName;
+            document.getElementById('current-artist').innerText = m.artistName;
+            document.getElementById('current-img').src = m.artworkUrl100.replace('100x100', '200x200');
             
-            audio.src = url;
+            audio.src = m.previewUrl;
             audio.play();
-            document.getElementById('p-icon').className = "fas fa-pause";
+            document.getElementById('play-icon').className = "fas fa-pause";
         }
 
-        function controlarAudio() {
+        function togglePlay() {
+            if(!audio.src) return;
             if(audio.paused) {
                 audio.play();
-                document.getElementById('p-icon').className = "fas fa-pause";
+                document.getElementById('play-icon').className = "fas fa-pause";
             } else {
                 audio.pause();
-                document.getElementById('p-icon').className = "fas fa-play";
+                document.getElementById('play-icon').className = "fas fa-play";
             }
         }
 
-        // Monitor de Progresso e Tempo
+        // Barra de progresso e Tempo
         audio.ontimeupdate = () => {
             const perc = (audio.currentTime / audio.duration) * 100;
-            document.getElementById('p-barra').style.width = perc + "%";
+            document.getElementById('bar-fill').style.width = perc + "%";
             
-            let c = audio.currentTime;
-            let m = Math.floor(c / 60).toString().padStart(2, '0');
-            let s = Math.floor(c % 60).toString().padStart(2, '0');
-            let ms = Math.floor((c % 1) * 100).toString().padStart(2, '0');
-            document.getElementById('p-tempo').innerText = `${m}:${s}:${ms}`;
+            // Tempo atual
+            const min = Math.floor(audio.currentTime / 60);
+            const sec = Math.floor(audio.currentTime % 60).toString().padStart(2, '0');
+            document.getElementById('time-start').innerText = `${min}:${sec}`;
+
+            // Tempo restante (igual ao seu print)
+            if(audio.duration) {
+                const rest = audio.duration - audio.currentTime;
+                const rMin = Math.floor(rest / 60);
+                const rSec = Math.floor(rest % 60).toString().padStart(2, '0');
+                document.getElementById('time-end').innerText = `-${rMin}:${rSec}`;
+            }
         };
 
-        // Busca ao digitar
-        let timeout;
-        input.oninput = (e) => {
-            clearTimeout(timeout);
-            timeout = setTimeout(() => buscarMusica(e.target.value), 500);
-        };
+        // Busca
+        input.addEventListener('keypress', (e) => {
+            if(e.key === 'Enter') buscar(input.value);
+        });
 
         // Inicia com algo
-        buscarMusica("Top Brasil");
+        buscar();
     </script>
 </body>
 </html>
