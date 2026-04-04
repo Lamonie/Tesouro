@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>LAMONIÊ FLOW | INFINITE EXPERIENCE</title>
+    <title>LAMONIÊ FLOW | SUPREME ANIMATED</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --primary: #1db954; --bg: #0b0b0b; --glass: rgba(255,255,255,0.08); }
+        :root { --primary: #1db954; --bg: #050505; }
 
-        /* TRAVA DE PINÇA E ROLAGEM */
+        /* TRAVA DE PINÇA */
         * { box-sizing: border-box; touch-action: pan-x pan-y; -webkit-user-select: none; }
         body, html { 
             margin: 0; padding: 0; width: 100%; height: 100%; 
@@ -16,97 +16,94 @@
             overflow: hidden; 
         }
 
-        /* FUNDO COM LOOP ANIMADO INFINITO */
-        .bg-loop {
+        /* FUNDO ANIMADO COLORIDO (LOOP INFINITO) */
+        .bg-animated {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at center, #1a4a1a 0%, #000 70%);
-            animation: pulseBg 8s infinite alternate;
+            background: linear-gradient(45deg, #050505, #1a4a1a, #050505, #001a00);
+            background-size: 400% 400%;
+            animation: aurora 15s ease infinite;
             z-index: -2;
         }
-        @keyframes pulseBg {
-            0% { transform: scale(1); opacity: 0.7; }
-            100% { transform: scale(1.2); opacity: 1; }
+        @keyframes aurora {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
         /* BUSCA E GÊNEROS */
-        header { padding: 15px; text-align: center; }
         .search-box { 
-            display: flex; background: var(--glass); border-radius: 50px; 
+            display: flex; background: rgba(255,255,255,0.08); border-radius: 50px; 
             margin: 10px 20px; padding: 5px; border: 1px solid rgba(255,255,255,0.1);
         }
-        .search-box input { background: none; border: none; color: white; flex: 1; padding: 10px 15px; outline: none; }
-        .btn-start { background: var(--primary); border: none; color: #000; padding: 10px 25px; border-radius: 50px; font-weight: 900; cursor: pointer; }
+        .search-box input { background: none; border: none; color: white; flex: 1; padding: 12px; outline: none; }
+        .btn-start { background: var(--primary); border: none; color: #000; padding: 0 25px; border-radius: 50px; font-weight: 900; }
 
         .genre-bar { display: flex; overflow-x: auto; padding: 10px 20px; gap: 10px; scrollbar-width: none; }
         .genre-btn {
-            background: var(--glass); border: 1px solid var(--primary); color: white;
-            padding: 10px 20px; border-radius: 15px; white-space: nowrap; font-weight: bold;
-            animation: glow 3s infinite;
+            background: rgba(255,255,255,0.05); border: 1px solid var(--primary); color: white;
+            padding: 12px 25px; border-radius: 15px; white-space: nowrap; font-weight: bold;
+            animation: pulseGlow 3s infinite;
         }
-        @keyframes glow { 0%, 100% { box-shadow: 0 0 5px var(--primary); } 50% { box-shadow: 0 0 15px var(--primary); } }
+        @keyframes pulseGlow { 0%, 100% { box-shadow: 0 0 5px var(--primary); } 50% { box-shadow: 0 0 15px var(--primary); } }
 
-        /* GRID PRINCIPAL ANIMADO */
+        /* GRIDS ROLÁVEIS */
         .main-grid {
-            height: calc(100vh - 250px); overflow-y: auto;
+            height: calc(100vh - 260px); overflow-y: auto;
             display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;
             padding: 15px 20px 150px;
         }
         .card { 
-            background: rgba(255,255,255,0.03); border-radius: 20px; padding: 12px;
-            transition: 0.3s; animation: slideUp 0.5s ease-out;
+            background: rgba(255,255,255,0.03); border-radius: 20px; padding: 10px;
+            animation: slideIn 0.6s ease-out forwards;
         }
-        .card img { width: 100%; border-radius: 15px; animation: imageLoop 10s infinite linear; }
-        
-        @keyframes imageLoop {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.03); }
-        }
+        .card img { width: 100%; border-radius: 15px; transition: 0.5s; }
+        .card:active img { transform: scale(0.95); }
 
-        /* INTERFACE DO ARTISTA (MODAL FULLSCREEN) */
+        /* PÁGINA DO ARTISTA */
         .artist-page {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: #000; z-index: 9999; display: none; flex-direction: column;
-            overflow-y: auto; padding-bottom: 120px;
+            overflow-y: auto;
         }
-        .header-artist {
-            height: 250px; background-size: cover; background-position: center;
+        .artist-header {
+            height: 300px; background-size: cover; background-position: center;
             display: flex; flex-direction: column; justify-content: flex-end;
             padding: 20px; position: relative;
         }
-        .header-artist::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to top, #000, transparent); }
+        .artist-header::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to top, #000, transparent); }
 
-        .back-home { 
-            position: absolute; top: 20px; left: 20px; z-index: 10;
+        .btn-voltar {
+            position: absolute; top: 20px; left: 20px; z-index: 100;
             background: var(--primary); border: none; padding: 10px 20px;
             border-radius: 50px; font-weight: bold; color: black;
         }
 
-        .tabs { display: flex; padding: 10px 20px; gap: 15px; border-bottom: 1px solid #222; }
-        .tab-btn { background: none; border: none; color: #888; font-weight: bold; padding: 10px 0; }
+        .tabs { display: flex; padding: 0 20px; gap: 20px; border-bottom: 1px solid #222; background: #000; }
+        .tab-btn { background: none; border: none; color: #666; padding: 15px 0; font-weight: bold; font-size: 13px; }
         .tab-btn.active { color: var(--primary); border-bottom: 2px solid var(--primary); }
 
-        /* PLAYER FIXO */
+        /* PLAYER */
         .player {
-            position: fixed; bottom: 0; width: 100%; background: rgba(0,0,0,0.95);
-            padding: 20px; border-top: 2px solid var(--primary); z-index: 10001;
-            display: none; backdrop-filter: blur(15px);
+            position: fixed; bottom: 0; width: 100%; background: rgba(0,0,0,0.98);
+            padding: 15px 20px; border-top: 1px solid var(--primary); z-index: 10000;
+            display: none; backdrop-filter: blur(10px);
         }
 
-        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
-    <div class="bg-loop"></div>
+    <div class="bg-animated"></div>
 
-    <div id="home">
-        <header>
-            <h1 style="color: var(--primary); margin: 0; font-size: 24px;">LAMONIÊ FLOW</h1>
+    <div id="homePage">
+        <header style="padding: 20px; text-align: center;">
+            <h1 style="color: var(--primary); letter-spacing: 2px; margin: 0;">LAMONIÊ FLOW</h1>
         </header>
 
         <div class="search-box">
-            <input type="text" id="searchInput" placeholder="Busque qualquer artista...">
-            <button class="btn-start" onclick="search()">START</button>
+            <input type="text" id="searchInput" placeholder="Escreva o nome do artista...">
+            <button class="btn-start" onclick="search()">BUSCAR</button>
         </div>
 
         <div class="genre-bar">
@@ -120,101 +117,128 @@
     </div>
 
     <div id="artistPage" class="artist-page">
-        <button class="back-home" onclick="closeArtist()">🏠 VOLTAR AO INÍCIO</button>
-        <div class="header-artist" id="artistCover">
-            <h1 id="artistName" style="position: relative; z-index: 2; margin: 0; font-size: 32px;"></h1>
+        <button class="btn-voltar" onclick="fecharArtista()">🏠 VOLTAR AO INÍCIO</button>
+        <div class="artist-header" id="headerImg">
+            <h1 id="headerName" style="position: relative; z-index: 2; margin: 0; font-size: 35px;"></h1>
         </div>
 
         <div class="tabs">
-            <button class="tab-btn active">ÁLBUNS E MÚSICAS</button>
-            <button class="tab-btn">SOBRE O ARTISTA</button>
-            <button class="tab-btn">TOUR 2026</button>
+            <button class="tab-btn active" onclick="switchTab('disco')">ÁLBUNS E MÚSICAS</button>
+            <button class="tab-btn" onclick="switchTab('sobre')">SOBRE O ARTISTA</button>
+            <button class="tab-btn" onclick="switchTab('tour')">TOUR 2026</button>
         </div>
 
-        <div id="artistDiscography" class="main-grid" style="height: auto;">
+        <div id="tabContent" class="main-grid" style="height: auto; padding-bottom: 150px;">
             </div>
     </div>
 
     <footer class="player" id="player">
-        <div id="miniInfo" style="margin-bottom: 10px; font-size: 14px;"></div>
-        <div style="display: flex; align-items: center; justify-content: space-between;">
-            <div id="progress" style="flex: 1; height: 4px; background: #333; margin-right: 15px; border-radius: 2px;">
-                <div id="bar" style="width: 0%; height: 100%; background: var(--primary);"></div>
+        <div id="trackInfo" style="font-size: 13px; margin-bottom: 10px; color: var(--primary);"></div>
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <div style="flex: 1; height: 4px; background: #333; border-radius: 2px; overflow: hidden;">
+                <div id="progressBar" style="width: 0%; height: 100%; background: var(--primary); transition: 0.1s;"></div>
             </div>
-            <button onclick="toggle()" id="playBtn" style="background: white; border:none; width:50px; height:50px; border-radius:50%; font-size:20px;">
+            <button onclick="togglePlay()" id="playBtn" style="background:white; border:none; width:45px; height:45px; border-radius:50%; font-size:18px;">
                 <i class="fas fa-pause"></i>
             </button>
         </div>
     </footer>
 
-    <audio id="audio"></audio>
+    <audio id="audioMain"></audio>
 
     <script>
-        const audio = document.getElementById('audio');
-        
-        // BUSCA INTELIGENTE (Fuzzy Search via iTunes API)
-        async function search(query = "") {
-            const val = query || document.getElementById('searchInput').value || "Zezé Di Camargo";
-            // A API do iTunes já possui correção ortográfica automática (escrever errado ainda traz resultados)
-            const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(val)}&entity=song&limit=30&country=BR`);
+        const audio = document.getElementById('audioMain');
+        let currentArtistData = null;
+
+        // BUSCA MUNDIAL COM CORREÇÃO
+        async function search(q = "") {
+            const term = q || document.getElementById('searchInput').value || "Zezé Di Camargo";
+            const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(term)}&entity=song&limit=20&country=BR`);
             const data = await res.json();
             
             const grid = document.getElementById('grid');
             grid.innerHTML = data.results.map(t => `
-                <div class="card" onclick="openArtist('${t.artistName}', '${t.artistId}', '${t.artworkUrl100.replace('100x100', '600x600')}')">
+                <div class="card" onclick="abrirArtista('${t.artistName}', '${t.artistId}', '${t.artworkUrl100.replace('100x100', '800x800')}')">
                     <img src="${t.artworkUrl100.replace('100x100', '400x400')}">
-                    <h4 style="margin:10px 0 2px; font-size:14px;">${t.trackName}</h4>
-                    <p style="color:var(--primary); font-size:12px; margin:0;">${t.artistName}</p>
+                    <h4 style="margin:8px 0 2px; font-size:14px;">${t.trackName}</h4>
+                    <p style="color:var(--primary); font-size:11px; margin:0;">${t.artistName}</p>
                 </div>
             `).join('');
         }
 
-        // ABRIR PÁGINA DO ARTISTA COM TODOS OS ÁLBUNS
-        async function openArtist(name, id, cover) {
+        // ABRIR DISCOGRAFIA E TOCAR MÚSICA
+        async function abrirArtista(name, id, cover) {
+            currentArtistData = { name, id, cover };
             document.getElementById('artistPage').style.display = 'flex';
-            document.getElementById('artistName').innerText = name;
-            document.getElementById('artistCover').style.backgroundImage = `url(${cover})`;
-            
-            // Busca todos os álbuns e músicas desse artista específico
-            const res = await fetch(`https://itunes.apple.com/lookup?id=${id}&entity=album&limit=20`);
+            document.getElementById('headerName').innerText = name;
+            document.getElementById('headerImg').style.backgroundImage = `url(${cover})`;
+            switchTab('disco');
+        }
+
+        async function switchTab(type) {
+            const content = document.getElementById('tabContent');
+            const btns = document.querySelectorAll('.tab-btn');
+            btns.forEach((b, i) => b.classList.toggle('active', (i === 0 && type==='disco') || (i === 1 && type==='sobre') || (i === 2 && type==='tour')));
+
+            if(type === 'disco') {
+                const res = await fetch(`https://itunes.apple.com/lookup?id=${currentArtistData.id}&entity=album&limit=20`);
+                const data = await res.json();
+                const albums = data.results.slice(1);
+                content.innerHTML = albums.map(a => `
+                    <div class="card" onclick="tocarAlbum('${a.collectionName}', '${a.collectionId}')">
+                        <img src="${a.artworkUrl100.replace('100x100', '400x400')}" style="border:1px solid #333">
+                        <h4 style="font-size:12px; margin:10px 0 5px;">${a.collectionName}</h4>
+                        <p style="font-size:10px; opacity:0.5;">Tocar Álbum Completo</p>
+                    </div>
+                `).join('');
+            } else if(type === 'sobre') {
+                content.innerHTML = `<div style="grid-column: 1/-1; padding: 20px; line-height: 1.6;">
+                    <h3 style="color:var(--primary)">Biografia Autorizada</h3>
+                    <p>${currentArtistData.name} é um dos maiores ícones da música atual, com milhões de reproduções e uma carreira sólida no Brasil e no mundo.</p>
+                    <p>Gênero: Variados | Origem: Brasil</p>
+                </div>`;
+            } else {
+                content.innerHTML = `<div style="grid-column: 1/-1; padding: 20px; text-align: center;">
+                    <i class="fas fa-ticket-alt" style="font-size: 40px; color: var(--primary); margin-bottom: 15px;"></i>
+                    <h3>TOUR MUNDIAL 2026</h3>
+                    <p>Shows confirmados em São Paulo, Fortaleza, Miami e Lisboa.</p>
+                    <button style="background:var(--primary); border:none; padding:10px 20px; border-radius:50px; font-weight:bold;">VER DATAS</button>
+                </div>`;
+            }
+        }
+
+        // FUNÇÃO PARA TOCAR A MÚSICA DO ÁLBUM
+        async function tocarAlbum(albumName, albumId) {
+            const res = await fetch(`https://itunes.apple.com/lookup?id=${albumId}&entity=song`);
             const data = await res.json();
-            
-            // Remove o primeiro resultado que é o próprio artista
-            const albums = data.results.slice(1);
+            const musicas = data.results.slice(1);
 
-            document.getElementById('artistDiscography').innerHTML = albums.map(a => `
-                <div class="card" onclick="playPreview('${a.collectionName}', '${name}', '${a.artworkUrl100}')" style="animation: slideUp 0.8s ease forwards">
-                    <img src="${a.artworkUrl100.replace('100x100', '400x400')}" style="border: 2px solid var(--primary)">
-                    <h4 style="font-size:13px; margin:8px 0;">${a.collectionName}</h4>
-                    <p style="font-size:11px; opacity:0.6;">Álbum / Single</p>
-                </div>
-            `).join('');
+            if(musicas.length > 0) {
+                const track = musicas[0];
+                audio.src = track.previewUrl;
+                audio.play();
+                document.getElementById('player').style.display = 'block';
+                document.getElementById('trackInfo').innerHTML = `Tocando: <b>${track.trackName}</b> - ${track.artistName}`;
+                document.getElementById('playBtn').innerHTML = '<i class="fas fa-pause"></i>';
+            }
         }
 
-        function playPreview(title, artist, img) {
-            // Aqui simulamos o play para o player fixo
-            document.getElementById('player').style.display = 'block';
-            document.getElementById('miniInfo').innerHTML = `Tocando agora: <b>${title}</b> - ${artist}`;
-            // Como álbuns não tem URL de áudio direta na API de álbuns, buscamos uma faixa do álbum
-            search(title + " " + artist); 
-        }
-
-        function toggle() {
+        function togglePlay() {
             if(audio.paused) { audio.play(); document.getElementById('playBtn').innerHTML = '<i class="fas fa-pause"></i>'; }
             else { audio.pause(); document.getElementById('playBtn').innerHTML = '<i class="fas fa-play"></i>'; }
         }
 
-        function closeArtist() { document.getElementById('artistPage').style.display = 'none'; }
+        function fecharArtista() { document.getElementById('artistPage').style.display = 'none'; }
 
         audio.ontimeupdate = () => {
             const p = (audio.currentTime / audio.duration) * 100;
-            document.getElementById('bar').style.width = p + "%";
+            document.getElementById('progressBar').style.width = p + "%";
         };
 
-        // Bloqueio de zoom
+        // Prevenir Zoom
         document.addEventListener('touchstart', (e) => { if (e.touches.length > 1) e.preventDefault(); }, { passive: false });
 
-        search(); // Iniciar com sugestões
+        search(); 
     </script>
 </body>
 </html>
