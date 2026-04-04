@@ -1,18 +1,26 @@
 <script>
 async function abrirNoSpotify(termo) {
     document.getElementById('albumPage').style.display = 'flex';
-    document.getElementById('spotifyPlayer').innerHTML = "<p style='color:var(--primary); text-align:center; padding:20px;'>Carregando Player do Spotify...</p>";
-    
-    // Mudamos o formato do link para um modelo de busca mais compatível
-    const linkSpotify = `https://open.spotify.com/embed/search/${encodeURIComponent(termo)}`;
-    
     document.getElementById('spotifyPlayer').innerHTML = `
-        <iframe src="${linkSpotify}" 
-                width="100%" height="500px" frameborder="0" 
-                allowtransparency="true" allow="encrypted-media; clipboard-write; localized-metadata"></iframe>
-        <p style="color: #666; font-size: 12px; text-align: center; margin-top: 10px;">
-            Dica: Clique em "Entrar" no player para ativar suas músicas completas.
-        </p>
+        <div style="text-align:center; padding:40px 20px;">
+            <i class="fab fa-spotify" style="font-size:80px; color:#1DB954; margin-bottom:20px;"></i>
+            <h2 style="margin-bottom:10px;">${termo}</h2>
+            <p style="color:#ccc; margin-bottom:30px;">Para ouvir a música completa e sem anúncios, use sua conta Premium no Spotify.</p>
+            
+            <a href="spotify:search:${encodeURIComponent(termo)}" 
+               style="display:block; background:#1DB954; color:white; padding:18px; border-radius:50px; text-decoration:none; font-weight:bold; margin-bottom:15px; animation: led-loop 2s infinite;">
+               ABRIR NO APLICATIVO
+            </a>
+
+            <a href="https://open.spotify.com/search/${encodeURIComponent(termo)}" target="_blank"
+               style="display:block; background:#333; color:white; padding:15px; border-radius:50px; text-decoration:none; font-weight:bold; font-size:14px;">
+               OUVIR PELO NAVEGADOR
+            </a>
+            
+            <p style="margin-top:30px; font-size:12px; color:#666;">
+                Dica: Ao abrir, faça login com sua conta paga para liberar o álbum inteiro.
+            </p>
+        </div>
     `;
 }
 </script>
