@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LAMONIÊ FLOW | ULTIMATE</title>
+    <title>LAMONIÊ FLOW | OFFICIAL</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --primary: #1db954; --bg-dark: #050505; }
@@ -11,10 +11,10 @@
 
         body { background: var(--bg-dark); color: white; min-height: 100vh; overflow-x: hidden; }
 
-        /* FUNDO ANIMADO PERSISTENTE EM TODAS AS ABAS */
-        .bg-layer {
+        /* FUNDO ANIMADO UNIFICADO - Correção Fundamental */
+        .bg-fixed {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(45deg, #0f0c29, #302b63, #24243e, #1db95433);
+            background: linear-gradient(45deg, #0f0c29, #302b63, #24243e, #1db95422);
             background-size: 400% 400%;
             animation: gradientAnim 15s ease infinite;
             z-index: -2;
@@ -24,187 +24,169 @@
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
         }
-        .bg-blur { position: fixed; top: 0; left: 0; width: 100%; height: 100%; backdrop-filter: blur(40px); z-index: -1; }
+        .bg-blur { position: fixed; top: 0; left: 0; width: 100%; height: 100%; backdrop-filter: blur(60px); z-index: -1; }
 
-        /* HEADER */
-        header { padding: 40px 20px; text-align: center; }
-        .logo { font-size: 35px; font-weight: 900; color: var(--primary); letter-spacing: 4px; text-shadow: 2px 2px 10px rgba(0,0,0,0.5); margin-bottom: 20px; }
-        .search-box { max-width: 600px; margin: 0 auto; display: flex; background: rgba(255,255,255,0.1); border-radius: 50px; padding: 5px; border: 1px solid rgba(255,255,255,0.2); }
-        .search-box input { background: none; border: none; color: white; flex: 1; padding: 15px; outline: none; font-size: 16px; }
-        .search-box button { background: var(--primary); border: none; padding: 0 30px; border-radius: 50px; font-weight: bold; cursor: pointer; }
-
-        /* GRID DE ÁLBUNS */
-        .container { padding: 20px; max-width: 1200px; margin: 0 auto 120px auto; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 25px; }
-        .card { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 15px; cursor: pointer; transition: 0.3s; border: 1px solid transparent; }
-        .card:hover { transform: translateY(-8px); background: rgba(255,255,255,0.15); border-color: var(--primary); }
-        .card img { width: 100%; border-radius: 10px; margin-bottom: 10px; box-shadow: 0 10px 20px rgba(0,0,0,0.4); }
-        .card h4 { font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-        /* PAINEL DO ÁLBUM (ABA DETALHES) */
-        .panel { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(0,0,0,0.8); z-index: 200; display: none; 
-            flex-direction: column; overflow-y: auto;
-        }
-        .panel-content { padding: 40px 20px; text-align: center; max-width: 600px; margin: 0 auto; }
-        .album-large-img { width: 280px; height: 280px; border-radius: 20px; margin-bottom: 25px; box-shadow: 0 15px 40px rgba(0,0,0,0.8); border: 2px solid var(--primary); }
-        .album-info h2 { font-size: 28px; margin-bottom: 10px; }
-        .details-text { color: #ccc; line-height: 1.6; margin-bottom: 20px; font-size: 14px; }
+        header { padding: 30px 20px; text-align: center; }
+        .logo { font-size: 32px; font-weight: 900; color: var(--primary); letter-spacing: 3px; margin-bottom: 20px; }
         
-        .btn-action { background: var(--primary); color: black; border: none; padding: 15px 30px; border-radius: 50px; font-weight: bold; margin: 10px; cursor: pointer; width: 200px; }
-        .btn-secondary { background: white; color: black; }
+        .search-bar { max-width: 500px; margin: 0 auto; display: flex; background: rgba(255,255,255,0.1); border-radius: 50px; padding: 5px; border: 1px solid rgba(255,255,255,0.2); }
+        .search-bar input { background: none; border: none; color: white; flex: 1; padding: 12px 20px; outline: none; }
+        .search-bar button { background: var(--primary); border: none; padding: 0 25px; border-radius: 50px; font-weight: bold; cursor: pointer; }
 
-        /* ABA DE LETRAS */
-        #lyricsView { background: rgba(0,0,0,0.95); display: none; padding: 40px 20px; }
-        .lyrics-body { font-size: 18px; line-height: 2; color: #fff; max-width: 500px; margin: 0 auto; white-space: pre-wrap; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; padding: 20px; max-width: 1200px; margin: 0 auto 120px auto; }
+        .card { background: rgba(255,255,255,0.05); padding: 12px; border-radius: 12px; cursor: pointer; transition: 0.3s; text-align: center; border: 1px solid transparent; }
+        .card:hover { transform: translateY(-5px); background: rgba(255,255,255,0.1); border-color: var(--primary); }
+        .card img { width: 100%; border-radius: 8px; margin-bottom: 10px; }
 
-        /* PLAYER FIXO */
-        .player { position: fixed; bottom: 0; width: 100%; height: 100px; background: rgba(0,0,0,0.9); border-top: 1px solid #333; padding: 15px; z-index: 300; display: flex; flex-direction: column; align-items: center; }
-        .progress-wrap { width: 100%; max-width: 800px; height: 4px; background: #333; margin-bottom: 15px; cursor: pointer; }
-        .progress-bar { height: 100%; background: var(--primary); width: 0%; transition: 0.1s; }
-        .controls { display: flex; align-items: center; gap: 35px; }
-        .c-btn { background: none; border: none; color: white; font-size: 22px; cursor: pointer; }
-        .play-btn { background: white; color: black; width: 50px; height: 50px; border-radius: 50%; font-size: 20px; }
+        /* PAINÉIS TRANSPARENTES PARA NÃO MATAR O FUNDO */
+        .overlay-panel { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.7); z-index: 100; display: none; 
+            flex-direction: column; align-items: center; justify-content: center;
+            backdrop-filter: blur(10px);
+        }
+        .content-wrap { width: 90%; max-width: 500px; text-align: center; overflow-y: auto; max-height: 80vh; }
+        .big-thumb { width: 250px; height: 250px; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+        
+        .btn { background: var(--primary); color: black; border: none; padding: 14px 28px; border-radius: 50px; font-weight: bold; margin: 10px; cursor: pointer; display: inline-block; }
+        .btn-close { background: #444; color: white; }
+
+        .lyrics-text { font-size: 18px; line-height: 1.8; white-space: pre-wrap; padding: 20px; color: #eee; }
+
+        /* PLAYER CORRIGIDO */
+        .footer-player { position: fixed; bottom: 0; width: 100%; background: rgba(0,0,0,0.9); padding: 15px; z-index: 200; border-top: 1px solid #222; }
+        .track-info { text-align: center; margin-bottom: 10px; font-size: 14px; color: var(--primary); }
+        .prog-bg { width: 100%; max-width: 600px; height: 5px; background: #333; margin: 0 auto 15px auto; border-radius: 10px; cursor: pointer; }
+        .prog-fill { height: 100%; background: var(--primary); width: 0%; border-radius: 10px; }
+        .btns { display: flex; justify-content: center; align-items: center; gap: 30px; }
+        .btn-p { background: none; border: none; color: white; font-size: 22px; cursor: pointer; transition: 0.2s; }
+        .btn-p:hover { color: var(--primary); }
+        .play-main { background: white; color: black; width: 50px; height: 50px; border-radius: 50%; font-size: 20px; }
     </style>
 </head>
 <body>
 
-    <div class="bg-layer"></div>
+    <div class="bg-fixed"></div>
     <div class="bg-blur"></div>
 
     <header>
         <div class="logo">LAMONIÊ FLOW</div>
-        <div class="search-box">
-            <input type="text" id="inp" placeholder="O que vamos ouvir, Benedito?">
-            <button onclick="buscar()">BUSCAR</button>
+        <div class="search-bar">
+            <input type="text" id="query" placeholder="Artista ou Música...">
+            <button onclick="search()">BUSCAR</button>
         </div>
     </header>
 
-    <div class="container">
-        <div class="grid" id="albumGrid"></div>
-    </div>
+    <div class="grid" id="grid"></div>
 
-    <div id="albumPanel" class="panel">
-        <div class="panel-content">
-            <img src="" id="detImg" class="album-large-img">
-            <div class="album-info">
-                <h2 id="detTitle">Título</h2>
-                <p id="detArtist" style="color: var(--primary); font-size: 18px; font-weight: bold;"></p>
-                <div class="details-text" id="detMeta">
-                    </div>
-                <button class="btn-action" onclick="showLyrics()">LER LETRA COMPLETA</button>
-                <button class="btn-action btn-secondary" onclick="closePanel()">FECHAR ÁLBUM</button>
-            </div>
+    <div id="albumView" class="overlay-panel">
+        <div class="content-wrap">
+            <img src="" id="albImg" class="big-thumb">
+            <h2 id="albTitle"></h2>
+            <p id="albArtist" style="color: var(--primary); margin: 10px 0;"></p>
+            <div id="albMeta" style="font-size: 13px; color: #aaa; margin-bottom: 20px;"></div>
+            <button class="btn" onclick="getLyrics()">VER LETRA</button>
+            <button class="btn btn-close" onclick="closeAll()">FECHAR</button>
         </div>
     </div>
 
-    <div id="lyricsPanel" class="panel" style="background: rgba(0,0,0,0.98);">
-        <div class="panel-content">
-            <h2 style="margin-bottom: 30px; color: var(--primary);">Letra da Música</h2>
-            <div class="lyrics-body" id="lyricsText">
-                Buscando letra oficial...
-                (A API de letras requer chave específica, simulando carregamento profissional)
-            </div>
-            <button class="btn-action" onclick="closeLyrics()">VOLTAR AO ÁLBUM</button>
+    <div id="lyricsView" class="overlay-panel">
+        <div class="content-wrap">
+            <h2 style="color: var(--primary); margin-bottom: 20px;">Letra Oficial</h2>
+            <div id="lyricsContent" class="lyrics-text">Carregando letra...</div>
+            <button class="btn" onclick="backToAlbum()">VOLTAR AO ÁLBUM</button>
         </div>
     </div>
 
-    <footer class="player">
-        <div class="progress-wrap" onclick="seek(event)">
-            <div class="progress-bar" id="pBar"></div>
+    <footer class="footer-player">
+        <div class="track-info" id="nowPlaying">Selecione uma música</div>
+        <div class="prog-bg" onclick="seek(event)">
+            <div class="prog-fill" id="pFill"></div>
         </div>
-        <div class="controls">
-            <button class="c-btn"><i class="fas fa-random"></i></button>
-            <button class="c-btn" onclick="prev()"><i class="fas fa-step-backward"></i></button>
-            <button class="c-btn play-btn" onclick="toggle()"><i class="fas fa-play" id="playIco"></i></button>
-            <button class="c-btn" onclick="next()"><i class="fas fa-step-forward"></i></button>
-            <button class="c-btn"><i class="fas fa-redo"></i></button>
+        <div class="btns">
+            <button class="btn-p" onclick="prev()"><i class="fas fa-step-backward"></i></button>
+            <button class="btn-p play-main" onclick="togglePlay()"><i class="fas fa-play" id="pIco"></i></button>
+            <button class="btn-p" onclick="next()"><i class="fas fa-step-forward"></i></button>
         </div>
     </footer>
 
-    <audio id="aud"></audio>
+    <audio id="mainAudio"></audio>
 
     <script>
-        const audio = document.getElementById('aud');
-        let list = [];
-        let cur = 0;
+        const audio = document.getElementById('mainAudio');
+        let tracks = [];
+        let index = 0;
 
-        async function buscar() {
-            const q = document.getElementById('inp').value || "Zezé Di Camargo";
-            const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(q)}&entity=song&limit=30`);
+        async function search() {
+            const q = document.getElementById('query').value || "Zezé Di Camargo";
+            const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(q)}&entity=song&limit=25`);
             const data = await res.json();
-            list = data.results;
-            render();
-        }
-
-        function render() {
-            const g = document.getElementById('albumGrid');
-            g.innerHTML = list.map((item, i) => `
-                <div class="card" onclick="openAlbum(${i})">
-                    <img src="${item.artworkUrl100.replace('100x100', '500x500')}">
-                    <h4>${item.trackName}</h4>
-                    <p style="font-size:12px; color:#888">${item.artistName}</p>
+            tracks = data.results;
+            document.getElementById('grid').innerHTML = tracks.map((t, i) => `
+                <div class="card" onclick="selectTrack(${i})">
+                    <img src="${t.artworkUrl100.replace('100x100', '400x400')}">
+                    <h4>${t.trackName}</h4>
                 </div>
             `).join('');
         }
 
-        function openAlbum(i) {
-            cur = i;
-            const s = list[i];
-            const date = new Date(s.releaseDate);
+        function selectTrack(i) {
+            index = i;
+            const t = tracks[i];
+            const d = new Date(t.releaseDate);
             
-            // MOSTRAR O MESMO ÁLBUM NA ABA
-            document.getElementById('detImg').src = s.artworkUrl100.replace('100x100', '600x600');
-            document.getElementById('detTitle').innerText = s.trackName;
-            document.getElementById('detArtist').innerText = s.artistName;
+            document.getElementById('albImg').src = t.artworkUrl100.replace('100x100', '600x600');
+            document.getElementById('albTitle').innerText = t.trackName;
+            document.getElementById('albArtist').innerText = t.artistName;
+            document.getElementById('albMeta').innerHTML = `Lançamento: ${d.toLocaleDateString('pt-BR')} | Gênero: ${t.primaryGenreName}`;
             
-            // DESCRIÇÃO COMPLETA
-            document.getElementById('detMeta').innerHTML = `
-                Álbum: ${s.collectionName} <br>
-                Ano: ${date.getFullYear()} | Data: ${date.toLocaleDateString('pt-BR')} <br>
-                Gênero: ${s.primaryGenreName} | País: ${s.country} <br>
-                Composição: Direitos reservados à gravadora oficial.
-            `;
-
-            // REMOVIDO VÍDEO - APENAS ÁUDIO PROFISSIONAL
-            audio.src = s.previewUrl;
+            audio.src = t.previewUrl;
             audio.play();
             
-            document.getElementById('albumPanel').style.display = 'flex';
-            document.getElementById('playIco').className = "fas fa-pause";
+            document.getElementById('nowPlaying').innerText = `${t.trackName} - ${t.artistName}`;
+            document.getElementById('albumView').style.display = 'flex';
+            document.getElementById('pIco').className = "fas fa-pause";
         }
 
-        function closePanel() { document.getElementById('albumPanel').style.display = 'none'; }
+        async function getLyrics() {
+            const t = tracks[index];
+            document.getElementById('lyricsView').style.display = 'flex';
+            document.getElementById('albumView').style.display = 'none';
+            document.getElementById('lyricsContent').innerText = "Buscando letra nos servidores...";
 
-        function showLyrics() { 
-            document.getElementById('lyricsPanel').style.display = 'flex'; 
-            // Aqui você pode integrar uma API como a Lyrics.ovh futuramente
-            document.getElementById('lyricsText').innerText = "Letra completa de " + list[cur].trackName + "\n\n(A música está tocando ao fundo...) \n\n[Letra protegida por direitos autorais carregada via LAMONIÊ API]";
+            try {
+                // API Pública de Letras (Lyrics.ovh)
+                const res = await fetch(`https://api.lyrics.ovh/v1/${encodeURIComponent(t.artistName)}/${encodeURIComponent(t.trackName)}`);
+                const data = await res.json();
+                document.getElementById('lyricsContent').innerText = data.lyrics || "Letra não encontrada para esta música.";
+            } catch (e) {
+                document.getElementById('lyricsContent').innerText = "Erro ao carregar letra.";
+            }
         }
 
-        function closeLyrics() { document.getElementById('lyricsPanel').style.display = 'none'; }
-
-        function toggle() {
-            if(audio.paused) { audio.play(); document.getElementById('playIco').className="fas fa-pause"; }
-            else { audio.pause(); document.getElementById('playIco').className="fas fa-play"; }
+        function togglePlay() {
+            if(audio.paused) { audio.play(); document.getElementById('pIco').className="fas fa-pause"; }
+            else { audio.pause(); document.getElementById('pIco').className="fas fa-play"; }
         }
 
-        function next() { cur=(cur+1)%list.length; openAlbum(cur); }
-        function prev() { cur=(cur-1+list.length)%list.length; openAlbum(cur); }
+        function next() { index=(index+1)%tracks.length; selectTrack(index); }
+        function prev() { index=(index-1+tracks.length)%tracks.length; selectTrack(index); }
+        
+        function closeAll() { document.getElementById('albumView').style.display = 'none'; }
+        function backToAlbum() { document.getElementById('lyricsView').style.display = 'none'; document.getElementById('albumView').style.display = 'flex'; }
 
         audio.ontimeupdate = () => {
             const p = (audio.currentTime / audio.duration) * 100;
-            document.getElementById('pBar').style.width = p + "%";
+            document.getElementById('pFill').style.width = p + "%";
         };
 
         function seek(e) {
-            const r = document.querySelector('.progress-wrap').getBoundingClientRect();
-            const p = (e.clientX - r.left) / r.width;
+            const rect = document.querySelector('.prog-bg').getBoundingClientRect();
+            const p = (e.clientX - rect.left) / rect.width;
             audio.currentTime = p * audio.duration;
         }
 
-        buscar();
+        search();
     </script>
 </body>
 </html>
