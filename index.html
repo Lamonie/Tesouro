@@ -261,3 +261,63 @@
     </script>
 </body>
 </html>
+// --- CONFIGURAÇÕES DO LAMONIÊ FLOW ---
+
+const audio = document.getElementById('audio-player'); // Certifique-se que o ID no HTML é este
+const btnPlayPause = document.getElementById('main-play-pause');
+const containerLetra = document.getElementById('detalhes-musica');
+
+// 1. CORREÇÃO DO BOTÃO PLAY/PAUSE
+function alternarReproducao() {
+    if (audio.paused) {
+        audio.play().then(() => {
+            btnPlayPause.innerHTML = 'PAUSE'; // Ou o ícone de pause
+            console.log("Tocando...");
+        }).catch(error => console.log("Erro ao dar play:", error));
+    } else {
+        audio.pause();
+        btnPlayPause.innerHTML = 'PLAY'; // Ou o ícone de play
+        console.log("Pausado.");
+    }
+}
+
+// 2. FUNÇÃO PARA ABRIR LETRA, ANO E INFORMAÇÕES (TUDO JUNTO)
+function abrirLetraEDetalhes(musica) {
+    // 'musica' deve ser um objeto com: titulo, artista, letra, data, ano, compositor
+    
+    containerLetra.style.display = 'block';
+    containerLetra.innerHTML = `
+        <div class="modal-detalhes">
+            <button onclick="fecharJanela()" class="btn-voltar">VOLTAR</button>
+            
+            <h2 style="color: #1DB954;">${musica.titulo}</h2>
+            <p><strong>Artista:</strong> ${musica.artista}</p>
+            
+            <div class="info-lancamento">
+                <p>📅 <strong>Data:</strong> ${musica.data}</p>
+                <p>✨ <strong>Ano:</strong> ${musica.ano}</p>
+                <p>✍️ <strong>Compositor:</strong> ${musica.compositor || 'Direitos Reservados'}</p>
+            </div>
+            
+            <hr>
+            <div class="letra-texto">
+                ${musica.letra ? musica.letra : 'Carregando letra via LAMONIÊ API...'}
+            </div>
+        </div>
+    `;
+}
+
+// 3. ATIVAR BOTÃO DE DISCOGRAFIA
+function carregarDiscografia(artistaId) {
+    console.log("Carregando álbuns do artista...");
+    // Aqui você chama a sua função que mostra os cards de álbuns
+    document.getElementById('secao-discografia').scrollIntoView({ behavior: 'smooth' });
+}
+
+// Fechar janelas
+function fecharJanela() {
+    containerLetra.style.display = 'none';
+}
+
+// Event Listeners para garantir que o clique funcione no iPhone
+btnPlayPause.addEventListener('click', alternarReproducao);
