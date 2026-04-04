@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>LAMONIÊ FLOW | ULTIMATE PLAYER</title>
+    <title>LAMONIÊ FLOW | ÁLBUNS COMPLETOS</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --primary: #1db954; --bg: #050505; --glass: rgba(255,255,255,0.08); }
+        :root { --primary: #1db954; --bg: #050505; }
         * { box-sizing: border-box; touch-action: pan-x pan-y; -webkit-user-select: none; }
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
 
@@ -14,94 +14,70 @@
         .bg-animated { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(45deg, #050505, #1a4a1a, #050505, #001a00); background-size: 400% 400%; animation: aurora 15s ease infinite; z-index: -2; }
         @keyframes aurora { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
-        /* INTERFACE BASE ARRUMADA PARA CELULAR EM PÉ */
-        .search-box { display: flex; background: rgba(255,255,255,0.08); border-radius: 50px; margin: 10px auto; padding: 5px; border: 1px solid rgba(255,255,255,0.1); width: 90%; max-width: 400px; }
-        .search-box input { background: none; border: none; color: white; flex: 1; padding: 12px; outline: none; width: 60%; }
-        .btn-start { background: var(--primary); border: none; color: #000; padding: 0 20px; border-radius: 50px; font-weight: 900; }
+        /* INTERFACE BASE */
+        .search-box { display: flex; background: rgba(255,255,255,0.08); border-radius: 50px; margin: 10px 20px; padding: 5px; border: 1px solid rgba(255,255,255,0.1); }
+        .search-box input { background: none; border: none; color: white; flex: 1; padding: 12px; outline: none; }
+        .btn-start { background: var(--primary); border: none; color: #000; padding: 0 25px; border-radius: 50px; font-weight: 900; }
 
         .main-grid { height: calc(100vh - 200px); overflow-y: auto; display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; padding: 15px 20px 150px; scrollbar-width: none; }
         .card { background: rgba(255,255,255,0.03); border-radius: 20px; padding: 10px; border: 1px solid transparent; transition: 0.3s; }
         .card img { width: 100%; border-radius: 15px; }
 
         /* TELAS SOBREPOSTAS */
-        .full-page { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 5000; display: none; flex-direction: column; }
-        .full-page.active { display: flex; }
-        
-        .nav-header { position: sticky; top: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); padding: 15px 20px; z-index: 1000; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid #111; }
-        .btn-nav { background: var(--primary); border: none; padding: 8px 18px; border-radius: 50px; font-weight: bold; color: black; font-size: 13px; cursor: pointer; }
+        .full-page { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; display: none; flex-direction: column; overflow-y: auto; }
+        .btn-back { margin: 20px; background: var(--primary); border: none; padding: 10px 20px; border-radius: 50px; font-weight: bold; width: fit-content; align-self: flex-start; }
 
-        .artist-header { height: 280px; background-size: cover; background-position: center; display: flex; flex-direction: column; justify-content: flex-end; padding: 25px; position: relative; }
-        .artist-header::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to top, #000, transparent); }
-        .artist-name { font-size: 30px; font-weight: 900; position: relative; z-index: 2; margin: 0; letter-spacing: 1px; }
-
-        .tabs { display: flex; padding: 0 25px; background: #000; border-bottom: 1px solid #222; overflow-x: auto; white-space: nowrap; }
-        .tab-btn { background: none; border: none; color: #777; padding: 15px 0; margin-right: 25px; font-weight: bold; font-size: 11px; text-transform: uppercase; cursor: pointer; }
-        .tab-btn.active { color: var(--primary); border-bottom: 2px solid var(--primary); }
-
+        /* LISTA DE MÚSICAS DO ÁLBUM */
         .track-list { padding: 0 20px 150px; }
         .track-item { display: flex; align-items: center; justify-content: space-between; padding: 15px 10px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        
-        .lyrics-page { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #333; z-index: 12000; display: none; flex-direction: column; overflow-y: auto; padding: 40px 25px; }
-        .lyrics-page.active { display: flex; }
-        .lyrics-body { font-size: 19px; line-height: 1.8; color: white; font-weight: 700; white-space: pre-wrap; }
+        .track-item:active { background: rgba(29, 185, 84, 0.1); }
+        .track-info { display: flex; align-items: center; gap: 15px; }
+        .track-number { color: #666; font-size: 14px; min-width: 20px; }
+        .track-duration { color: #888; font-size: 12px; }
 
-        .player { position: fixed; bottom: 0; width: 100%; background: rgba(0,0,0,0.95); padding: 15px 20px 35px; border-top: 1px solid var(--primary); z-index: 10001; display: none; backdrop-filter: blur(10px); }
-        #progressBar { width: 0%; height: 4px; background: var(--primary); position: absolute; top: 0; left: 0; }
+        /* PLAYER */
+        .player { position: fixed; bottom: 0; width: 100%; background: rgba(0,0,0,0.95); padding: 15px 20px; border-top: 1px solid var(--primary); z-index: 10001; display: none; backdrop-filter: blur(10px); }
+        #progressBar { width: 0%; height: 4px; background: var(--primary); position: absolute; top: 0; left: 0; transition: 0.1s; }
     </style>
 </head>
 <body>
 
     <div class="bg-animated"></div>
 
-    <div id="homePage" style="display: block;">
+    <div id="homePage">
         <header style="padding: 20px; text-align: center;"><h1 style="color: var(--primary); margin: 0;">LAMONIÊ FLOW</h1></header>
         <div class="search-box">
-            <input type="text" id="searchInput" placeholder="Artista ou Música...">
+            <input type="text" id="searchInput" placeholder="Zezé, Tarcísio, Safadão...">
             <button class="btn-start" onclick="search()">BUSCAR</button>
         </div>
         <div class="main-grid" id="grid"></div>
     </div>
 
     <div id="artistPage" class="full-page">
-        <div class="artist-header" id="artistHeader">
-            <button class="btn-nav" style="position: absolute; top: 20px; left: 20px; z-index: 10;" onclick="showPage('homePage')"><i class="fas fa-arrow-left"></i> VOLTAR</button>
-            <h1 class="artist-name" id="artistTitle">Artista</h1>
-        </div>
-        <div class="tabs">
-            <button class="tab-btn active">ÁLBUNS</button>
-            <button class="tab-btn">SOBRE</button>
-            <button class="tab-btn">TOUR</button>
-        </div>
-        <div id="artistAlbums" class="main-grid" style="height: auto;"></div>
+        <button class="btn-back" onclick="fecharPagina('artistPage')"><i class="fas fa-chevron-left"></i> VOLTAR AO INÍCIO</button>
+        <div id="artistHeader" style="padding: 0 20px 20px;"><h1 id="artistTitle" style="font-size: 32px; margin:0;"></h1></div>
+        <div id="artistAlbums" class="main-grid"></div>
     </div>
 
-    <div id="albumPage" class="full-page">
-        <div class="nav-header">
-            <button class="btn-nav" onclick="showPage('artistPage')"><i class="fas fa-chevron-left"></i> DISCOGRAFIA</button>
-        </div>
-        <div style="display: flex; padding: 20px; gap: 15px; align-items: center;">
-            <img id="albumCoverImg" style="width: 100px; height: 100px; border-radius: 10px;">
+    <div id="albumPage" class="full-page" style="z-index: 10000;">
+        <button class="btn-back" onclick="fecharPagina('albumPage')"><i class="fas fa-chevron-left"></i> VOLTAR AO ÁLBUM</button>
+        <div style="display: flex; padding: 20px; gap: 20px; align-items: center;">
+            <img id="albumCoverImg" style="width: 120px; height: 120px; border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
             <div>
-                <h2 id="albumTitleDisplay" style="margin: 0; font-size: 18px;"></h2>
-                <p id="albumArtistDisplay" style="color: var(--primary); margin: 5px 0; font-size: 14px;"></p>
+                <h2 id="albumTitleDisplay" style="margin: 0; font-size: 20px;"></h2>
+                <p id="albumArtistDisplay" style="color: var(--primary); margin: 5px 0 0;"></p>
             </div>
         </div>
         <div id="trackListContainer" class="track-list"></div>
     </div>
 
-    <div id="lyricsPage" class="lyrics-page" onclick="fecharLetras(event)">
-        <h2 id="lyricsTrackName" style="color:var(--primary);"></h2>
-        <div class="lyrics-body" id="lyricsContent"></div>
-    </div>
-
     <footer class="player" id="player">
         <div id="progressBar"></div>
         <div style="display: flex; justify-content: space-between; align-items: center;">
-            <div style="flex:1; overflow:hidden;">
-                <div id="trackTitle" style="font-weight:bold; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Música</div>
-                <div id="trackArtist" style="font-size:11px; color:var(--primary);">Artista</div>
+            <div>
+                <div id="trackTitle" style="font-weight: bold; font-size: 14px;"></div>
+                <div id="trackArtist" style="font-size: 11px; color: var(--primary);"></div>
             </div>
-            <button onclick="abrirLetras()" style="background:none; border:none; color:white; font-size:20px; margin: 0 15px;"><i class="fas fa-music"></i></button>
             <button onclick="togglePlay()" id="playBtn" style="background:white; border:none; width:45px; height:45px; border-radius:50%;"><i class="fas fa-pause"></i></button>
         </div>
     </footer>
@@ -110,67 +86,67 @@
 
     <script>
         const audio = document.getElementById('audioMain');
-        const pages = ['homePage', 'artistPage', 'albumPage'];
-        let currentTrackData = null;
-
-        function showPage(pageId) {
-            pages.forEach(id => document.getElementById(id).style.display = 'none');
-            const target = document.getElementById(pageId);
-            target.style.display = 'flex';
-            if(pageId === 'homePage') target.style.display = 'block';
-        }
-
+        
         async function search(q = "") {
             const term = q || document.getElementById('searchInput').value || "Zezé Di Camargo";
             const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(term)}&entity=song&limit=20&country=BR`);
             const data = await res.json();
             document.getElementById('grid').innerHTML = data.results.map(t => `
-                <div class="card" onclick="openArtist('${t.artistName}', '${t.artistId}', '${t.artworkUrl100.replace('100x100', '800x800')}')">
+                <div class="card" onclick="abrirArtista('${t.artistName}', '${t.artistId}')">
                     <img src="${t.artworkUrl100.replace('100x100', '400x400')}">
-                    <h4 style="font-size:12px; margin:8px 0 0;">${t.trackName}</h4>
+                    <h4 style="margin:10px 0 0; font-size:13px;">${t.trackName}</h4>
+                    <p style="color:var(--primary); font-size:11px; margin:3px 0;">${t.artistName}</p>
                 </div>
             `).join('');
         }
 
-        async function openArtist(name, id, headerImg) {
+        async function abrirArtista(name, id) {
+            document.getElementById('artistPage').style.display = 'flex';
             document.getElementById('artistTitle').innerText = name;
-            document.getElementById('artistHeader').style.backgroundImage = `url(${headerImg})`;
-            showPage('artistPage');
-            const res = await fetch(`https://itunes.apple.com/lookup?id=${id}&entity=album&limit=10`);
+            const res = await fetch(`https://itunes.apple.com/lookup?id=${id}&entity=album&limit=20`);
             const data = await res.json();
             document.getElementById('artistAlbums').innerHTML = data.results.slice(1).map(a => `
-                <div class="card" onclick="openAlbum('${a.collectionName}', '${a.collectionId}', '${a.artworkUrl100.replace('100x100','600x600')}', '${a.artistName}')">
+                <div class="card" onclick="abrirAlbum('${a.collectionName}', '${a.collectionId}', '${a.artworkUrl100}', '${a.artistName}')">
                     <img src="${a.artworkUrl100.replace('100x100', '400x400')}">
-                    <h4 style="font-size:11px;">${a.collectionName}</h4>
+                    <h4 style="font-size:12px; margin-top:10px;">${a.collectionName}</h4>
                 </div>
             `).join('');
         }
 
-        async function openAlbum(title, id, cover, artist) {
-            document.getElementById('albumCoverImg').src = cover;
+        // FUNÇÃO QUE ABRE A LISTA DE MÚSICAS DO ÁLBUM
+        async function abrirAlbum(title, id, cover, artist) {
+            document.getElementById('albumPage').style.display = 'flex';
+            document.getElementById('albumCoverImg').src = cover.replace('100x100', '400x400');
             document.getElementById('albumTitleDisplay').innerText = title;
             document.getElementById('albumArtistDisplay').innerText = artist;
-            showPage('albumPage');
+
             const res = await fetch(`https://itunes.apple.com/lookup?id=${id}&entity=song`);
             const data = await res.json();
             const tracks = data.results.slice(1);
+
             document.getElementById('trackListContainer').innerHTML = tracks.map((t, index) => {
-                const tData = JSON.stringify({ name: t.trackName, artist: t.artistName, url: t.previewUrl }).replace(/'/g, "\\'");
+                const durMin = Math.floor(t.trackTimeMillis / 60000);
+                const durSec = ((t.trackTimeMillis % 60000) / 1000).toFixed(0).padStart(2, '0');
                 return `
-                <div class="track-item" onclick='tocarTrack(${tData}, ${t.trackId})'>
-                    <div><b style="font-size:14px;">${t.trackName}</b></div>
-                    <button class="btn-track-play"><i class="fas fa-play"></i></button>
-                </div>`;
-            }).join('');
+                <div class="track-item" onclick="tocarTrack('${t.trackName}', '${t.artistName}', '${t.previewUrl}')">
+                    <div class="track-info">
+                        <span class="track-number">${index + 1}</span>
+                        <div>
+                            <div style="font-size:14px; font-weight:500;">${t.trackName}</div>
+                            <div style="font-size:11px; opacity:0.6;">${t.artistName}</div>
+                        </div>
+                    </div>
+                    <span class="track-duration">${durMin}:${durSec}</span>
+                </div>
+            `}).join('');
         }
 
-        function tocarTrack(tData, trackId) {
-            currentTrackData = tData;
-            audio.src = tData.url;
+        function tocarTrack(name, artist, url) {
+            audio.src = url;
             audio.play();
             document.getElementById('player').style.display = 'block';
-            document.getElementById('trackTitle').innerText = tData.name;
-            document.getElementById('trackArtist').innerText = tData.artist;
+            document.getElementById('trackTitle').innerText = name;
+            document.getElementById('trackArtist').innerText = artist;
             document.getElementById('playBtn').innerHTML = '<i class="fas fa-pause"></i>';
         }
 
@@ -179,13 +155,7 @@
             else { audio.pause(); document.getElementById('playBtn').innerHTML = '<i class="fas fa-play"></i>'; }
         }
 
-        function abrirLetras() {
-            document.getElementById('lyricsTrackName').innerText = currentTrackData.name;
-            document.getElementById('lyricsPage').classList.add('active');
-            document.getElementById('lyricsContent').innerText = "Carregando letra...\n\nDireitos Reservados LAMONIÊ FLOW.";
-        }
-
-        function fecharLetras(e) { if(e.target.id === 'lyricsPage') e.target.classList.remove('active'); }
+        function fecharPagina(id) { document.getElementById(id).style.display = 'none'; }
         
         audio.ontimeupdate = () => {
             const p = (audio.currentTime / audio.duration) * 100;
