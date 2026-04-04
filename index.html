@@ -1,18 +1,67 @@
-<script>
-async function abrirNoSpotify(albumUrl) {
-    // albumUrl deve ser o link que você copiou do Spotify
-    const albumID = albumUrl.split('album/')[1].split('?')[0];
-    const embedUrl = `https://open.spotify.com/embed/album/${albumID}`;
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>LAMONIÊ FLOW | PREMIUM</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { --primary: #1db954; --bg: #000; }
+        body { background: var(--bg); color: white; font-family: sans-serif; margin: 0; padding: 0; }
+        header { padding: 20px; text-align: center; border-bottom: 2px solid var(--primary); box-shadow: 0 0 15px var(--primary); }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px; }
+        .card { background: #111; border: 1px solid #333; border-radius: 10px; padding: 10px; text-align: center; }
+        .card img { width: 100%; border-radius: 8px; }
+        .card h4 { font-size: 14px; margin: 10px 0 5px; color: var(--primary); }
+        
+        /* Modal do Player */
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; display: none; flex-direction: column; z-index: 1000; }
+        .btn-voltar { background: #222; color: white; border: 1px solid var(--primary); padding: 10px; margin: 15px; border-radius: 50px; font-weight: bold; }
+        iframe { border-radius: 12px; border: 2px solid var(--primary); margin: 0 15px; }
+    </style>
+</head>
+<body>
 
-    document.getElementById('albumPage').style.display = 'flex';
-    document.getElementById('spotifyPlayer').innerHTML = `
-        <iframe src="${embedUrl}" 
-                width="100%" height="500" 
-                frameborder="0" allowtransparency="true" 
-                allow="encrypted-media; clipboard-write"></iframe>
-        <p style="text-align:center; color:#1db954; font-size:12px; margin-top:10px;">
-            ⚠️ IMPORTANTE: Toque no logo do Spotify dentro do player e faça LOGIN para ouvir as músicas inteiras!
-        </p>
-    `;
-}
+<header>
+    <h1 style="color: var(--primary); margin: 0;">LAMONIÊ FLOW</h1>
+    <small>STREAMING PROFESSIONAL EXPERIENCE</small>
+</header>
+
+<div class="grid">
+    <div class="card" onclick="playSpotify('4LpY2M54C6kSlyhGq9p81z')">
+        <img src="https://i.scdn.co/image/ab67616d0000b2738379659b85c2c770c3c5ed72" alt="Marília Mendonça">
+        <h4>Marília Mendonça</h4>
+        <p style="font-size: 10px;">Ao Vivo</p>
+    </div>
+
+    <div class="card" onclick="playSpotify('49U94l3v9xRk0G9XUfA8R6')">
+        <img src="https://i.scdn.co/image/ab67616d0000b273b4007823f65672a87a746538" alt="Henrique e Juliano">
+        <h4>Henrique & Juliano</h4>
+        <p style="font-size: 10px;">Céu Explica Tudo</p>
+    </div>
+</div>
+
+<div id="playerModal" class="modal">
+    <button class="btn-voltar" onclick="fechar()">🔙 VOLTAR</button>
+    <div id="container-embed"></div>
+</div>
+
+<script>
+    function playSpotify(id) {
+        document.getElementById('playerModal').style.display = 'flex';
+        // O embedUrl usa o ID FIXO do álbum para não dar erro 404
+        document.getElementById('container-embed').innerHTML = `
+            <iframe src="https://open.spotify.com/embed/album/${id}?utm_source=generator&theme=0" 
+                    width="92%" height="500" frameBorder="0" allowfullscreen="" 
+                    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
+                    loading="lazy"></iframe>
+            <p style="text-align:center; color:#1db954; font-size:12px; margin-top:20px; padding: 0 20px;">
+                ⚠️ LOGUE NO SPOTIFY DENTRO DO PLAYER ACIMA PARA OUVIR AS MÚSICAS COMPLETAS!
+            </p>
+        `;
+    }
+    function fechar() { document.getElementById('playerModal').style.display = 'none'; }
 </script>
+
+</body>
+</html>
