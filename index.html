@@ -10,25 +10,22 @@
             --primary: #1db954; 
             --bg: #050505; 
             --surface: #121212;
-            --led-shadow: 0 0 10px rgba(29, 185, 84, 0.5);
         }
 
-        /* RESET E TRAVA DE PINÇA */
+        /* TRAVA DE PINÇA E ROLAGEM LATERAL DO SITE */
         * { 
             box-sizing: border-box; 
             touch-action: manipulation; 
             -webkit-user-select: none; 
-            -webkit-touch-callout: none;
         }
 
         body, html { 
             margin: 0; padding: 0; width: 100%; height: 100%; 
             background: var(--bg); color: white; 
             font-family: 'Segoe UI', sans-serif; 
-            overflow: hidden; 
+            overflow-x: hidden; /* TRAVA ROLAGEM PARA DIREITA/ESQUERDA NO SITE TODO */
         }
 
-        /* FUNDO ANIMADO EM LOOP */
         .bg-animated { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: linear-gradient(45deg, #050505, #0a2a0a, #050505, #1a0a2a); 
@@ -38,7 +35,6 @@
         }
         @keyframes aurora { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
-        /* ANIMAÇÃO DE LED RGB */
         @keyframes led-loop {
             0% { border-color: #1db954; box-shadow: 0 0 8px #1db954; }
             33% { border-color: #00d2ff; box-shadow: 0 0 8px #00d2ff; }
@@ -46,8 +42,15 @@
             100% { border-color: #1db954; box-shadow: 0 0 8px #1db954; }
         }
 
-        /* CATEGORIAS LED */
-        .categories-nav { display: flex; overflow-x: auto; padding: 15px 20px; gap: 12px; scrollbar-width: none; }
+        /* CATEGORIAS - ROLAGEM LATERAL MANTIDA AQUI */
+        .categories-nav { 
+            display: flex; 
+            overflow-x: auto; 
+            padding: 15px 20px; 
+            gap: 12px; 
+            scrollbar-width: none;
+            -webkit-overflow-scrolling: touch;
+        }
         .categories-nav::-webkit-scrollbar { display: none; }
         
         .cat-btn { 
@@ -55,36 +58,39 @@
             border: 2px solid transparent; 
             color: white; padding: 10px 22px; 
             border-radius: 50px; white-space: nowrap; 
-            font-size: 14px; font-weight: bold; 
-            transition: 0.3s;
+            font-size: 13px; font-weight: bold; 
+            text-transform: uppercase;
             animation: led-loop 5s linear infinite;
         }
-        .cat-btn.active { background: var(--primary); color: black; transform: scale(1.1); }
+        .cat-btn.active { background: var(--primary); color: black; border-color: var(--primary); }
 
-        /* BUSCA LED */
         .search-box { 
             display: flex; background: rgba(0,0,0,0.6); 
             border-radius: 50px; margin: 0 20px 20px; padding: 5px; 
             border: 2px solid var(--primary);
             animation: led-loop 4s reverse infinite;
         }
-        .search-box input { background: none; border: none; color: white; flex: 1; padding: 12px; outline: none; font-size: 16px; }
+        .search-box input { background: none; border: none; color: white; flex: 1; padding: 12px; outline: none; font-size: 16px; width: 100%; }
         .btn-start { background: var(--primary); border: none; color: #000; padding: 0 25px; border-radius: 50px; font-weight: 900; }
 
-        /* GRID PRINCIPAL COM EFEITO LOOP NOS ÁLBUNS */
-        .main-grid { height: calc(100vh - 260px); overflow-y: auto; display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; padding: 10px 20px 150px; }
+        /* GRID DE ÁLBUNS - SÓ ROLA PRA CIMA E BAIXO */
+        .main-grid { 
+            display: grid; 
+            grid-template-columns: repeat(2, 1fr); 
+            gap: 15px; 
+            padding: 10px 20px 150px; 
+            width: 100%;
+        }
         
         .card { 
-            position: relative; background: var(--surface); 
-            border-radius: 18px; padding: 10px; 
+            background: var(--surface); 
+            border-radius: 15px; padding: 8px; 
             border: 2px solid transparent;
-            transition: transform 0.3s;
             animation: led-loop 6s linear infinite;
+            width: 100%; /* Ajusta ao tamanho da coluna */
         }
-        .card:active { transform: scale(0.95); }
-        .card img { width: 100%; border-radius: 12px; aspect-ratio: 1/1; object-fit: cover; }
+        .card img { width: 100%; border-radius: 10px; aspect-ratio: 1/1; object-fit: cover; }
 
-        /* PLAYER LED */
         .player { 
             position: fixed; bottom: 0; width: 100%; 
             background: rgba(0,0,0,0.95); padding: 15px 20px 35px; 
@@ -94,25 +100,11 @@
             animation: led-loop 3s infinite alternate;
         }
 
-        /* PÁGINAS FULL */
         .full-page { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: #000; z-index: 9999; display: none; 
             flex-direction: column; overflow-y: auto; 
         }
-
-        .album-info-box { 
-            padding: 25px; 
-            background: linear-gradient(180deg, rgba(29,185,84,0.2) 0%, #000 100%); 
-            border-bottom: 2px solid var(--primary);
-            animation: led-loop 8s infinite;
-        }
-
-        .track-item { 
-            display: flex; align-items: center; padding: 15px 20px; 
-            border-bottom: 1px solid rgba(255,255,255,0.05); 
-        }
-        .track-item:active { background: rgba(29,185,84,0.1); }
     </style>
 </head>
 <body>
@@ -121,19 +113,26 @@
 
     <div id="homePage">
         <header style="padding: 20px 20px 10px;">
-            <h1 style="color: var(--primary); margin: 0; font-size: 28px; text-shadow: 0 0 15px var(--primary);">LAMONIÊ FLOW</h1>
+            <h1 style="color: var(--primary); margin: 0; font-size: 24px; text-shadow: 0 0 15px var(--primary);">LAMONIÊ FLOW</h1>
         </header>
 
         <div class="categories-nav">
-            <button class="cat-btn active" onclick="search('Lançamentos 2026')">🔥 NOVIDADES</button>
-            <button class="cat-btn" onclick="search('Vaquejada')">🐎 VAQUEJADA</button>
-            <button class="cat-btn" onclick="search('Piseiro')">🎹 PISEIRO</button>
-            <button class="cat-btn" onclick="search('Sertanejo')">🤠 SERTANEJO</button>
-            <button class="cat-btn" onclick="search('Arrocha')">🍺 ARROCHA</button>
+            <button class="cat-btn active" onclick="search('Lançamentos 2026')">Lançamentos</button>
+            <button class="cat-btn" onclick="search('Vaquejada')">Vaquejada</button>
+            <button class="cat-btn" onclick="search('Piseiro')">Piseiro</button>
+            <button class="cat-btn" onclick="search('Sertanejo')">Sertanejo</button>
+            <button class="cat-btn" onclick="search('Arrocha')">Arrocha</button>
+            <button class="cat-btn" onclick="search('Forró')">Forró</button>
+            <button class="cat-btn" onclick="search('Brega')">Brega</button>
+            <button class="cat-btn" onclick="search('Pagode')">Pagode</button>
+            <button class="cat-btn" onclick="search('Gospel')">Gospel</button>
+            <button class="cat-btn" onclick="search('Funk')">Funk</button>
+            <button class="cat-btn" onclick="search('Pop')">Pop</button>
+            <button class="cat-btn" onclick="search('Rock')">Rock</button>
         </div>
 
         <div class="search-box">
-            <input type="text" id="searchInput" placeholder="Pesquisar música ou artista...">
+            <input type="text" id="searchInput" placeholder="Pesquisar...">
             <button class="btn-start" onclick="search()"><i class="fas fa-search"></i></button>
         </div>
 
@@ -142,32 +141,19 @@
 
     <div id="albumPage" class="full-page">
         <button style="margin: 15px; background: #222; border: 1px solid var(--primary); color: white; padding: 10px 20px; border-radius: 50px;" onclick="fecharPagina('albumPage')">🔙 VOLTAR</button>
-        
-        <div class="album-info-box">
-            <div style="display: flex; gap: 20px; align-items: center;">
-                <img id="albumCoverImg" style="width: 120px; height: 120px; border-radius: 15px; border: 2px solid white;">
-                <div>
-                    <h2 id="albumTitleDisplay" style="margin: 0; font-size: 22px;"></h2>
-                    <p id="albumArtistDisplay" style="color: var(--primary); margin: 5px 0; font-weight: bold;"></p>
-                </div>
-            </div>
-            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 20px; font-size: 12px; opacity: 0.8;">
-                <div style="background: #111; padding: 10px; border-radius: 8px;">📅 ANO: <span id="metaYear"></span></div>
-                <div style="background: #111; padding: 10px; border-radius: 8px;">🏷️ GÊNERO: <span id="metaGenre"></span></div>
-                <div style="background: #111; padding: 10px; border-radius: 8px;">⏳ DURAÇÃO: <span id="metaDuration"></span></div>
-                <div style="background: #111; padding: 10px; border-radius: 8px;">📀 GRAVADORA: <span id="metaLabel"></span></div>
-            </div>
+        <div id="albumContent">
+             <div class="album-info-box" id="albumHeader"></div>
+             <div id="trackListContainer"></div>
         </div>
-        <div id="trackListContainer"></div>
     </div>
 
     <footer class="player" id="player">
         <div style="display: flex; justify-content: space-between; align-items: center;">
-            <div style="flex: 1; overflow: hidden;">
+            <div style="flex: 1; overflow: hidden; margin-right: 10px;">
                 <div id="trackTitle" style="font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Música</div>
                 <div id="trackArtist" style="font-size: 12px; color: var(--primary);">Artista</div>
             </div>
-            <button onclick="togglePlay()" id="playBtn" style="background:white; border:none; width:55px; height:55px; border-radius:50%;"><i class="fas fa-pause"></i></button>
+            <button onclick="togglePlay()" id="playBtn" style="background:white; border:none; width:50px; height:50px; border-radius:50%;"><i class="fas fa-pause"></i></button>
         </div>
     </footer>
 
@@ -177,15 +163,21 @@
         const audio = document.getElementById('audioMain');
 
         async function search(q = "") {
-            const term = q || document.getElementById('searchInput').value || "Tarcisio do Acordeon";
-            const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(term)}&entity=song&limit=20&country=BR`);
+            const term = q || document.getElementById('searchInput').value || "Música Brasileira";
+            
+            // Troca o botão ativo visualmente
+            const btns = document.querySelectorAll('.cat-btn');
+            btns.forEach(b => b.classList.remove('active'));
+            if(q) event.target.classList.add('active');
+
+            const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(term)}&entity=album&limit=20&country=BR`);
             const data = await res.json();
             
             document.getElementById('grid').innerHTML = data.results.map(t => `
                 <div class="card" onclick="abrirAlbum('${t.collectionId}')">
                     <img src="${t.artworkUrl100.replace('100x100', '400x400')}">
-                    <h4 style="margin:10px 0 2px; font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${t.trackName}</h4>
-                    <p style="color:var(--primary); font-size:11px; margin:0;">${t.artistName}</p>
+                    <h4 style="margin:8px 0 2px; font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${t.collectionName}</h4>
+                    <p style="color:var(--primary); font-size:10px; margin:0;">${t.artistName}</p>
                 </div>
             `).join('');
         }
@@ -197,26 +189,25 @@
             const album = data.results[0];
             const tracks = data.results.slice(1);
 
-            document.getElementById('albumCoverImg').src = album.artworkUrl100.replace('100x100', '600x600');
-            document.getElementById('albumTitleDisplay').innerText = album.collectionName;
-            document.getElementById('albumArtistDisplay').innerText = album.artistName;
-            document.getElementById('metaYear').innerText = new Date(album.releaseDate).getFullYear();
-            document.getElementById('metaGenre').innerText = album.primaryGenreName;
-            document.getElementById('metaLabel').innerText = album.copyright?.split(' ').slice(0,3).join(' ') || "Oficial";
-            
-            let totalMs = tracks.reduce((acc, t) => acc + (t.trackTimeMillis || 0), 0);
-            document.getElementById('metaDuration').innerText = Math.floor(totalMs/60000) + " min";
-
-            document.getElementById('trackListContainer').innerHTML = tracks.map((t, i) => `
-                <div class="track-item" onclick="tocarTrack('${t.trackName.replace(/'/g, "\\'")}', '${t.artistName.replace(/'/g, "\\'")}', '${t.previewUrl}')">
-                    <span style="margin-right:15px; color:var(--primary);">${i+1}</span>
-                    <div style="flex:1">
-                        <div style="font-size:15px;">${t.trackName}</div>
-                        <div style="font-size:12px; opacity:0.5;">${t.artistName}</div>
-                    </div>
-                    <i class="fas fa-play-circle" style="color:var(--primary)"></i>
+            document.getElementById('albumContent').innerHTML = `
+                <div style="padding:20px; text-align:center; background: linear-gradient(to bottom, rgba(29,185,84,0.3), #000);">
+                    <img src="${album.artworkUrl100.replace('100x100', '600x600')}" style="width:200px; border-radius:15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+                    <h2 style="margin:15px 0 5px;">${album.collectionName}</h2>
+                    <p style="color:var(--primary); font-weight:bold;">${album.artistName}</p>
                 </div>
-            `).join('');
+                <div style="padding:10px;">
+                    ${tracks.map((t, i) => `
+                        <div style="display:flex; align-items:center; padding:15px; border-bottom:1px solid #222;" onclick="tocarTrack('${t.trackName.replace(/'/g, "\\'")}', '${t.artistName.replace(/'/g, "\\'")}', '${t.previewUrl}')">
+                            <span style="color:var(--primary); width:30px;">${i+1}</span>
+                            <div style="flex:1">
+                                <div style="font-size:14px;">${t.trackName}</div>
+                                <div style="font-size:11px; opacity:0.6;">${t.artistName}</div>
+                            </div>
+                            <i class="fas fa-play" style="color:var(--primary); font-size:12px;"></i>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
         }
 
         function tocarTrack(name, artist, url) {
