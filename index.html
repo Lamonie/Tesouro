@@ -3,103 +3,208 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>LAMONIÊ FLOW | PREMIUM INTEGRADO</title>
+    <title>LAMONIÊ FLOW | LED EDITION</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --primary: #1db954; --bg: #000; }
-        body { background: var(--bg); color: white; font-family: sans-serif; margin: 0; padding: 0; }
+        :root { --primary: #1db954; --bg: #050505; --surface: #121212; }
+        * { box-sizing: border-box; touch-action: manipulation; -webkit-user-select: none; margin: 0; padding: 0; }
+        body, html { width: 100%; height: 100%; background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; overflow-x: hidden; }
         
-        /* Layout LED Profissional */
-        header { padding: 25px; text-align: center; border-bottom: 2px solid var(--primary); box-shadow: 0 0 15px rgba(29, 185, 84, 0.7); }
-        .logo { font-size: 26px; font-weight: 900; color: #fff; margin: 0; }
-        .logo span { color: var(--primary); }
-        
-        /* Grid de Álbuns (2 por linha) */
-        .main-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; padding: 20px; padding-bottom: 120px; }
-        
-        .card { 
-            background: #111; border-radius: 12px; padding: 10px; 
-            border: 1px solid transparent; cursor: pointer; transition: 0.3s;
-            position: relative;
-        }
-        .card:active { transform: scale(0.95); }
-        .card:hover { border-color: var(--primary); box-shadow: 0 0 10px var(--primary); }
-        .card img { width: 100%; border-radius: 8px; display: block; margin-bottom: 10px; }
-        .card h4 { margin: 0; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .card p { margin: 3px 0 0; font-size: 11px; color: var(--primary); font-weight: bold; }
+        .bg-animated { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(45deg, #050505, #0a2a0a, #050505, #1a0a2a); background-size: 400% 400%; animation: aurora 10s ease infinite; z-index: -2; }
+        @keyframes aurora { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
-        /* Modal do Player (Página do Álbum Integrada) */
-        .modal { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(0,0,0,0.95); display: none; flex-direction: column; 
-            z-index: 9999; backdrop-filter: blur(10px);
-        }
-        .btn-voltar { 
-            background: #222; color: white; border: 1px solid var(--primary); 
-            padding: 12px 25px; margin: 15px; border-radius: 50px; 
-            font-weight: bold; width: fit-content; align-self: center; cursor: pointer;
+        /* Animação de LED RGB para as bordas */
+        @keyframes led-loop {
+            0% { border-color: #1db954; box-shadow: 0 0 10px #1db954; }
+            33% { border-color: #00d2ff; box-shadow: 0 0 10px #00d2ff; }
+            66% { border-color: #ff00ff; box-shadow: 0 0 10px #ff00ff; }
+            100% { border-color: #1db954; box-shadow: 0 0 10px #1db954; }
         }
 
-        /* Iframe do Spotify com Borda Neon */
-        iframe { 
-            border-radius: 12px; 
-            border: 2px solid var(--primary); 
-            box-shadow: 0 0 20px rgba(29, 185, 84, 0.5); 
-            margin: 0 15px; flex: 1; 
+        /* NOVA ANIMAÇÃO DE COR PARA O SUBTÍTULO 'SÓ HITS' */
+        @keyframes text-color-loop {
+            0% { color: #ffffff; text-shadow: 0 0 5px #ffffff; }
+            33% { color: #00d2ff; text-shadow: 0 0 5px #00d2ff; }
+            66% { color: #ff00ff; text-shadow: 0 0 5px #ff00ff; }
+            100% { color: #ffffff; text-shadow: 0 0 5px #ffffff; }
         }
+
+        .categories-nav { display: flex; overflow-x: auto; padding: 15px 20px; gap: 10px; scrollbar-width: none; }
+        .categories-nav::-webkit-scrollbar { display: none; }
+        .cat-btn { background: rgba(255,255,255,0.05); border: 2px solid transparent; color: white; padding: 10px 18px; border-radius: 50px; white-space: nowrap; font-size: 13px; font-weight: bold; animation: led-loop 5s linear infinite; }
+
+        .search-container { padding: 0 20px 20px; }
+        .search-box { display: flex; background: rgba(0,0,0,0.6); border-radius: 50px; padding: 5px; border: 2px solid var(--primary); animation: led-loop 4s reverse infinite; }
+        .search-box input { background: none; border: none; color: white; flex: 1; padding: 12px; outline: none; font-size: 16px; width: 100%; }
+        .btn-start { background: var(--primary); border: none; color: #000; padding: 0 20px; border-radius: 50px; font-weight: 900; }
+
+        .main-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; padding: 0 20px 150px; width: 100%; }
+        .card { background: var(--surface); border-radius: 15px; padding: 10px; border: 2px solid transparent; animation: led-loop 6s linear infinite; overflow: hidden; }
+        .card img { width: 100%; border-radius: 10px; aspect-ratio: 1/1; object-fit: cover; display: block; }
+        .card h4 { margin: 10px 0 3px; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .card p { color: var(--primary); font-size: 11px; font-weight: bold; }
+
+        .full-page { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; display: none; flex-direction: column; overflow-y: auto; }
+        .album-header { padding: 30px 20px; background: linear-gradient(180deg, rgba(29,185,84,0.4) 0%, #000 100%); text-align: center; border-bottom: 2px solid var(--primary); animation: led-loop 8s infinite; }
+        .meta-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 20px; text-align: left; }
+        .meta-item { background: rgba(255,255,255,0.05); padding: 8px 12px; border-radius: 8px; font-size: 11px; color: #ccc; }
+        .meta-item span { display: block; color: var(--primary); font-weight: bold; font-size: 12px; }
+
+        .player { position: fixed; bottom: 0; width: 100%; background: rgba(0,0,0,0.95); padding: 15px 20px 30px; border-top: 3px solid var(--primary); z-index: 10001; display: none; backdrop-filter: blur(20px); animation: led-loop 3s infinite alternate; }
     </style>
 </head>
 <body>
+    <div class="bg-animated"></div>
 
     <div id="homePage">
-        <header>
-            <h1 class="logo">LAMONIÊ <span>FLOW</span></h1>
-            <p style="font-size: 10px; color: var(--primary); letter-spacing: 1px; margin-top: 5px;">STREAMING PROFESSIONAL EXPERIENCE</p>
+        <header style="padding: 20px;">
+            <h1 style="color: var(--primary); font-size: 26px; text-shadow: 0 0 15px var(--primary); margin: 0;">LAMONIÊ FLOW</h1>
+            <p style="font-size: 10px; letter-spacing: 1px; animation: text-color-loop 5s infinite; font-weight: bold; text-transform: uppercase;">SÓ HITS</p>
         </header>
 
-        <div class="main-grid">
-            <div class="card" onclick="abrirAlbumSpotify('4LpY2M54C6kSlyhGq9p81z')">
-                <img src="https://i.scdn.co/image/ab67616d0000b2738379659b85c2c770c3c5ed72" alt="Marília Mendonça">
-                <h4>Marília Mendonça</h4>
-                <p>Ao Vivo</p>
-            </div>
+        <div class="categories-nav">
+            <button class="cat-btn active">Destaques</button>
+            <button class="cat-btn" onclick="search('Vaquejada')">Vaquejada</button>
+            <button class="cat-btn" onclick="search('Piseiro')">Piseiro</button>
+            <button class="cat-btn" onclick="search('Sertanejo')">Sertanejo</button>
+            <button class="cat-btn" onclick="search('Funk')">Funk</button>
+            <button class="cat-btn" onclick="search('Trap')">Trap</button>
+        </div>
 
-            <div class="card" onclick="abrirAlbumSpotify('49U94l3v9xRk0G9XUfA8R6')">
-                <img src="https://i.scdn.co/image/ab67616d0000b273b4007823f65672a87a746538" alt="Henrique e Juliano">
-                <h4>Henrique & Juliano</h4>
-                <p>Céu Explica Tudo</p>
+        <div class="search-container">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Buscar álbum ou artista...">
+                <button class="btn-start" onclick="search()"><i class="fas fa-search"></i></button>
             </div>
         </div>
-    </div>
 
-    <div id="playerModal" class="modal">
-        <button class="btn-voltar" onclick="fecharModal()"><i class="fas fa-chevron-left"></i> VOLTAR</button>
-        <div id="embedContainer" style="height: 100%; display: flex; flex-direction: column;">
+        <div class="main-grid" id="grid">
             </div>
     </div>
 
+    <div id="albumPage" class="full-page">
+        <button style="margin: 15px; background: #222; border: 1px solid var(--primary); color: white; padding: 12px 25px; border-radius: 50px; font-weight: bold;" onclick="fecharPagina('albumPage')">🔙 VOLTAR</button>
+        <div id="albumDetailContent"></div>
+    </div>
+
+    <footer class="player" id="player">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="flex: 1; overflow: hidden; margin-right: 10px;">
+                <div id="trackTitle" style="font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 14px;">Música</div>
+                <div id="trackArtist" style="font-size: 11px; color: var(--primary);">Artista</div>
+            </div>
+            <button onclick="togglePlay()" id="playBtn" style="background:white; border:none; width:50px; height:50px; border-radius:50%;"><i class="fas fa-pause"></i></button>
+        </div>
+    </footer>
+
+    <audio id="audioMain"></audio>
+
     <script>
-        function abrirAlbumSpotify(id) {
-            document.getElementById('playerModal').style.display = 'flex';
-            
-            // Usamos o ID FIXO do álbum para abrir a lista de músicas INTEGRADA
-            document.getElementById('embedContainer').innerHTML = `
-                <iframe src="https://open.spotify.com/embed/album/${id}?utm_source=generator&theme=0" 
-                        width="92%" height="100%" frameBorder="0" allowfullscreen="" 
-                        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
-                        loading="lazy"></iframe>
-                <p style="text-align:center; color:#1db954; font-size:11px; margin:15px; padding: 0 10px; font-weight: bold;">
-                    ⚠️ ATENÇÃO: Se as músicas tocarem apenas 30 segundos, clique no logo do Spotify dentro do player acima e faça LOGIN com sua conta Premium!
-                </p>
-            `;
+        const audio = document.getElementById('audioMain');
+        const grid = document.getElementById('grid');
+
+        // Lista de álbuns solicitada anteriormente
+        const albunsIniciais = [
+            "MC Ryan SP Casei Com a Putaria", "Henrique e Juliano Arranhão", 
+            "Jorge e Mateus Molhando o Volante", "Zé Neto e Cristiano Largado às Traças", 
+            "Gusttavo Lima Ficha Limpa", "Ana Castela Nosso Quadro", 
+            "Luísa Sonza Chico", "Pedro Sampaio Dançarina", 
+            "Veigh Novo Balanço", "Matuê Quer Voar", 
+            "Filipe Ret Good Vibe", "MC IG 3 Dias Virado", 
+            "Menos é Mais Lapada Dela"
+        ];
+
+        async function carregarHome() {
+            grid.innerHTML = "";
+            for (const busca of albunsIniciais) {
+                try {
+                    const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(busca)}&entity=album&limit=1&country=BR`);
+                    const data = await res.json();
+                    if (data.results.length > 0) {
+                        const t = data.results[0];
+                        grid.innerHTML += `
+                            <div class="card" onclick="abrirAlbum('${t.collectionId}')">
+                                <img src="${t.artworkUrl100.replace('100x100', '400x400')}">
+                                <h4>${t.collectionName}</h4>
+                                <p>${t.artistName}</p>
+                            </div>
+                        `;
+                    }
+                } catch (error) { console.error("Erro ao carregar álbum:", error); }
+            }
         }
 
-        function fecharModal() {
-            document.getElementById('playerModal').style.display = 'none';
-            // Limpa o iframe para parar a música ao fechar
-            document.getElementById('embedContainer').innerHTML = ""; 
+        async function search(q = "") {
+            const term = q || document.getElementById('searchInput').value;
+            if(!term) return;
+            grid.innerHTML = "<p style='padding:20px; color:var(--primary);'>Buscando hits...</p>";
+            try {
+                const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(term)}&entity=album&limit=20&country=BR`);
+                const data = await res.json();
+                if(data.results.length === 0) { grid.innerHTML = "<p style='padding:20px;'>Nenhum hit encontrado.</p>"; return; }
+                grid.innerHTML = data.results.map(t => `
+                    <div class="card" onclick="abrirAlbum('${t.collectionId}')">
+                        <img src="${t.artworkUrl100.replace('100x100', '400x400')}">
+                        <h4>${t.collectionName}</h4>
+                        <p>${t.artistName}</p>
+                    </div>
+                `).join('');
+            } catch (error) { grid.innerHTML = "<p style='padding:20px; color:red;'>Erro na conexão.</p>"; }
         }
+
+        async function abrirAlbum(id) {
+            document.getElementById('albumPage').style.display = 'flex';
+            document.getElementById('albumDetailContent').innerHTML = "<p style='padding:20px; color:var(--primary);'>Carregando detalhes do álbum...</p>";
+            try {
+                const res = await fetch(`https://itunes.apple.com/lookup?id=${id}&entity=song`);
+                const data = await res.json();
+                const album = data.results[0];
+                const tracks = data.results.slice(1);
+                const dataF = new Date(album.releaseDate).toLocaleDateString('pt-BR');
+                const gravadora = album.copyright ? album.copyright.substring(0, 30) : "Oficial";
+
+                document.getElementById('albumDetailContent').innerHTML = `
+                    <div class="album-header">
+                        <img src="${album.artworkUrl100.replace('100x100', '600x600')}" style="width:180px; height:180px; border-radius:15px; border:3px solid white;">
+                        <h2 style="margin-top:20px; font-size:20px;">${album.collectionName}</h2>
+                        <p style="color:var(--primary); font-weight:bold;">${album.artistName}</p>
+                        <div class="meta-container">
+                            <div class="meta-item">Data: <span>${dataF}</span></div>
+                            <div class="meta-item">Gênero: <span>${album.primaryGenreName}</span></div>
+                            <div class="meta-item">Gravadora: <span>${gravadora}</span></div>
+                        </div>
+                    </div>
+                    <div style="padding-bottom: 150px;">
+                        ${tracks.map((t, i) => `
+                            <div style="display:flex; align-items:center; padding:15px 20px; border-bottom:1px solid #111;" onclick="tocarTrack('${t.trackName.replace(/'/g, "\\'")}', '${t.artistName.replace(/'/g, "\\'")}', '${t.previewUrl}')">
+                                <span style="color:var(--primary); width:30px; font-weight:bold;">${i+1}</span>
+                                <div style="flex:1; overflow:hidden;">
+                                    <div style="font-size:15px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${t.trackName}</div>
+                                </div>
+                                <i class="fas fa-play-circle" style="color:var(--primary); font-size:20px;"></i>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            } catch (error) { document.getElementById('albumDetailContent').innerHTML = "<p style='padding:20px; color:red;'>Erro ao carregar álbum.</p>"; }
+        }
+
+        function tocarTrack(name, artist, url) {
+            audio.src = url; audio.play();
+            document.getElementById('player').style.display = 'block';
+            document.getElementById('trackTitle').innerText = name;
+            document.getElementById('trackArtist').innerText = artist;
+            document.getElementById('playBtn').innerHTML = '<i class="fas fa-pause"></i>';
+        }
+
+        function togglePlay() {
+            if(audio.paused) { audio.play(); document.getElementById('playBtn').innerHTML = '<i class="fas fa-pause"></i>'; }
+            else { audio.pause(); document.getElementById('playBtn').innerHTML = '<i class="fas fa-play"></i>'; }
+        }
+
+        function fecharPagina(id) { document.getElementById(id).style.display = 'none'; }
+        
+        carregarHome();
     </script>
-
 </body>
 </html>
