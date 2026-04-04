@@ -13,7 +13,6 @@
         .bg-animated { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(45deg, #050505, #0a2a0a, #050505, #1a0a2a); background-size: 400% 400%; animation: aurora 10s ease infinite; z-index: -2; }
         @keyframes aurora { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
-        /* Animação de LED RGB para as bordas */
         @keyframes led-loop {
             0% { border-color: #1db954; box-shadow: 0 0 10px #1db954; }
             33% { border-color: #00d2ff; box-shadow: 0 0 10px #00d2ff; }
@@ -21,7 +20,6 @@
             100% { border-color: #1db954; box-shadow: 0 0 10px #1db954; }
         }
 
-        /* NOVA ANIMAÇÃO DE COR PARA O SUBTÍTULO 'SÓ HITS' */
         @keyframes text-color-loop {
             0% { color: #ffffff; text-shadow: 0 0 5px #ffffff; }
             33% { color: #00d2ff; text-shadow: 0 0 5px #00d2ff; }
@@ -29,9 +27,9 @@
             100% { color: #ffffff; text-shadow: 0 0 5px #ffffff; }
         }
 
-        .categories-nav { display: flex; overflow-x: auto; padding: 15px 20px; gap: 10px; scrollbar-width: none; }
+        .categories-nav { display: flex; overflow-x: auto; padding: 15px 20px; gap: 10px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
         .categories-nav::-webkit-scrollbar { display: none; }
-        .cat-btn { background: rgba(255,255,255,0.05); border: 2px solid transparent; color: white; padding: 10px 18px; border-radius: 50px; white-space: nowrap; font-size: 13px; font-weight: bold; animation: led-loop 5s linear infinite; }
+        .cat-btn { background: rgba(255,255,255,0.05); border: 2px solid transparent; color: white; padding: 10px 18px; border-radius: 50px; white-space: nowrap; font-size: 13px; font-weight: bold; animation: led-loop 5s linear infinite; cursor: pointer; }
 
         .search-container { padding: 0 20px 20px; }
         .search-box { display: flex; background: rgba(0,0,0,0.6); border-radius: 50px; padding: 5px; border: 2px solid var(--primary); animation: led-loop 4s reverse infinite; }
@@ -63,12 +61,23 @@
         </header>
 
         <div class="categories-nav">
-            <button class="cat-btn active">Destaques</button>
+            <button class="cat-btn active" onclick="carregarHome()">Destaques</button>
             <button class="cat-btn" onclick="search('Vaquejada')">Vaquejada</button>
             <button class="cat-btn" onclick="search('Piseiro')">Piseiro</button>
+            <button class="cat-btn" onclick="search('Forró')">Forró</button>
             <button class="cat-btn" onclick="search('Sertanejo')">Sertanejo</button>
             <button class="cat-btn" onclick="search('Funk')">Funk</button>
             <button class="cat-btn" onclick="search('Trap')">Trap</button>
+            <button class="cat-btn" onclick="search('Axé')">Axé</button>
+            <button class="cat-btn" onclick="search('Pagode')">Pagode</button>
+            <button class="cat-btn" onclick="search('Pop')">Pop</button>
+            <button class="cat-btn" onclick="search('Rock')">Rock</button>
+            <button class="cat-btn" onclick="search('Eletrônica')">Eletrônica</button>
+            <button class="cat-btn" onclick="search('Gospel')">Gospel</button>
+            <button class="cat-btn" onclick="search('Reggae')">Reggae</button>
+            <button class="cat-btn" onclick="search('Lo-fi')">Lo-fi</button>
+            <button class="cat-btn" onclick="search('Jazz')">Jazz</button>
+            <button class="cat-btn" onclick="search('Blues')">Blues</button>
         </div>
 
         <div class="search-container">
@@ -78,8 +87,7 @@
             </div>
         </div>
 
-        <div class="main-grid" id="grid">
-            </div>
+        <div class="main-grid" id="grid"></div>
     </div>
 
     <div id="albumPage" class="full-page">
@@ -103,7 +111,6 @@
         const audio = document.getElementById('audioMain');
         const grid = document.getElementById('grid');
 
-        // Lista de álbuns solicitada anteriormente
         const albunsIniciais = [
             "MC Ryan SP Casei Com a Putaria", "Henrique e Juliano Arranhão", 
             "Jorge e Mateus Molhando o Volante", "Zé Neto e Cristiano Largado às Traças", 
@@ -130,7 +137,7 @@
                             </div>
                         `;
                     }
-                } catch (error) { console.error("Erro ao carregar álbum:", error); }
+                } catch (error) { console.error("Erro ao carregar:", error); }
             }
         }
 
@@ -141,7 +148,6 @@
             try {
                 const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(term)}&entity=album&limit=20&country=BR`);
                 const data = await res.json();
-                if(data.results.length === 0) { grid.innerHTML = "<p style='padding:20px;'>Nenhum hit encontrado.</p>"; return; }
                 grid.innerHTML = data.results.map(t => `
                     <div class="card" onclick="abrirAlbum('${t.collectionId}')">
                         <img src="${t.artworkUrl100.replace('100x100', '400x400')}">
@@ -154,14 +160,13 @@
 
         async function abrirAlbum(id) {
             document.getElementById('albumPage').style.display = 'flex';
-            document.getElementById('albumDetailContent').innerHTML = "<p style='padding:20px; color:var(--primary);'>Carregando detalhes do álbum...</p>";
+            document.getElementById('albumDetailContent').innerHTML = "<p style='padding:20px; color:var(--primary);'>Carregando...</p>";
             try {
                 const res = await fetch(`https://itunes.apple.com/lookup?id=${id}&entity=song`);
                 const data = await res.json();
                 const album = data.results[0];
                 const tracks = data.results.slice(1);
                 const dataF = new Date(album.releaseDate).toLocaleDateString('pt-BR');
-                const gravadora = album.copyright ? album.copyright.substring(0, 30) : "Oficial";
 
                 document.getElementById('albumDetailContent').innerHTML = `
                     <div class="album-header">
@@ -171,7 +176,6 @@
                         <div class="meta-container">
                             <div class="meta-item">Data: <span>${dataF}</span></div>
                             <div class="meta-item">Gênero: <span>${album.primaryGenreName}</span></div>
-                            <div class="meta-item">Gravadora: <span>${gravadora}</span></div>
                         </div>
                     </div>
                     <div style="padding-bottom: 150px;">
@@ -186,7 +190,7 @@
                         `).join('')}
                     </div>
                 `;
-            } catch (error) { document.getElementById('albumDetailContent').innerHTML = "<p style='padding:20px; color:red;'>Erro ao carregar álbum.</p>"; }
+            } catch (error) { document.getElementById('albumDetailContent').innerHTML = "<p style='padding:20px;'>Erro ao carregar.</p>"; }
         }
 
         function tocarTrack(name, artist, url) {
