@@ -13,7 +13,6 @@
         .bg-animated { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(45deg, #050505, #0a2a0a, #050505, #1a0a2a); background-size: 400% 400%; animation: aurora 10s ease infinite; z-index: -2; }
         @keyframes aurora { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
-        /* Animação de LED RGB para as bordas */
         @keyframes led-loop {
             0% { border-color: #1db954; box-shadow: 0 0 10px #1db954; }
             33% { border-color: #00d2ff; box-shadow: 0 0 10px #00d2ff; }
@@ -21,7 +20,6 @@
             100% { border-color: #1db954; box-shadow: 0 0 10px #1db954; }
         }
 
-        /* NOVA ANIMAÇÃO DE COR PARA O SUBTÍTULO 'SÓ HITS' */
         @keyframes text-color-loop {
             0% { color: #ffffff; text-shadow: 0 0 5px #ffffff; }
             33% { color: #00d2ff; text-shadow: 0 0 5px #00d2ff; }
@@ -78,8 +76,7 @@
             </div>
         </div>
 
-        <div class="main-grid" id="grid">
-            </div>
+        <div class="main-grid" id="grid"></div>
     </div>
 
     <div id="albumPage" class="full-page">
@@ -103,15 +100,22 @@
         const audio = document.getElementById('audioMain');
         const grid = document.getElementById('grid');
 
-        // Lista de álbuns solicitada anteriormente
+        // LISTA AMPLIADA COM MUITOS ÁLBUNS DIFERENTES
         const albunsIniciais = [
-            "MC Ryan SP Casei Com a Putaria", "Henrique e Juliano Arranhão", 
-            "Jorge e Mateus Molhando o Volante", "Zé Neto e Cristiano Largado às Traças", 
-            "Gusttavo Lima Ficha Limpa", "Ana Castela Nosso Quadro", 
-            "Luísa Sonza Chico", "Pedro Sampaio Dançarina", 
-            "Veigh Novo Balanço", "Matuê Quer Voar", 
-            "Filipe Ret Good Vibe", "MC IG 3 Dias Virado", 
-            "Menos é Mais Lapada Dela"
+            "João Gomes De Norte a Sul", "Nadson O Ferinha Seresta", "Tarcísio do Acordeon",
+            "Iguinho e Lulinha", "Vitor Fernandes", "Nattan o Fantástico",
+            "Wesley Safadão TBT", "Xand Avião Mix", "Mari Fernandez Ao Vivo",
+            "MC Ryan SP", "MC IG Todo Mundo Odeia o IG", "Veigh Dos Prédios",
+            "KayBlack", "Matuê Máquina de Tempo", "Filipe Ret LUME",
+            "Henrique e Juliano To Be", "Jorge e Mateus É Simples Assim", "Gusttavo Lima Embaixador",
+            "Zé Neto e Cristiano Escolhas", "Ana Castela Boiadeira Internacional", "Luan Santana Luan City",
+            "Menos é Mais Confia", "Grupo Revelação", "Thiaguinho Tardezinha",
+            "Ludmilla Numanice", "Péricles Pagode do Pericão", "Ferrugem Interessante",
+            "Simone Mendes Cintilante", "Matheus e Kauan", "Maiara e Maraisa Identidade",
+            "Hugo e Guilherme", "Murilo Huff Ao Vivo", "Tierry",
+            "Kadu Martins", "Luan Pereira", "Leo Santana",
+            "Dennis DJ", "Pedro Sampaio Astro", "Luísa Sonza Escândalo Íntimo",
+            "Jão SUPER", "Marina Sena Vício Inerente", "BaianaSystem"
         ];
 
         async function carregarHome() {
