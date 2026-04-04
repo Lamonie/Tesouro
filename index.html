@@ -2,16 +2,23 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LAMONIÊ FLOW | OFFICIAL</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>LAMONIÊ FLOW | PREMIUM</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --primary: #1db954; --bg-dark: #050505; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        
+        /* TRAVA DE TELA TOTAL - RESOLVE O PROBLEMA DA PINÇA */
+        html, body { 
+            margin: 0; padding: 0; box-sizing: border-box; 
+            font-family: 'Segoe UI', sans-serif;
+            background: var(--bg-dark); color: white;
+            height: 100%; width: 100%;
+            overflow: hidden; /* Impede qualquer rolagem indesejada fora do grid */
+            touch-action: none;
+        }
 
-        body { background: var(--bg-dark); color: white; min-height: 100vh; overflow-x: hidden; }
-
-        /* FUNDO ANIMADO UNIFICADO - Correção Fundamental */
+        /* FUNDO ANIMADO */
         .bg-fixed {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: linear-gradient(45deg, #0f0c29, #302b63, #24243e, #1db95422);
@@ -24,169 +31,192 @@
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
         }
-        .bg-blur { position: fixed; top: 0; left: 0; width: 100%; height: 100%; backdrop-filter: blur(60px); z-index: -1; }
 
-        header { padding: 30px 20px; text-align: center; }
-        .logo { font-size: 32px; font-weight: 900; color: var(--primary); letter-spacing: 3px; margin-bottom: 20px; }
-        
-        .search-bar { max-width: 500px; margin: 0 auto; display: flex; background: rgba(255,255,255,0.1); border-radius: 50px; padding: 5px; border: 1px solid rgba(255,255,255,0.2); }
-        .search-bar input { background: none; border: none; color: white; flex: 1; padding: 12px 20px; outline: none; }
-        .search-bar button { background: var(--primary); border: none; padding: 0 25px; border-radius: 50px; font-weight: bold; cursor: pointer; }
-
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; padding: 20px; max-width: 1200px; margin: 0 auto 120px auto; }
-        .card { background: rgba(255,255,255,0.05); padding: 12px; border-radius: 12px; cursor: pointer; transition: 0.3s; text-align: center; border: 1px solid transparent; }
-        .card:hover { transform: translateY(-5px); background: rgba(255,255,255,0.1); border-color: var(--primary); }
-        .card img { width: 100%; border-radius: 8px; margin-bottom: 10px; }
-
-        /* PAINÉIS TRANSPARENTES PARA NÃO MATAR O FUNDO */
-        .overlay-panel { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(0,0,0,0.7); z-index: 100; display: none; 
-            flex-direction: column; align-items: center; justify-content: center;
-            backdrop-filter: blur(10px);
+        .main-container {
+            height: 100%; display: flex; flex-direction: column;
+            position: relative; z-index: 1;
         }
-        .content-wrap { width: 90%; max-width: 500px; text-align: center; overflow-y: auto; max-height: 80vh; }
-        .big-thumb { width: 250px; height: 250px; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+
+        header { padding: 20px; text-align: center; flex-shrink: 0; }
+        .logo { font-size: 24px; font-weight: 900; color: var(--primary); letter-spacing: 2px; }
+
+        .search-area { padding: 0 20px 15px; flex-shrink: 0; }
+        .search-bar { max-width: 500px; margin: 0 auto; display: flex; background: rgba(255,255,255,0.1); border-radius: 50px; border: 1px solid rgba(255,255,255,0.2); overflow: hidden; }
+        .search-bar input { background: none; border: none; color: white; flex: 1; padding: 12px 20px; outline: none; }
+        .search-bar button { background: var(--primary); border: none; padding: 0 20px; color: black; font-weight: bold; cursor: pointer; }
+
+        /* GRID ROLÁVEL APENAS AQUI */
+        .grid { 
+            flex: 1; overflow-y: auto; touch-action: pan-y;
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); 
+            gap: 15px; padding: 10px 20px 120px;
+        }
+        .card { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 12px; cursor: pointer; }
+        .card img { width: 100%; border-radius: 8px; margin-bottom: 8px; }
+        .card h4 { font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        /* OVERLAYS (ABAS) */
+        .overlay { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.9); z-index: 2000; display: none; 
+            flex-direction: column; align-items: center; justify-content: center;
+            backdrop-filter: blur(20px); touch-action: none;
+        }
+        .content { width: 85%; max-width: 400px; text-align: center; }
+        .album-art { width: 200px; height: 200px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         
-        .btn { background: var(--primary); color: black; border: none; padding: 14px 28px; border-radius: 50px; font-weight: bold; margin: 10px; cursor: pointer; display: inline-block; }
-        .btn-close { background: #444; color: white; }
+        .info-box { background: rgba(255,255,255,0.07); padding: 20px; border-radius: 15px; margin: 15px 0; text-align: left; font-size: 14px; border: 1px solid rgba(29,185,84,0.3); }
+        .info-box b { color: var(--primary); }
 
-        .lyrics-text { font-size: 18px; line-height: 1.8; white-space: pre-wrap; padding: 20px; color: #eee; }
+        .btn-action { background: var(--primary); color: black; border: none; padding: 16px; border-radius: 50px; font-weight: bold; width: 100%; margin-bottom: 10px; cursor: pointer; font-size: 14px; }
+        .btn-close { background: #333; color: white; }
 
-        /* PLAYER CORRIGIDO */
-        .footer-player { position: fixed; bottom: 0; width: 100%; background: rgba(0,0,0,0.9); padding: 15px; z-index: 200; border-top: 1px solid #222; }
-        .track-info { text-align: center; margin-bottom: 10px; font-size: 14px; color: var(--primary); }
-        .prog-bg { width: 100%; max-width: 600px; height: 5px; background: #333; margin: 0 auto 15px auto; border-radius: 10px; cursor: pointer; }
-        .prog-fill { height: 100%; background: var(--primary); width: 0%; border-radius: 10px; }
-        .btns { display: flex; justify-content: center; align-items: center; gap: 30px; }
-        .btn-p { background: none; border: none; color: white; font-size: 22px; cursor: pointer; transition: 0.2s; }
-        .btn-p:hover { color: var(--primary); }
-        .play-main { background: white; color: black; width: 50px; height: 50px; border-radius: 50%; font-size: 20px; }
+        /* PLAYER INFERIOR REFORÇADO */
+        .player-bar { 
+            position: fixed; bottom: 0; left: 0; width: 100%; 
+            background: #000; padding: 15px 20px 25px; z-index: 3000; 
+            border-top: 1px solid #1db954; text-align: center;
+            touch-action: none;
+        }
+        .play-trigger { 
+            background: white; color: black; width: 55px; height: 55px; 
+            border-radius: 50%; font-size: 22px; border: none; 
+            display: inline-flex; align-items: center; justify-content: center;
+            cursor: pointer;
+        }
+        .progress-wrap { width: 100%; height: 4px; background: #222; margin: 12px 0; border-radius: 2px; }
+        .progress-val { height: 100%; background: var(--primary); width: 0%; transition: width 0.1s; }
     </style>
 </head>
 <body>
 
     <div class="bg-fixed"></div>
-    <div class="bg-blur"></div>
 
-    <header>
-        <div class="logo">LAMONIÊ FLOW</div>
-        <div class="search-bar">
-            <input type="text" id="query" placeholder="Artista ou Música...">
-            <button onclick="search()">BUSCAR</button>
+    <div class="main-container">
+        <header><div class="logo">LAMONIÊ FLOW</div></header>
+
+        <div class="search-area">
+            <div class="search-bar">
+                <input type="text" id="searchInput" placeholder="Zezé, Gonzaga, Alok...">
+                <button onclick="performSearch()">BUSCAR</button>
+            </div>
         </div>
-    </header>
 
-    <div class="grid" id="grid"></div>
+        <div class="grid" id="musicGrid"></div>
+    </div>
 
-    <div id="albumView" class="overlay-panel">
-        <div class="content-wrap">
-            <img src="" id="albImg" class="big-thumb">
-            <h2 id="albTitle"></h2>
-            <p id="albArtist" style="color: var(--primary); margin: 10px 0;"></p>
-            <div id="albMeta" style="font-size: 13px; color: #aaa; margin-bottom: 20px;"></div>
-            <button class="btn" onclick="getLyrics()">VER LETRA</button>
-            <button class="btn btn-close" onclick="closeAll()">FECHAR</button>
+    <div id="panelAlbum" class="overlay">
+        <div class="content">
+            <img src="" id="detImg" class="album-art">
+            <h2 id="detTitle"></h2>
+            <div class="info-box" id="detBio"></div>
+            <button class="btn-action" onclick="showLyrics()">LER LETRA COMPLETA</button>
+            <button class="btn-action btn-close" onclick="closeAll()">FECHAR E VOLTAR</button>
         </div>
     </div>
 
-    <div id="lyricsView" class="overlay-panel">
-        <div class="content-wrap">
-            <h2 style="color: var(--primary); margin-bottom: 20px;">Letra Oficial</h2>
-            <div id="lyricsContent" class="lyrics-text">Carregando letra...</div>
-            <button class="btn" onclick="backToAlbum()">VOLTAR AO ÁLBUM</button>
+    <div id="panelLyrics" class="overlay">
+        <div class="content" style="overflow-y: auto; height: 80vh; touch-action: pan-y; padding-top: 50px;">
+            <h3 style="color: var(--primary);">Letra da Música</h3>
+            <div id="lyricsBody" style="margin: 20px 0; line-height: 1.8; font-size: 17px;"></div>
+            <button class="btn-action btn-close" onclick="backToDet()">VOLTAR AO ÁLBUM</button>
         </div>
     </div>
 
-    <footer class="footer-player">
-        <div class="track-info" id="nowPlaying">Selecione uma música</div>
-        <div class="prog-bg" onclick="seek(event)">
-            <div class="prog-fill" id="pFill"></div>
+    <footer class="player-bar">
+        <button class="play-trigger" onclick="toggleMusic()">
+            <i class="fas fa-play" id="playIcon"></i>
+        </button>
+        <div class="progress-wrap">
+            <div class="progress-val" id="progressBar"></div>
         </div>
-        <div class="btns">
-            <button class="btn-p" onclick="prev()"><i class="fas fa-step-backward"></i></button>
-            <button class="btn-p play-main" onclick="togglePlay()"><i class="fas fa-play" id="pIco"></i></button>
-            <button class="btn-p" onclick="next()"><i class="fas fa-step-forward"></i></button>
-        </div>
+        <div id="playingText" style="font-size: 11px; color: #666;">Selecione uma faixa</div>
     </footer>
 
-    <audio id="mainAudio"></audio>
+    <audio id="coreAudio"></audio>
 
     <script>
-        const audio = document.getElementById('mainAudio');
-        let tracks = [];
-        let index = 0;
+        const audio = document.getElementById('coreAudio');
+        let activeTrack = null;
 
-        async function search() {
-            const q = document.getElementById('query').value || "Zezé Di Camargo";
-            const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(q)}&entity=song&limit=25`);
+        async function performSearch() {
+            const term = document.getElementById('searchInput').value || "Sertanejo";
+            const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(term)}&entity=song&limit=24`);
             const data = await res.json();
-            tracks = data.results;
-            document.getElementById('grid').innerHTML = tracks.map((t, i) => `
-                <div class="card" onclick="selectTrack(${i})">
+            
+            document.getElementById('musicGrid').innerHTML = data.results.map(t => `
+                <div class="card" onclick='openTrack(${JSON.stringify(t).replace(/'/g, "&apos;")})'>
                     <img src="${t.artworkUrl100.replace('100x100', '400x400')}">
                     <h4>${t.trackName}</h4>
                 </div>
             `).join('');
         }
 
-        function selectTrack(i) {
-            index = i;
-            const t = tracks[i];
-            const d = new Date(t.releaseDate);
+        function openTrack(t) {
+            activeTrack = t;
+            const date = new Date(t.releaseDate);
+
+            document.getElementById('detImg').src = t.artworkUrl100.replace('100x100', '600x600');
+            document.getElementById('detTitle').innerText = t.trackName;
             
-            document.getElementById('albImg').src = t.artworkUrl100.replace('100x100', '600x600');
-            document.getElementById('albTitle').innerText = t.trackName;
-            document.getElementById('albArtist').innerText = t.artistName;
-            document.getElementById('albMeta').innerHTML = `Lançamento: ${d.toLocaleDateString('pt-BR')} | Gênero: ${t.primaryGenreName}`;
-            
+            // DADOS COMPLETOS: PAÍS, GÊNERO E DATA
+            document.getElementById('detBio').innerHTML = `
+                <b>Artista:</b> ${t.artistName} <br>
+                <b>Álbum:</b> ${t.collectionName} <br>
+                <b>Lançamento:</b> ${date.toLocaleDateString('pt-BR')} <br>
+                <b>País:</b> ${t.country === 'USA' ? 'Estados Unidos' : t.country} <br>
+                <b>Gênero:</b> ${t.primaryGenreName}
+            `;
+
             audio.src = t.previewUrl;
             audio.play();
-            
-            document.getElementById('nowPlaying').innerText = `${t.trackName} - ${t.artistName}`;
-            document.getElementById('albumView').style.display = 'flex';
-            document.getElementById('pIco').className = "fas fa-pause";
+            updateUI(true);
+            document.getElementById('playingText').innerText = t.trackName;
+            document.getElementById('panelAlbum').style.display = 'flex';
         }
 
-        async function getLyrics() {
-            const t = tracks[index];
-            document.getElementById('lyricsView').style.display = 'flex';
-            document.getElementById('albumView').style.display = 'none';
-            document.getElementById('lyricsContent').innerText = "Buscando letra nos servidores...";
+        function toggleMusic() {
+            if(!audio.src) return;
+            audio.paused ? audio.play() : audio.pause();
+            updateUI(!audio.paused);
+        }
 
+        function updateUI(isPlaying) {
+            document.getElementById('playIcon').className = isPlaying ? "fas fa-pause" : "fas fa-play";
+        }
+
+        async function showLyrics() {
+            document.getElementById('panelLyrics').style.display = 'flex';
+            document.getElementById('panelAlbum').style.display = 'none';
+            document.getElementById('lyricsBody').innerText = "Buscando letra oficial...";
+            
             try {
-                // API Pública de Letras (Lyrics.ovh)
-                const res = await fetch(`https://api.lyrics.ovh/v1/${encodeURIComponent(t.artistName)}/${encodeURIComponent(t.trackName)}`);
-                const data = await res.json();
-                document.getElementById('lyricsContent').innerText = data.lyrics || "Letra não encontrada para esta música.";
-            } catch (e) {
-                document.getElementById('lyricsContent').innerText = "Erro ao carregar letra.";
+                const r = await fetch(`https://api.lyrics.ovh/v1/${activeTrack.artistName}/${activeTrack.trackName}`);
+                const d = await r.json();
+                document.getElementById('lyricsBody').innerText = d.lyrics || "Letra não encontrada.";
+            } catch {
+                document.getElementById('lyricsBody').innerText = "Erro ao conectar com a base de letras.";
             }
         }
 
-        function togglePlay() {
-            if(audio.paused) { audio.play(); document.getElementById('pIco').className="fas fa-pause"; }
-            else { audio.pause(); document.getElementById('pIco').className="fas fa-play"; }
+        function closeAll() { document.getElementById('panelAlbum').style.display = 'none'; }
+        function backToDet() { 
+            document.getElementById('panelLyrics').style.display = 'none'; 
+            document.getElementById('panelAlbum').style.display = 'flex'; 
         }
-
-        function next() { index=(index+1)%tracks.length; selectTrack(index); }
-        function prev() { index=(index-1+tracks.length)%tracks.length; selectTrack(index); }
-        
-        function closeAll() { document.getElementById('albumView').style.display = 'none'; }
-        function backToAlbum() { document.getElementById('lyricsView').style.display = 'none'; document.getElementById('albumView').style.display = 'flex'; }
 
         audio.ontimeupdate = () => {
             const p = (audio.currentTime / audio.duration) * 100;
-            document.getElementById('pFill').style.width = p + "%";
+            document.getElementById('progressBar').style.width = p + "%";
         };
 
-        function seek(e) {
-            const rect = document.querySelector('.prog-bg').getBoundingClientRect();
-            const p = (e.clientX - rect.left) / rect.width;
-            audio.currentTime = p * audio.duration;
-        }
+        // Impedir zoom e movimentos laterais
+        document.addEventListener('touchmove', (e) => {
+            if (e.target.closest('.grid') || e.target.closest('#panelLyrics')) return;
+            e.preventDefault();
+        }, { passive: false });
 
-        search();
+        performSearch();
     </script>
 </body>
 </html>
