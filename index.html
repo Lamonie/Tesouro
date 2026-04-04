@@ -1,37 +1,39 @@
+<script>
 // --- CONFIGURAÇÕES DO LAMONIÊ FLOW ---
 const audio = document.getElementById('audio-player');
 const btnPlayPause = document.getElementById('main-play-pause');
 
-// 1. ARRUMAR O BOTÃO PLAY/PAUSE
+// 1. FUNÇÃO PARA DAR PLAY/PAUSE SEM TRAVAR
 function alternarReproducao() {
     if (audio.paused) {
         audio.play();
-        btnPlayPause.innerHTML = "PAUSE"; 
+        if(btnPlayPause) btnPlayPause.innerHTML = "PAUSE";
     } else {
         audio.pause();
-        btnPlayPause.innerHTML = "PLAY";
+        if(btnPlayPause) btnPlayPause.innerHTML = "PLAY";
     }
 }
 
-// 2. MOSTRAR LETRA, ANO E DIA (TUDO JUNTO)
+// 2. FUNÇÃO PARA MOSTRAR DATA E ANO (DETALHES COMPLETOS)
 function mostrarInfoCompleta(musica) {
     const tela = document.getElementById('detalhes-musica');
-    tela.style.display = 'block';
-    tela.innerHTML = `
-        <button onclick="fechar()">VOLTAR</button>
-        <h2>${musica.titulo}</h2>
-        <p>📅 Data: ${musica.data}</p>
-        <p>✨ Ano: ${musica.ano}</p>
-        <hr>
-        <div class="letra">${musica.letra}</div>
-    `;
+    if(tela) {
+        tela.style.display = 'block';
+        tela.innerHTML = `
+            <div style="background:#111; padding:20px; border-radius:15px;">
+                <button onclick="document.getElementById('detalhes-musica').style.display='none'" style="background:#1DB954; border:none; padding:10px; border-radius:5px; color:white;">VOLTAR</button>
+                <h2 style="color:#1DB954;">${musica.titulo}</h2>
+                <p>📅 Data: ${musica.data}</p>
+                <p>✨ Ano: ${musica.ano}</p>
+                <hr style="border:0.5px solid #333;">
+                <div style="white-space: pre-wrap;">${musica.letra}</div>
+            </div>
+        `;
+    }
 }
 
-function fechar() {
-    document.getElementById('detalhes-musica').style.display = 'none';
-}
-
-// Liga o botão ao clique no celular
+// Liga o botão de play/pause ao clique no iPhone
 if(btnPlayPause) {
     btnPlayPause.onclick = alternarReproducao;
 }
+</script>
