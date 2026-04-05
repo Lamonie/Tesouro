@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>LAMONIÊ FLOW</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/awesome/6.0.0/css/all.min.css">
     <style>
         :root { --primary: #94b3ce; --bg: #000000; --text-main: #ffffff; }
         
@@ -14,36 +14,13 @@
         header { padding: 25px 15px 10px; display: flex; justify-content: space-between; align-items: flex-start; }
         header h1 { color: #2ecc71; font-size: 26px; font-weight: 900; letter-spacing: -1px; flex: 1; }
 
-        /* ADIÇÃO: CONTAINER DA FOGUEIRA (IMG_7291.jpg) */
-        .fogueira-container {
-            width: 130px; /* Encaixa no espaço rabiscado */
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background: rgba(18, 18, 20, 0.95);
-            padding: 8px;
-            border-radius: 12px;
-            border: 1px solid #333;
-            box-shadow: 0 4px 15px rgba(255, 100, 0, 0.2);
-            text-align: center;
-        }
-
-        .fogueira-gif {
-            width: 100%;
+        /* NOVA FOGUEIRA ANIMADA EM LOOP 🔥 (CORREÇÃO) */
+        .fogueira-topo {
+            width: 80px; /* Tamanho discreto no topo */
             height: auto;
             border-radius: 8px;
             display: block;
-        }
-
-        .fogueira-container p {
-            color: #ff9f43; /* Cor laranja fogueira */
-            font-size: 10px;
-            font-weight: bold;
-            text-transform: uppercase;
-            margin-top: 6px;
-            letter-spacing: 0.5px;
-            line-height: 1.2;
+            margin-right: 5px; /* Alinha com o relógio do iPhone nas fotos (cite: IMG_7284.jpg) */
         }
 
         /* LAYOUT PRESERVADO (IMG_7280.jpg, IMG_7286.jpg) */
@@ -74,28 +51,20 @@
         .btn-voltar { margin: 15px; background: #2ecc71; border: none; color: #000; padding: 12px 25px; border-radius: 30px; font-weight: 800; width: fit-content; font-size: 12px; }
         
         .album-info-box { padding: 0 20px 20px; font-size: 11px; color: #8e8e93; text-align: center; line-height: 1.5; }
-        .album-info-box b { color: var(--primary); text-transform: uppercase; }
-
         .track-row { display: flex; align-items: center; padding: 16px; border-bottom: 1px solid #1c1c1e; }
 
         .player { position: fixed; bottom: 0; width: 100%; background: rgba(20,20,22,0.98); backdrop-filter: blur(20px); padding: 12px 20px 35px; border-top: 1px solid #333; z-index: 10001; transition: transform 0.4s ease; }
-        .player.minimized { transform: translateY(80%); }
         .minimize-toggle { width: 40px; height: 5px; background: #3a3a3c; border-radius: 10px; margin: 0 auto 12px; }
-        
         .player-controls { display: flex; align-items: center; gap: 12px; }
         .control-icon { background: none; border: none; color: #8e8e93; font-size: 16px; cursor: pointer; }
         .control-icon.active { color: var(--primary); }
-        
         .play-trigger { background: var(--primary); border: none; width: 42px; height: 42px; border-radius: 50%; color: #000; font-size: 16px; display: flex; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
     <header>
         <h1>LAMONIÊ FLOW</h1>
-        <div class="fogueira-container">
-            <img src="https://media.giphy.com/media/26hirw81b1E0nQWkU/giphy.gif" alt="Fogueira de São João" class="fogueira-gif">
-            <p>SÃO JOÃO<br>ESTÁ CHEGANDO</p>
-        </div>
+        <img src="https://media.giphy.com/media/26hirw81b1E0nQWkU/giphy.gif" alt="Fogueira 🔥" class="fogueira-topo">
     </header>
 
     <div class="categories-nav" id="catNav"></div>
@@ -148,8 +117,7 @@
         let isLoop = false;
 
         const generos = ["Destaques", "Forró", "Vaquejada", "Piseiro", "Sertanejo", "Arrocha", "Brega", "Pagode", "Samba", "Axé", "Funk", "Trap", "Pop", "Rock", "MPB", "Gospel"];
-        
-        const mestresForro = ["Luiz Gonzaga", "Dominguinhos", "Flávio José", "Elba Ramalho", " Wesley Safadão", "Nattan", "Xand Avião", "João Gomes", "Tarcísio do Acordeon", "Vitor Fernandes", "Mastruz com Leite", "Limão com Mel", "Magníficos", "Calcinha Preta", "Aviões do Forró"];
+        const mestresForro = ["Luiz Gonzaga", "Dominguinhos", "Flávio José", "Elba Ramalho", "Wesley Safadão", "Nattan", "Xand Avião", "João Gomes", "Tarcísio do Acordeon", "Vitor Fernandes", "Mastruz com Leite", "Limão com Mel", "Magníficos", "Calcinha Preta", "Aviões do Forró"];
 
         function carregarGeneros() {
             document.getElementById('catNav').innerHTML = generos.map(g => `<button class="cat-btn ${g === 'Destaques' ? 'active' : ''}" onclick="selecionarGenero(this, '${g}')">${g}</button>`).join('');
@@ -166,7 +134,7 @@
             let htmlContent = "";
             for (const artista of mestresForro) {
                 try {
-                    const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(artista)}&entity=album&limit=15&country=BR`);
+                    const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(artista)}&entity=album&limit=20&country=BR`);
                     const data = await res.json();
                     data.results.forEach(t => {
                         htmlContent += `<div class="card" onclick="abrirAlbum('${t.collectionId}')">
@@ -211,7 +179,6 @@
                     <h2 style="margin-top:25px; font-size:22px; color:white;">${album.collectionName}</h2>
                 </div>
                 <div class="album-info-box">
-                    <span><b>Lançamento:</b> ${new Date(album.releaseDate).toLocaleDateString('pt-BR')}</span><br>
                     <span><b>Ano:</b> ${new Date(album.releaseDate).getFullYear()}</span><br>
                     <span><b>Gravadora:</b> ${album.copyright || "Independente"}</span>
                 </div>
