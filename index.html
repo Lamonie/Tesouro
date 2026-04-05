@@ -33,7 +33,7 @@
         .search-box { display: flex; background: #1a1a1a; border-radius: 8px; border: 1px solid #333; align-items: center; }
         .search-box input { background: none; border: none; color: white; flex: 1; padding: 12px; outline: none; width: 100%; }
 
-        /* LAYOUT BLINDADO: 2 ÁLBUNS LADO A LADO */
+        /* LAYOUT MANTIDO: 2 ÁLBUNS LADO A LADO */
         .main-grid { 
             display: flex;
             flex-wrap: wrap;
@@ -63,6 +63,18 @@
 
         .full-page { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; display: none; flex-direction: column; overflow-y: auto; }
         .btn-voltar { margin: 15px; background: var(--primary); border: none; color: black; padding: 12px; border-radius: 25px; font-weight: 800; width: fit-content; }
+        
+        /* ADIÇÃO: BOX DE INFORMAÇÕES DO ÁLBUM */
+        .album-meta-info {
+            padding: 0 20px 20px;
+            font-size: 12px;
+            color: #b3b3b3;
+            text-align: center;
+            line-height: 1.6;
+        }
+        .album-meta-info span { display: block; }
+        .album-meta-info b { color: var(--primary); }
+
         .track-row { display: flex; align-items: center; padding: 15px; border-bottom: 1px solid #1a1a1a; }
 
         .player { position: fixed; bottom: 0; width: 100%; background: rgba(18,18,18,0.98); padding: 15px 20px 40px; border-top: 1px solid #282828; z-index: 10001; display: none; }
@@ -96,17 +108,8 @@
     <script>
         const audio = document.getElementById('audioMain');
         const grid = document.getElementById('grid');
-
-        // Gêneros da barra
         const generos = ["Destaques", "Forró", "Vaquejada", "Piseiro", "Sertanejo", "Arrocha", "Pagode", "Funk", "Trap", "Pop", "Rock", "Gospel"];
-        
-        // LISTA DE MESTRES PARA OS 300 ÁLBUNS
-        const mestresForro = [
-            "Luiz Gonzaga", "Dominguinhos", "Sivuca", "Elba Ramalho", "Flávio José", 
-            "Alcymar Monteiro", "Mastruz com Leite", "Limão com Mel", "Magníficos", 
-            "Jackson do Pandeiro", "Trio Nordestino", "Santanna O Cantador", 
-            "Jorge de Altinho", "Petrúcio Amorim", "Waldonys", "Adelmário Coelho"
-        ];
+        const mestresForro = ["Luiz Gonzaga", "Dominguinhos", "Sivuca", "Elba Ramalho", "Flávio José", "Alcymar Monteiro", "Mastruz com Leite", "Limão com Mel", "Magníficos", "Jackson do Pandeiro"];
 
         function carregarGeneros() {
             document.getElementById('catNav').innerHTML = generos.map(g => `<button class="cat-btn ${g === 'Destaques' ? 'active' : ''}" onclick="selecionarGenero(this, '${g}')">${g}</button>`).join('');
@@ -118,12 +121,11 @@
             if(g === "Destaques") carregarDestaquesForro(); else search(g);
         }
 
-        // CARREGA OS 300 ÁLBUNS DE FORRÓ
         async function carregarDestaquesForro() {
             grid.innerHTML = "";
             for (const artista of mestresForro) {
                 try {
-                    const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(artista)}&entity=album&limit=20&country=BR`);
+                    const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(artista)}&entity=album&limit=15&country=BR`);
                     const data = await res.json();
                     data.results.forEach(t => renderCard(t));
                 } catch (e) {}
@@ -156,19 +158,33 @@
                 const data = await res.json();
                 const album = data.results[0];
                 const musicas = data.results.slice(1);
+                
+                // Formatação das adições pedidas
+                const dataCompleta = new Date(album.releaseDate).toLocaleDateString('pt-BR');
+                const anoLancamento = new Date(album.releaseDate).getFullYear();
+                const gravadora = album.copyright || "Gravadora Independente";
+
                 content.innerHTML = `
                     <div style="text-align:center; padding:20px;">
-                        <img src="${album.artworkUrl100.replace('100x100', '600x600')}" style="width:70%; border-radius:8px;">
+                        <img src="${album.artworkUrl100.replace('100x100', '600x600')}" style="width:70%; border-radius:8px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
                         <h2 style="margin-top:15px; font-size:18px;">${album.collectionName}</h2>
-                        <p style="color:#666; font-size:12px;">${album.artistName} • ${new Date(album.releaseDate).getFullYear()}</p>
+                        <p style="color:var(--primary); font-size:14px; font-weight:bold;">${album.artistName}</p>
                     </div>
-                    <div style="padding-bottom: 120px;">
+
+                    <div class="album-meta-info">
+                        <span><b>DATA:</b> ${dataCompleta}</span>
+                        <span><b>ANO DE LANÇAMENTO:</b> ${anoLancamento}</span>
+                        <span><b>COMPOSITOR:</b> ${album.artistName}</span>
+                        <span><b>GRAVADORA:</b> ${gravadora}</span>
+                    </div>
+
+                    <div style="padding-bottom: 150px;">
                         ${musicas.map((m, i) => `
                             <div class="track-row" onclick="tocar('${m.trackName.replace(/'/g, "")}', '${m.artistName}', '${m.previewUrl}')">
                                 <span style="color:#666; width:25px; font-size:12px;">${i+1}</span>
                                 <div style="flex:1;">
                                     <div style="font-size:14px; font-weight:500;">${m.trackName}</div>
-                                    <div style="font-size:11px; color:#666;">Gravadora: ${album.copyright || 'N/A'}</div>
+                                    <div style="font-size:11px; color:#666;">Duração: 0:30 (Preview)</div>
                                 </div>
                                 <i class="fas fa-play" style="color:var(--primary); font-size:12px;"></i>
                             </div>
