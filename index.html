@@ -8,11 +8,10 @@
     <style>
         :root { --primary: #1db954; --bg: #000000; --text-main: #ffffff; }
         
-        /* TRAVA DE SEGURANÇA CONTRA ERROS DE TELA */
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         body, html { 
             width: 100%; 
-            overflow-x: hidden; /* Proíbe rolar para os lados */
+            overflow-x: hidden; 
             background: var(--bg); 
             color: var(--text-main); 
             font-family: 'Segoe UI', sans-serif; 
@@ -21,13 +20,7 @@
         header { padding: 20px 15px; }
         header h1 { color: var(--primary); font-size: 24px; font-weight: 900; }
 
-        /* BARRA DE GÊNEROS - ROLA SÓ ELA */
-        .categories-nav { 
-            display: flex; 
-            overflow-x: auto; 
-            padding: 10px 15px; 
-            gap: 8px; 
-        }
+        .categories-nav { display: flex; overflow-x: auto; padding: 10px 15px; gap: 8px; }
         .categories-nav::-webkit-scrollbar { display: none; }
         .cat-btn { 
             background: #2a2a2a; border: none; color: white; 
@@ -40,7 +33,7 @@
         .search-box { display: flex; background: #1a1a1a; border-radius: 8px; border: 1px solid #333; align-items: center; }
         .search-box input { background: none; border: none; color: white; flex: 1; padding: 12px; outline: none; width: 100%; }
 
-        /* GRID CORRIGIDO: DOIS POR LINHA SEMPRE */
+        /* LAYOUT BLINDADO: 2 ÁLBUNS LADO A LADO */
         .main-grid { 
             display: flex;
             flex-wrap: wrap;
@@ -49,7 +42,7 @@
             width: 100%;
         }
         .card { 
-            width: 47%; /* Garante que dois caibam com folga na largura */
+            width: 47%; 
             background: #181818; 
             border-radius: 8px; 
             padding: 8px; 
@@ -68,12 +61,10 @@
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis; 
         }
 
-        /* PÁGINA DO ÁLBUM */
         .full-page { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; display: none; flex-direction: column; overflow-y: auto; }
         .btn-voltar { margin: 15px; background: var(--primary); border: none; color: black; padding: 12px; border-radius: 25px; font-weight: 800; width: fit-content; }
         .track-row { display: flex; align-items: center; padding: 15px; border-bottom: 1px solid #1a1a1a; }
 
-        /* PLAYER COM BOTÕES DE CONTROLE */
         .player { position: fixed; bottom: 0; width: 100%; background: rgba(18,18,18,0.98); padding: 15px 20px 40px; border-top: 1px solid #282828; z-index: 10001; display: none; }
         .play-trigger { background: #fff; border: none; width: 45px; height: 45px; border-radius: 50%; color: #000; font-size: 18px; display: flex; align-items: center; justify-content: center; }
     </style>
@@ -81,7 +72,7 @@
 <body>
     <header><h1>LAMONIÊ FLOW</h1></header>
     <div class="categories-nav" id="catNav"></div>
-    <div class="search-container"><div class="search-box"><input type="text" id="searchInput" placeholder="Buscar álbum ou artista..."></div></div>
+    <div class="search-container"><div class="search-box"><input type="text" id="searchInput" placeholder="Buscar álbum ou artista..." onchange="search(this.value)"></div></div>
     
     <div class="main-grid" id="grid"></div>
 
@@ -104,8 +95,19 @@
 
     <script>
         const audio = document.getElementById('audioMain');
+        const grid = document.getElementById('grid');
+
+        // Gêneros da barra
         const generos = ["Destaques", "Forró", "Vaquejada", "Piseiro", "Sertanejo", "Arrocha", "Pagode", "Funk", "Trap", "Pop", "Rock", "Gospel"];
         
+        // LISTA DE MESTRES PARA OS 300 ÁLBUNS
+        const mestresForro = [
+            "Luiz Gonzaga", "Dominguinhos", "Sivuca", "Elba Ramalho", "Flávio José", 
+            "Alcymar Monteiro", "Mastruz com Leite", "Limão com Mel", "Magníficos", 
+            "Jackson do Pandeiro", "Trio Nordestino", "Santanna O Cantador", 
+            "Jorge de Altinho", "Petrúcio Amorim", "Waldonys", "Adelmário Coelho"
+        ];
+
         function carregarGeneros() {
             document.getElementById('catNav').innerHTML = generos.map(g => `<button class="cat-btn ${g === 'Destaques' ? 'active' : ''}" onclick="selecionarGenero(this, '${g}')">${g}</button>`).join('');
         }
@@ -113,22 +115,36 @@
         function selecionarGenero(btn, g) {
             document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-            search(g);
+            if(g === "Destaques") carregarDestaquesForro(); else search(g);
         }
 
-        async function search(q = "Wesley Safadão") {
-            const grid = document.getElementById('grid');
+        // CARREGA OS 300 ÁLBUNS DE FORRÓ
+        async function carregarDestaquesForro() {
+            grid.innerHTML = "";
+            for (const artista of mestresForro) {
+                try {
+                    const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(artista)}&entity=album&limit=20&country=BR`);
+                    const data = await res.json();
+                    data.results.forEach(t => renderCard(t));
+                } catch (e) {}
+            }
+        }
+
+        function renderCard(t) {
+            grid.innerHTML += `<div class="card" onclick="abrirAlbum('${t.collectionId}')">
+                <img src="${t.artworkUrl100.replace('100x100', '400x400')}">
+                <h4>${t.collectionName}</h4>
+                <p style="font-size:10px; color:#666;">${t.artistName}</p>
+            </div>`;
+        }
+
+        async function search(q) {
+            if(!q) return;
             grid.innerHTML = "";
             try {
-                const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(q)}&entity=album&limit=20&country=BR`);
+                const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(q)}&entity=album&limit=50&country=BR`);
                 const data = await res.json();
-                data.results.forEach(t => {
-                    grid.innerHTML += `<div class="card" onclick="abrirAlbum('${t.collectionId}')">
-                        <img src="${t.artworkUrl100.replace('100x100', '400x400')}">
-                        <h4>${t.collectionName}</h4>
-                        <p style="font-size:10px; color:#666;">${t.artistName}</p>
-                    </div>`;
-                });
+                data.results.forEach(t => renderCard(t));
             } catch (e) {}
         }
 
@@ -178,7 +194,7 @@
         function fecharPagina(id) { document.getElementById(id).style.display = 'none'; }
         
         carregarGeneros();
-        search();
+        carregarDestaquesForro();
     </script>
 </body>
 </html>
