@@ -4,24 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>LAMONIÊ FLOW</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --primary: #94b3ce; --bg: #000000; --text-main: #ffffff; }
         
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         body, html { width: 100%; overflow-x: hidden; background: var(--bg); color: var(--text-main); font-family: -apple-system, sans-serif; }
 
-        header { padding: 25px 15px 10px; display: flex; justify-content: space-between; align-items: flex-start; }
-        header h1 { color: #2ecc71; font-size: 26px; font-weight: 900; letter-spacing: -1px; flex: 1; }
-
-        /* NOVA FOGUEIRA ANIMADA EM LOOP 🔥 (CORREÇÃO) */
-        .fogueira-topo {
-            width: 80px; /* Tamanho discreto no topo */
-            height: auto;
-            border-radius: 8px;
-            display: block;
-            margin-right: 5px; /* Alinha com o relógio do iPhone nas fotos (cite: IMG_7284.jpg) */
-        }
+        /* CABEÇALHO LIMPO VOLTANDO AO ORIGINAL (IMG_7284.jpg, IMG_7286.jpg) */
+        header { padding: 25px 15px 10px; display: flex; align-items: center; }
+        header h1 { color: #2ecc71; font-size: 26px; font-weight: 900; letter-spacing: -1px; }
 
         /* LAYOUT PRESERVADO (IMG_7280.jpg, IMG_7286.jpg) */
         .categories-nav { display: flex; overflow-x: auto; padding: 10px 15px; gap: 8px; scrollbar-width: none; }
@@ -64,7 +56,6 @@
 <body>
     <header>
         <h1>LAMONIÊ FLOW</h1>
-        <img src="https://media.giphy.com/media/26hirw81b1E0nQWkU/giphy.gif" alt="Fogueira 🔥" class="fogueira-topo">
     </header>
 
     <div class="categories-nav" id="catNav"></div>
@@ -117,7 +108,7 @@
         let isLoop = false;
 
         const generos = ["Destaques", "Forró", "Vaquejada", "Piseiro", "Sertanejo", "Arrocha", "Brega", "Pagode", "Samba", "Axé", "Funk", "Trap", "Pop", "Rock", "MPB", "Gospel"];
-        const mestresForro = ["Luiz Gonzaga", "Dominguinhos", "Flávio José", "Elba Ramalho", "Wesley Safadão", "Nattan", "Xand Avião", "João Gomes", "Tarcísio do Acordeon", "Vitor Fernandes", "Mastruz com Leite", "Limão com Mel", "Magníficos", "Calcinha Preta", "Aviões do Forró"];
+        const mestresForro = ["Luiz Gonzaga", "Dominguinhos", "Flávio José", "Elba Ramalho", " Wesley Safadão", "Nattan", "Xand Avião", "João Gomes", "Tarcísio do Acordeon", "Vitor Fernandes", "Mastruz com Leite", "Limão com Mel", "Magníficos", "Calcinha Preta", "Aviões do Forró"];
 
         function carregarGeneros() {
             document.getElementById('catNav').innerHTML = generos.map(g => `<button class="cat-btn ${g === 'Destaques' ? 'active' : ''}" onclick="selecionarGenero(this, '${g}')">${g}</button>`).join('');
