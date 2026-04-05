@@ -6,14 +6,13 @@
     <title>LAMONIÊ FLOW</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --primary: #1db954; --bg: #000000; --text-main: #ffffff; --text-sub: #b3b3b3; }
+        :root { --primary: #1db954; --bg: #000000; --text-main: #ffffff; }
         
-        /* TRAVA TOTAL CONTRA ROLAGEM LATERAL */
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        /* TRAVA DE SEGURANÇA CONTRA ERROS DE TELA */
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         body, html { 
             width: 100%; 
-            max-width: 100%; 
-            overflow-x: hidden; 
+            overflow-x: hidden; /* Proíbe rolar para os lados */
             background: var(--bg); 
             color: var(--text-main); 
             font-family: 'Segoe UI', sans-serif; 
@@ -22,24 +21,18 @@
         header { padding: 20px 15px; }
         header h1 { color: var(--primary); font-size: 24px; font-weight: 900; }
 
-        /* GÊNEROS - APENAS ESTA BARRA ROLA PARA O LADO */
+        /* BARRA DE GÊNEROS - ROLA SÓ ELA */
         .categories-nav { 
             display: flex; 
             overflow-x: auto; 
             padding: 10px 15px; 
             gap: 8px; 
-            -webkit-overflow-scrolling: touch;
         }
         .categories-nav::-webkit-scrollbar { display: none; }
         .cat-btn { 
-            background: #2a2a2a; 
-            border: none; 
-            color: white; 
-            padding: 8px 16px; 
-            border-radius: 20px; 
-            font-size: 13px; 
-            font-weight: 600; 
-            flex-shrink: 0; 
+            background: #2a2a2a; border: none; color: white; 
+            padding: 8px 16px; border-radius: 20px; 
+            font-size: 13px; font-weight: 600; flex-shrink: 0; 
         }
         .cat-btn.active { background: var(--primary); color: black; }
 
@@ -47,26 +40,41 @@
         .search-box { display: flex; background: #1a1a1a; border-radius: 8px; border: 1px solid #333; align-items: center; }
         .search-box input { background: none; border: none; color: white; flex: 1; padding: 12px; outline: none; width: 100%; }
 
-        /* GRID FIXO: 2 ÁLBUNS SEMPRE LADO A LADO */
+        /* GRID CORRIGIDO: DOIS POR LINHA SEMPRE */
         .main-grid { 
-            display: grid !important; 
-            grid-template-columns: repeat(2, 1fr) !important; 
-            gap: 12px; 
-            padding: 15px 15px 150px; 
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            padding: 10px 15px 150px;
             width: 100%;
         }
-        .card { background: #181818; border-radius: 8px; padding: 10px; border: 1px solid #282828; width: 100%; }
-        .card img { width: 100%; aspect-ratio: 1/1; border-radius: 4px; object-fit: cover; }
-        .card h4 { font-size: 13px; margin-top: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .card { 
+            width: 47%; /* Garante que dois caibam com folga na largura */
+            background: #181818; 
+            border-radius: 8px; 
+            padding: 8px; 
+            margin-bottom: 15px;
+            border: 1px solid #282828; 
+        }
+        .card img { 
+            width: 100%; 
+            aspect-ratio: 1/1; 
+            border-radius: 4px; 
+            object-fit: cover; 
+            display: block;
+        }
+        .card h4 { 
+            font-size: 12px; margin-top: 8px; 
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; 
+        }
 
-        /* PÁGINA DO ÁLBUM COM BOTÕES DE PLAY NAS MÚSICAS */
+        /* PÁGINA DO ÁLBUM */
         .full-page { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; display: none; flex-direction: column; overflow-y: auto; }
-        .btn-voltar { margin: 15px; background: var(--primary); border: none; color: black; padding: 12px; border-radius: 25px; font-weight: 800; }
+        .btn-voltar { margin: 15px; background: var(--primary); border: none; color: black; padding: 12px; border-radius: 25px; font-weight: 800; width: fit-content; }
         .track-row { display: flex; align-items: center; padding: 15px; border-bottom: 1px solid #1a1a1a; }
-        .play-btn-list { color: var(--primary); margin-left: auto; font-size: 14px; }
 
-        /* PLAYER INFERIOR COM CONTROLES COMPLETOS */
-        .player { position: fixed; bottom: 0; width: 100%; background: rgba(18,18,18,0.98); padding: 15px 20px 35px; border-top: 1px solid #282828; z-index: 10001; display: none; }
+        /* PLAYER COM BOTÕES DE CONTROLE */
+        .player { position: fixed; bottom: 0; width: 100%; background: rgba(18,18,18,0.98); padding: 15px 20px 40px; border-top: 1px solid #282828; z-index: 10001; display: none; }
         .play-trigger { background: #fff; border: none; width: 45px; height: 45px; border-radius: 50%; color: #000; font-size: 18px; display: flex; align-items: center; justify-content: center; }
     </style>
 </head>
@@ -74,6 +82,7 @@
     <header><h1>LAMONIÊ FLOW</h1></header>
     <div class="categories-nav" id="catNav"></div>
     <div class="search-container"><div class="search-box"><input type="text" id="searchInput" placeholder="Buscar álbum ou artista..."></div></div>
+    
     <div class="main-grid" id="grid"></div>
 
     <div id="albumPage" class="full-page">
@@ -117,7 +126,7 @@
                     grid.innerHTML += `<div class="card" onclick="abrirAlbum('${t.collectionId}')">
                         <img src="${t.artworkUrl100.replace('100x100', '400x400')}">
                         <h4>${t.collectionName}</h4>
-                        <p style="font-size:11px; color:#b3b3b3;">${t.artistName}</p>
+                        <p style="font-size:10px; color:#666;">${t.artistName}</p>
                     </div>`;
                 });
             } catch (e) {}
@@ -131,24 +140,21 @@
                 const data = await res.json();
                 const album = data.results[0];
                 const musicas = data.results.slice(1);
-                const dataAno = new Date(album.releaseDate).getFullYear();
-
                 content.innerHTML = `
                     <div style="text-align:center; padding:20px;">
-                        <img src="${album.artworkUrl100.replace('100x100', '600x600')}" style="width:75%; border-radius:8px;">
-                        <h2 style="margin-top:15px; font-size:20px;">${album.collectionName}</h2>
-                        <p style="color:#b3b3b3; font-size:13px;">${album.artistName} • ${dataAno}</p>
-                        <p style="color:#666; font-size:11px; margin-top:5px;">Gravadora: ${album.copyright || 'N/A'}</p>
+                        <img src="${album.artworkUrl100.replace('100x100', '600x600')}" style="width:70%; border-radius:8px;">
+                        <h2 style="margin-top:15px; font-size:18px;">${album.collectionName}</h2>
+                        <p style="color:#666; font-size:12px;">${album.artistName} • ${new Date(album.releaseDate).getFullYear()}</p>
                     </div>
-                    <div style="padding-bottom: 100px;">
+                    <div style="padding-bottom: 120px;">
                         ${musicas.map((m, i) => `
                             <div class="track-row" onclick="tocar('${m.trackName.replace(/'/g, "")}', '${m.artistName}', '${m.previewUrl}')">
                                 <span style="color:#666; width:25px; font-size:12px;">${i+1}</span>
                                 <div style="flex:1;">
                                     <div style="font-size:14px; font-weight:500;">${m.trackName}</div>
-                                    <div style="font-size:11px; color:#666;">Comp: ${album.artistName}</div>
+                                    <div style="font-size:11px; color:#666;">Gravadora: ${album.copyright || 'N/A'}</div>
                                 </div>
-                                <i class="fas fa-play play-btn-list"></i>
+                                <i class="fas fa-play" style="color:var(--primary); font-size:12px;"></i>
                             </div>
                         `).join('')}
                     </div>
