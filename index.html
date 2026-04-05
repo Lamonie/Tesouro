@@ -45,9 +45,15 @@
 
         .track-row { display: flex; align-items: center; padding: 16px; border-bottom: 1px solid #1c1c1e; }
 
+        /* PLAYER COM BOTÃO ALEATÓRIO (IMG_7288.jpeg) */
         .player { position: fixed; bottom: 0; width: 100%; background: rgba(20,20,22,0.98); backdrop-filter: blur(20px); padding: 12px 20px 35px; border-top: 1px solid #333; z-index: 10001; transition: transform 0.4s ease; }
         .player.minimized { transform: translateY(80%); }
         .minimize-toggle { width: 40px; height: 5px; background: #3a3a3c; border-radius: 10px; margin: 0 auto 12px; }
+        
+        .player-controls { display: flex; align-items: center; gap: 15px; }
+        .shuffle-btn { background: none; border: none; color: #8e8e93; font-size: 18px; cursor: pointer; transition: 0.3s; }
+        .shuffle-btn.active { color: var(--primary); }
+        
         .play-trigger { background: var(--primary); border: none; width: 45px; height: 45px; border-radius: 50%; color: #000; font-size: 18px; display: flex; align-items: center; justify-content: center; }
     </style>
 </head>
@@ -85,7 +91,14 @@
                 <h4 id="trackTitle" style="font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Música</h4>
                 <p id="trackArtist" style="font-size:12px; color:var(--primary);">Artista</p>
             </div>
-            <button onclick="event.stopPropagation(); togglePlay();" id="playBtn" class="play-trigger"><i class="fas fa-pause"></i></button>
+            <div class="player-controls">
+                <button id="shuffleBtn" class="shuffle-btn" onclick="event.stopPropagation(); toggleShuffle();">
+                    <i class="fas fa-random"></i>
+                </button>
+                <button onclick="event.stopPropagation(); togglePlay();" id="playBtn" class="play-trigger">
+                    <i class="fas fa-pause"></i>
+                </button>
+            </div>
         </div>
     </footer>
 
@@ -96,6 +109,9 @@
         const grid = document.getElementById('grid');
         const player = document.getElementById('player');
         
+        let currentPlaylist = [];
+        let isShuffle = false;
+
         const generos = ["Destaques", "Forró", "Vaquejada", "Piseiro", "Sertanejo", "Arrocha", "Brega", "Pagode", "Samba", "Axé", "Funk", "Trap", "Pop", "Rock", "MPB", "Gospel"];
         const mestresForro = ["Luiz Gonzaga", "Dominguinhos", "Flávio José", "Elba Ramalho", "Wesley Safadão", "Nattan"];
 
@@ -117,94 +133,70 @@
         }
 
         async function carregarDestaques() {
-            grid.innerHTML = "<p style='padding:20px; color:#8e8e93;'>Carregando mestre do forró...</p>";
-            let htmlContent = "";
+            grid.innerHTML = "";
             for (const artista of mestresForro) {
-                try {
-                    const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(artista)}&entity=album&limit=4&country=BR`);
-                    const data = await res.json();
-                    data.results.forEach(t => {
-                        htmlContent += `<div class="card" onclick="abrirAlbum('${t.collectionId}')">
-                            <img src="${t.artworkUrl100.replace('100x100', '400x400')}">
-                            <h4>${t.collectionName}</h4>
-                            <p style="font-size:10px; color:#8e8e93;">${t.artistName}</p>
-                        </div>`;
-                    });
-                } catch(e) { console.error(e); }
+                const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(artista)}&entity=album&limit=4&country=BR`);
+                const data = await res.json();
+                data.results.forEach(t => renderCard(t));
             }
-            grid.innerHTML = htmlContent;
+        }
+
+        function renderCard(t) {
+            grid.innerHTML += `<div class="card" onclick="abrirAlbum('${t.collectionId}')">
+                <img src="${t.artworkUrl100.replace('100x100', '400x400')}">
+                <h4>${t.collectionName}</h4>
+                <p style="font-size:10px; color:#8e8e93;">${t.artistName}</p>
+            </div>`;
         }
 
         async function search(q) {
             if(!q) return;
-            grid.innerHTML = "<p style='padding:20px; color:#8e8e93;'>Buscando...</p>";
-            try {
-                const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(q)}&entity=album&limit=40&country=BR`);
-                const data = await res.json();
-                grid.innerHTML = "";
-                if(data.results.length === 0) grid.innerHTML = "<p style='padding:20px;'>Nada encontrado.</p>";
-                data.results.forEach(t => {
-                    grid.innerHTML += `<div class="card" onclick="abrirAlbum('${t.collectionId}')">
-                        <img src="${t.artworkUrl100.replace('100x100', '400x400')}">
-                        <h4>${t.collectionName}</h4>
-                        <p style="font-size:10px; color:#8e8e93;">${t.artistName}</p>
-                    </div>`;
-                });
-            } catch(e) { grid.innerHTML = "<p style='padding:20px;'>Erro na conexão.</p>"; }
+            grid.innerHTML = "<p style='padding:20px;'>Buscando...</p>";
+            const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(q)}&entity=album&limit=30&country=BR`);
+            const data = await res.json();
+            grid.innerHTML = "";
+            data.results.forEach(t => renderCard(t));
         }
 
-        // CORREÇÃO: FUNÇÃO ABRIR ÁLBUM COM LIMPEZA DE CACHE
         async function abrirAlbum(id) {
             const page = document.getElementById('albumPage');
             const content = document.getElementById('albumDetailContent');
-            
-            // Limpa o conteúdo anterior antes de abrir
-            content.innerHTML = "<p style='padding:50px; text-align:center;'>Carregando conteúdo real...</p>";
+            content.innerHTML = "<p style='padding:50px; text-align:center;'>Carregando...</p>";
             page.style.display = 'flex';
             
-            try {
-                const res = await fetch(`https://itunes.apple.com/lookup?id=${id}&entity=song`);
-                const data = await res.json();
+            const res = await fetch(`https://itunes.apple.com/lookup?id=${id}&entity=song`);
+            const data = await res.json();
+            const album = data.results[0];
+            const musicas = data.results.slice(1);
+            currentPlaylist = musicas; // Salva para o Shuffle
+            
+            content.innerHTML = `
+                <div style="text-align:center; padding:30px 20px;">
+                    <img src="${album.artworkUrl100.replace('100x100', '600x600')}" style="width:80%; border-radius:15px;">
+                    <h2 style="margin-top:25px; font-size:22px;">${album.collectionName}</h2>
+                    <p style="color:var(--primary); font-weight:bold; margin-top:5px;">${album.artistName}</p>
+                </div>
                 
-                if(!data.results || data.results.length < 2) {
-                    content.innerHTML = "<div style='text-align:center; padding:50px;'><h2>Álbum indisponível</h2><p>Este álbum não possui prévias disponíveis no momento.</p></div>";
-                    return;
-                }
+                <div class="album-info-box">
+                    <span><b>Lançamento:</b> ${new Date(album.releaseDate).toLocaleDateString('pt-BR')}</span><br>
+                    <span><b>Ano:</b> ${new Date(album.releaseDate).getFullYear()}</span><br>
+                    <span><b>Compositor:</b> ${album.artistName}</span><br>
+                    <span><b>Gravadora:</b> ${album.copyright || "Independente"}</span>
+                </div>
 
-                const album = data.results[0];
-                const musicas = data.results.slice(1);
-                
-                content.innerHTML = `
-                    <div style="text-align:center; padding:30px 20px;">
-                        <img src="${album.artworkUrl100.replace('100x100', '600x600')}" style="width:80%; border-radius:15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
-                        <h2 style="margin-top:25px; font-size:22px;">${album.collectionName}</h2>
-                        <p style="color:var(--primary); font-weight:bold; margin-top:5px;">${album.artistName}</p>
-                    </div>
-                    
-                    <div class="album-info-box">
-                        <span><b>Lançamento:</b> ${new Date(album.releaseDate).toLocaleDateString('pt-BR')}</span><br>
-                        <span><b>Ano:</b> ${new Date(album.releaseDate).getFullYear()}</span><br>
-                        <span><b>Compositor:</b> ${album.artistName}</span><br>
-                        <span><b>Gravadora:</b> ${album.copyright || "Independente"}</span>
-                    </div>
-
-                    <div style="padding-bottom: 180px;">
-                        ${musicas.map((m, i) => `
-                            <div class="track-row" onclick="tocar('${m.trackName.replace(/'/g, "")}', '${m.artistName}', '${m.previewUrl}')">
-                                <span style="color:#48484a; width:35px; font-weight:bold;">${i+1}</span>
-                                <div style="flex:1;"><div style="font-size:15px;">${m.trackName}</div></div>
-                                <i class="fas fa-play-circle" style="color:var(--primary); font-size:20px;"></i>
-                            </div>
-                        `).join('')}
-                    </div>
-                `;
-            } catch(e) {
-                content.innerHTML = "<p style='padding:50px; text-align:center;'>Erro ao carregar álbum. Tente outro.</p>";
-            }
+                <div style="padding-bottom: 180px;">
+                    ${musicas.map((m, i) => `
+                        <div class="track-row" onclick="tocar('${m.trackName.replace(/'/g, "")}', '${m.artistName}', '${m.previewUrl}')">
+                            <span style="color:#48484a; width:35px; font-weight:bold;">${i+1}</span>
+                            <div style="flex:1;"><div style="font-size:15px;">${m.trackName}</div></div>
+                            <i class="fas fa-play-circle" style="color:var(--primary); font-size:20px;"></i>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
         }
 
         function tocar(nome, artista, url) {
-            if(!url) return alert("Prévia não disponível");
             audio.src = url; audio.play();
             player.style.display = 'block';
             player.classList.remove('minimized');
@@ -212,6 +204,23 @@
             document.getElementById('trackArtist').innerText = artista;
             document.getElementById('playBtn').innerHTML = '<i class="fas fa-pause"></i>';
         }
+
+        function toggleShuffle() {
+            isShuffle = !isShuffle;
+            const btn = document.getElementById('shuffleBtn');
+            btn.classList.toggle('active', isShuffle);
+            if(isShuffle && currentPlaylist.length > 0) {
+                const randomTrack = currentPlaylist[Math.floor(Math.random() * currentPlaylist.length)];
+                tocar(randomTrack.trackName, randomTrack.artistName, randomTrack.previewUrl);
+            }
+        }
+
+        audio.onended = () => {
+            if(isShuffle && currentPlaylist.length > 0) {
+                const randomTrack = currentPlaylist[Math.floor(Math.random() * currentPlaylist.length)];
+                tocar(randomTrack.trackName, randomTrack.artistName, randomTrack.previewUrl);
+            }
+        };
 
         function togglePlay() {
             if(audio.paused) { audio.play(); document.getElementById('playBtn').innerHTML = '<i class="fas fa-pause"></i>'; }
