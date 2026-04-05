@@ -7,10 +7,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { 
-            --primary: #1db954; /* Verde Spotify padrão */
+            --primary: #1db954; 
             --bg: #000000; 
             --surface: #121212; 
-            --card-hover: #282828;
             --text-main: #ffffff;
             --text-sub: #b3b3b3;
         }
@@ -26,7 +25,6 @@
             overflow-x: hidden; 
         }
 
-        /* FUNDO LIMPO - SEM TIMELINE OU AURORA AGRESSIVA */
         .bg-static { 
             position: fixed; 
             top: 0; 
@@ -41,7 +39,6 @@
         header h1 { color: var(--primary); font-size: 28px; font-weight: 900; letter-spacing: -1px; }
         header p { color: var(--text-sub); font-size: 12px; font-weight: bold; margin-top: 4px; }
 
-        /* NAVEGAÇÃO SEM BORDAS NEON */
         .categories-nav { 
             display: flex; 
             overflow-x: auto; 
@@ -61,18 +58,15 @@
             font-size: 14px; 
             font-weight: 600; 
             cursor: pointer;
-            transition: background 0.2s;
         }
         .cat-btn.active { background: var(--primary); color: black; }
 
-        /* BUSCA DISCRETA */
         .search-container { padding: 10px 20px 20px; }
         .search-box { 
             display: flex; 
             background: #242424; 
             border-radius: 4px; 
             padding: 2px; 
-            border: 1px solid transparent;
         }
         .search-box input { 
             background: none; 
@@ -83,9 +77,8 @@
             outline: none; 
             font-size: 14px; 
         }
-        .btn-start { background: none; border: none; color: var(--text-sub); padding: 0 15px; cursor: pointer; }
+        .btn-start { background: none; border: none; color: var(--text-sub); padding: 0 15px; }
 
-        /* GRID DE CARDS ESTILO SPOTIFY - SEM BRILHO EXTERNO */
         .main-grid { 
             display: grid; 
             grid-template-columns: repeat(2, 1fr); 
@@ -96,21 +89,16 @@
             background: #181818; 
             border-radius: 8px; 
             padding: 12px; 
-            transition: background 0.3s;
-            border: none; /* LED REMOVIDO */
-            box-shadow: none; /* LED REMOVIDO */
         }
         .card img { 
             width: 100%; 
             border-radius: 4px; 
             aspect-ratio: 1/1; 
             object-fit: cover; 
-            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
         }
         .card h4 { margin: 12px 0 4px; font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .card p { color: var(--text-sub); font-size: 12px; }
 
-        /* PÁGINA DE ÁLBUM */
         .full-page { 
             position: fixed; 
             top: 0; 
@@ -138,9 +126,8 @@
             background: linear-gradient(180deg, #282828 0%, #121212 100%); 
             text-align: center; 
         }
-        .album-header img { width: 200px; height: 200px; border-radius: 4px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .album-header img { width: 200px; height: 200px; border-radius: 4px; }
 
-        /* PLAYER RODAPÉ - ESTILO FLAT */
         .player { 
             position: fixed; 
             bottom: 0; 
@@ -151,13 +138,9 @@
             z-index: 10001; 
             display: none; 
         }
-        .player-info h4 { font-size: 14px; margin-bottom: 2px; }
-        .player-info p { font-size: 12px; color: var(--primary); }
-        .play-trigger { background: white; border: none; width: 45px; height: 45px; border-radius: 50%; color: black; font-size: 18px; }
+        .play-trigger { background: white; border: none; width: 45px; height: 45px; border-radius: 50%; color: black; }
 
-        /* LISTA DE MÚSICAS */
-        .track-row { display: flex; align-items: center; padding: 12px 20px; transition: background 0.2s; }
-        .track-row:active { background: #282828; }
+        .track-row { display: flex; align-items: center; padding: 12px 20px; }
         .track-num { color: var(--text-sub); width: 30px; font-size: 14px; }
         .track-meta { flex: 1; }
         .track-meta div { font-size: 14px; }
@@ -172,13 +155,8 @@
             <p>SÓ HITS</p>
         </header>
 
-        <div class="categories-nav">
-            <button class="cat-btn active" onclick="carregarHome()">Destaques</button>
-            <button class="cat-btn" onclick="search('Vaquejada')">Vaquejada</button>
-            <button class="cat-btn" onclick="search('Piseiro')">Piseiro</button>
-            <button class="cat-btn" onclick="search('Forró')">Forró</button>
-            <button class="cat-btn" onclick="search('Sertanejo')">Sertanejo</button>
-        </div>
+        <div class="categories-nav" id="catNav">
+            </div>
 
         <div class="search-container">
             <div class="search-box">
@@ -198,8 +176,8 @@
     <footer class="player" id="player">
         <div style="display: flex; justify-content: space-between; align-items: center;">
             <div class="player-info">
-                <h4 id="trackTitle">Música</h4>
-                <p id="trackArtist">Artista</p>
+                <h4 id="trackTitle" style="font-size:14px;">Música</h4>
+                <p id="trackArtist" style="font-size:12px; color:var(--primary);">Artista</p>
             </div>
             <button onclick="togglePlay()" id="playBtn" class="play-trigger"><i class="fas fa-pause"></i></button>
         </div>
@@ -211,14 +189,41 @@
         const audio = document.getElementById('audioMain');
         const grid = document.getElementById('grid');
 
-        // Albuns reais para carregar na home
-        const albunsIniciais = ["Wesley Safadao", "Nattanzinho", "Mari Fernandez", "Jorge e Mateus", "Henrique e Juliano", "Ze Neto e Cristiano"];
+        // LISTA DE 30 ÁLBUNS/ARTISTAS PARA A HOME
+        const albunsIniciais = [
+            "Luiz Gonzaga", "Dominguinhos", "Sivuca", "Mestrinho", "Elba Ramalho", 
+            "Flávio José", "Alceu Valença", "Mastruz com Leite", "Limão com Mel", "Magníficos",
+            "Wesley Safadão", "Nattanzinho", "Mari Fernandez", "Xand Avião", "João Gomes",
+            "Tarcísio do Acordeon", "Vitor Fernandes", "Iguinho e Lulinha", "Henry Freitas", "Nadson o Ferinha",
+            "Henrique e Juliano", "Jorge e Mateus", "Gusttavo Lima", "Ana Castela", "Zé Neto e Cristiano",
+            "Luan Santana", "Matuê", "Mc Ryan SP", "Luísa Sonza", "Pabllo Vittar"
+        ];
+
+        // TODOS OS GÊNEROS
+        const generos = [
+            "Destaques", "Forró", "Vaquejada", "Piseiro", "Sertanejo", "Brega", "Arrocha", 
+            "MPB", "Axé", "Pagode", "Samba", "Funk", "Trap", "Rap", "Pop", "Rock", 
+            "Gospel", "Eletrônica", "Reggae", "Lo-fi", "Jazz", "Blues", "Clássica", "Country"
+        ];
+
+        function carregarGeneros() {
+            const nav = document.getElementById('catNav');
+            nav.innerHTML = generos.map(g => `
+                <button class="cat-btn ${g === 'Destaques' ? 'active' : ''}" onclick="selecionarGenero(this, '${g}')">${g}</button>
+            `).join('');
+        }
+
+        function selecionarGenero(btn, g) {
+            document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            if(g === 'Destaques') carregarHome(); else search(g);
+        }
 
         async function carregarHome() {
             grid.innerHTML = "";
-            for (const artista of albunsIniciais) {
+            for (const item of albunsIniciais) {
                 try {
-                    const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(artista)}&entity=album&limit=1&country=BR`);
+                    const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(item)}&entity=album&limit=1&country=BR`);
                     const data = await res.json();
                     if (data.results.length > 0) {
                         const t = data.results[0];
@@ -239,7 +244,7 @@
             if(!term) return;
             grid.innerHTML = "<p style='padding:20px; color:#b3b3b3;'>Buscando...</p>";
             try {
-                const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(term)}&entity=album&limit=20&country=BR`);
+                const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(term)}&entity=album&limit=30&country=BR`);
                 const data = await res.json();
                 grid.innerHTML = data.results.map(t => `
                     <div class="card" onclick="abrirAlbum('${t.collectionId}')">
@@ -253,7 +258,7 @@
 
         async function abrirAlbum(id) {
             document.getElementById('albumPage').style.display = 'flex';
-            document.getElementById('albumDetailContent').innerHTML = "<p style='padding:20px;'>Carregando tracks...</p>";
+            document.getElementById('albumDetailContent').innerHTML = "<p style='padding:20px;'>Carregando...</p>";
             try {
                 const res = await fetch(`https://itunes.apple.com/lookup?id=${id}&entity=song`);
                 const data = await res.json();
@@ -296,6 +301,7 @@
 
         function fecharPagina(id) { document.getElementById(id).style.display = 'none'; }
         
+        carregarGeneros();
         carregarHome();
     </script>
 </body>
