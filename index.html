@@ -44,14 +44,13 @@
         .album-info-box b { color: var(--primary); text-transform: uppercase; }
 
         .track-row { display: flex; align-items: center; padding: 16px; border-bottom: 1px solid #1c1c1e; }
-        .track-row.playing { background: rgba(148, 179, 206, 0.1); }
 
         .player { position: fixed; bottom: 0; width: 100%; background: rgba(20,20,22,0.98); backdrop-filter: blur(20px); padding: 12px 20px 35px; border-top: 1px solid #333; z-index: 10001; transition: transform 0.4s ease; }
         .player.minimized { transform: translateY(80%); }
         .minimize-toggle { width: 40px; height: 5px; background: #3a3a3c; border-radius: 10px; margin: 0 auto 12px; }
         
         .player-controls { display: flex; align-items: center; gap: 12px; }
-        .control-icon { background: none; border: none; color: #8e8e93; font-size: 16px; cursor: pointer; transition: 0.3s; }
+        .control-icon { background: none; border: none; color: #8e8e93; font-size: 16px; cursor: pointer; }
         .control-icon.active { color: var(--primary); }
         
         .play-trigger { background: var(--primary); border: none; width: 42px; height: 42px; border-radius: 50%; color: #000; font-size: 16px; display: flex; align-items: center; justify-content: center; }
@@ -90,15 +89,9 @@
                 <p id="trackArtist" style="font-size:12px; color:var(--primary);">Artista</p>
             </div>
             <div class="player-controls">
-                <button id="shuffleBtn" class="control-icon" onclick="event.stopPropagation(); toggleShuffle();">
-                    <i class="fas fa-random"></i>
-                </button>
-                <button id="loopBtn" class="control-icon" onclick="event.stopPropagation(); toggleLoop();">
-                    <i class="fas fa-redo-alt"></i>
-                </button>
-                <button onclick="event.stopPropagation(); togglePlay();" id="playBtn" class="play-trigger">
-                    <i class="fas fa-pause"></i>
-                </button>
+                <button id="shuffleBtn" class="control-icon" onclick="event.stopPropagation(); toggleShuffle();"><i class="fas fa-random"></i></button>
+                <button id="loopBtn" class="control-icon" onclick="event.stopPropagation(); toggleLoop();"><i class="fas fa-redo-alt"></i></button>
+                <button onclick="event.stopPropagation(); togglePlay();" id="playBtn" class="play-trigger"><i class="fas fa-pause"></i></button>
             </div>
         </div>
     </footer>
@@ -117,6 +110,9 @@
 
         const generos = ["Destaques", "Forró", "Vaquejada", "Piseiro", "Sertanejo", "Arrocha", "Brega", "Pagode", "Samba", "Axé", "Funk", "Trap", "Pop", "Rock", "MPB", "Gospel"];
         
+        // ARTISTAS PARA GERAR OS 300 ÁLBUNS
+        const mestresForro = ["Luiz Gonzaga", "Dominguinhos", "Flávio José", "Elba Ramalho", "Wesley Safadão", "Nattan", "Xand Avião", "João Gomes", "Tarcísio do Acordeon", "Vitor Fernandes", "Mastruz com Leite", "Limão com Mel", "Magníficos", "Calcinha Preta", "Aviões do Forró", "Saia Rodada", "Barões da Pisadinha", "Fagner", "Alceu Valença", "Zand"];
+
         function carregarGeneros() {
             document.getElementById('catNav').innerHTML = generos.map(g => `<button class="cat-btn ${g === 'Destaques' ? 'active' : ''}" onclick="selecionarGenero(this, '${g}')">${g}</button>`).join('');
         }
@@ -124,13 +120,34 @@
         function selecionarGenero(btn, g) {
             document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-            search(g === "Destaques" ? "Forró" : g);
+            if(g === "Destaques") carregar300Albuns(); else search(g);
+        }
+
+        // FUNÇÃO PARA CARREGAR OS 300 ÁLBUNS
+        async function carregar300Albuns() {
+            grid.innerHTML = "<p style='padding:20px;'>Carregando sua coleção...</p>";
+            let htmlContent = "";
+            for (const artista of mestresForro) {
+                try {
+                    const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(artista)}&entity=album&limit=15&country=BR`);
+                    const data = await res.json();
+                    data.results.forEach(t => {
+                        htmlContent += `<div class="card" onclick="abrirAlbum('${t.collectionId}')">
+                            <img src="${t.artworkUrl100.replace('100x100', '400x400')}">
+                            <h4>${t.collectionName}</h4>
+                            <p style="font-size:10px; color:#8e8e93;">${t.artistName}</p>
+                        </div>`;
+                    });
+                } catch(e) {}
+            }
+            grid.innerHTML = htmlContent;
         }
 
         async function search(q) {
-            grid.innerHTML = "";
-            const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(q)}&entity=album&limit=20&country=BR`);
+            grid.innerHTML = "<p style='padding:20px;'>Buscando...</p>";
+            const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(q)}&entity=album&limit=40&country=BR`);
             const data = await res.json();
+            grid.innerHTML = "";
             data.results.forEach(t => {
                 grid.innerHTML += `<div class="card" onclick="abrirAlbum('${t.collectionId}')">
                     <img src="${t.artworkUrl100.replace('100x100', '400x400')}">
@@ -143,6 +160,7 @@
         async function abrirAlbum(id) {
             const page = document.getElementById('albumPage');
             const content = document.getElementById('albumDetailContent');
+            content.innerHTML = "<p style='padding:50px; text-align:center;'>Abrindo álbum...</p>";
             page.style.display = 'flex';
             
             const res = await fetch(`https://itunes.apple.com/lookup?id=${id}&entity=song`);
@@ -154,6 +172,11 @@
                 <div style="text-align:center; padding:30px 20px;">
                     <img src="${album.artworkUrl100.replace('100x100', '600x600')}" style="width:80%; border-radius:15px;">
                     <h2 style="margin-top:25px; font-size:22px; color:white;">${album.collectionName}</h2>
+                </div>
+                <div class="album-info-box">
+                    <span><b>Lançamento:</b> ${new Date(album.releaseDate).toLocaleDateString('pt-BR')}</span><br>
+                    <span><b>Ano:</b> ${new Date(album.releaseDate).getFullYear()}</span><br>
+                    <span><b>Gravadora:</b> ${album.copyright || "Independente"}</span>
                 </div>
                 <div style="padding-bottom: 180px;">
                     ${currentPlaylist.map((m, i) => `
@@ -182,29 +205,13 @@
             document.getElementById('playBtn').innerHTML = '<i class="fas fa-pause"></i>';
         }
 
-        // LÓGICA DE LOOP E PULO AUTOMÁTICO
-        function toggleLoop() {
-            isLoop = !isLoop;
-            document.getElementById('loopBtn').classList.toggle('active', isLoop);
-        }
-
-        function toggleShuffle() {
-            isShuffle = !isShuffle;
-            document.getElementById('shuffleBtn').classList.toggle('active', isShuffle);
-        }
+        function toggleLoop() { isLoop = !isLoop; document.getElementById('loopBtn').classList.toggle('active', isLoop); }
+        function toggleShuffle() { isShuffle = !isShuffle; document.getElementById('shuffleBtn').classList.toggle('active', isShuffle); }
 
         audio.onended = () => {
-            if(isLoop) {
-                audio.play(); // Repete a mesma música
-            } else if(isShuffle) {
-                let next = Math.floor(Math.random() * currentPlaylist.length);
-                tocarDoAlbum(next);
-            } else {
-                // PULA PARA A PRÓXIMA AUTOMATICAMENTE
-                if(currentIndex < currentPlaylist.length - 1) {
-                    tocarDoAlbum(currentIndex + 1);
-                }
-            }
+            if(isLoop) audio.play();
+            else if(isShuffle) tocarDoAlbum(Math.floor(Math.random() * currentPlaylist.length));
+            else if(currentIndex < currentPlaylist.length - 1) tocarDoAlbum(currentIndex + 1);
         };
 
         function togglePlay() {
@@ -218,7 +225,7 @@
         function limparBusca() { document.getElementById('searchInput').value = ""; toggleClearBtn(""); }
 
         carregarGeneros();
-        search("Forró");
+        carregar300Albuns();
     </script>
 </body>
 </html>
