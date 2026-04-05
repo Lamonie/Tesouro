@@ -27,7 +27,9 @@
         .bg-static { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: -1; }
 
         header { padding: 25px 15px 5px; text-align: left; }
-        header h1 { color: var(--primary); font-size: 24px; font-weight: 900; }
+        
+        /* NOME EM BRANCO */
+        header h1 { color: #ffffff; font-size: 24px; font-weight: 900; }
         
         #dataHora { 
             font-size: 12px; 
@@ -35,6 +37,8 @@
             letter-spacing: 1px;
             text-transform: uppercase;
             animation: colorLoop 5s infinite linear;
+            margin-top: 5px;
+            display: block;
         }
 
         @keyframes colorLoop {
@@ -55,7 +59,6 @@
         .search-box input { background: none; border: none; color: white; flex: 1; padding: 12px; outline: none; font-size: 14px; }
         .btn-start { background: none; border: none; color: var(--text-sub); padding: 0 15px; }
 
-        /* TRAVA DO LAYOUT: 2 POR LINHA SEMPRE */
         .main-grid { 
             display: grid; 
             grid-template-columns: repeat(2, 1fr); 
@@ -70,7 +73,6 @@
             display: flex; 
             flex-direction: column;
             width: 100%;
-            overflow: hidden;
         }
         .card img { 
             width: 100%; 
@@ -93,7 +95,7 @@
         .btn-voltar { margin: 15px; background: #1db954; border: none; color: black; padding: 10px 20px; border-radius: 5px; font-weight: 800; font-size: 12px; width: fit-content; text-transform: uppercase; }
         
         .album-header { padding: 20px; text-align: center; }
-        .album-header img { width: 220px; height: 220px; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
+        .album-header img { width: 220px; height: 220px; border-radius: 8px; }
         
         .track-row { display: flex; align-items: center; padding: 15px; border-bottom: 1px solid #1a1a1a; }
         .track-num { color: var(--text-sub); width: 30px; font-size: 14px; }
@@ -157,16 +159,18 @@
         setInterval(atualizarRelogio, 1000);
         atualizarRelogio();
 
+        // TODOS OS GÊNEROS EXISTENTES
+        const generos = [
+            "Destaques", "Forró", "Vaquejada", "Piseiro", "Sertanejo", "Arrocha", "Brega", "Funk", "Pagode", "Samba", "Axé", 
+            "MPB", "Trap", "Rap", "Hip Hop", "Pop", "Rock", "Heavy Metal", "Gospel", "Reggae", "Eletrônica", "House", "Techno", 
+            "Jazz", "Blues", "Soul", "R&B", "Country", "Folk", "Latino", "Reggaeton", "K-Pop", "Clássica", "Lo-fi", "Indie", "Dance"
+        ];
+
         const artistasBase = [
             "Luiz Gonzaga", "Dominguinhos", "Mastruz com Leite", "Wesley Safadão", "Nattanzinho",
             "Mari Fernandez", "João Gomes", "Tarcísio do Acordeon", "Iguinho e Lulinha", "Henry Freitas",
-            "Nadson o Ferinha", "Jorge e Mateus", "Henrique e Juliano", "Gusttavo Lima", "Ana Castela",
-            "Luan Santana", "Matuê", "Mc Ryan SP", "Luísa Sonza", "Pabllo Vittar", "Felipe Amorim",
-            "Limão com Mel", "Magníficos", "Flávio José", "Elba Ramalho", "Alceu Valença", "Zé Vaqueiro",
-            "Xand Avião", "Simone Mendes", "Mano Walter", "Calcinha Preta", "Dorgival Dantas", "Taty Girl"
+            "Nadson o Ferinha", "Jorge e Mateus", "Henrique e Juliano", "Gusttavo Lima", "Ana Castela"
         ];
-
-        const generos = ["Destaques", "Forró", "Vaquejada", "Piseiro", "Sertanejo", "Brega", "Axé", "Pagode", "Funk", "Trap", "Pop", "Rock"];
 
         function carregarGeneros() {
             document.getElementById('catNav').innerHTML = generos.map(g => `
@@ -184,7 +188,7 @@
             grid.innerHTML = "";
             for (const nome of artistasBase) {
                 try {
-                    const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(nome)}&entity=album&limit=9&country=BR`);
+                    const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(nome)}&entity=album&limit=15&country=BR`);
                     const data = await res.json();
                     data.results.forEach(t => renderCard(t));
                 } catch (e) {}
@@ -223,8 +227,8 @@
                 document.getElementById('albumDetailContent').innerHTML = `
                     <div class="album-header">
                         <img src="${album.artworkUrl100.replace('100x100', '600x600')}">
-                        <h2 style="margin-top:20px; font-size:20px;">${album.collectionName}</h2>
-                        <p style="color:var(--primary); font-size:16px;">${album.artistName}</p>
+                        <h2 style="margin-top:20px;">${album.collectionName}</h2>
+                        <p style="color:var(--primary);">${album.artistName}</p>
                     </div>
                     <div style="padding-bottom: 150px;">
                         ${musicas.map((m, i) => `
