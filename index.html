@@ -3,111 +3,124 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>LAMONIÊ FLOW | LED EDITION</title>
+    <title>LAMONIÊ FLOW | PIP REAL</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --primary: #1db954; --bg: #050505; --surface: #121212; }
-        * { box-sizing: border-box; touch-action: pan-y; -webkit-user-select: none; margin: 0; padding: 0; }
+        * { box-sizing: border-box; touch-action: manipulation; margin: 0; padding: 0; }
         body, html { width: 100%; height: 100%; background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; overflow-x: hidden; }
         
-        /* Seu Layout Original Neon */
         .bg-animated { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(45deg, #050505, #0a2a0a, #050505, #1a0a2a); background-size: 400% 400%; animation: aurora 10s ease infinite; z-index: -2; }
         @keyframes aurora { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
+        @keyframes led-loop {
+            0% { border-color: #1db954; box-shadow: 0 0 10px #1db954; }
+            50% { border-color: #ff00ff; box-shadow: 0 0 10px #ff00ff; }
+            100% { border-color: #1db954; box-shadow: 0 0 10px #1db954; }
+        }
+
         .categories-nav { display: flex; overflow-x: auto; padding: 15px 20px; gap: 10px; scrollbar-width: none; }
-        .cat-btn { background: rgba(255,255,255,0.05); border: 2px solid var(--primary); color: white; padding: 10px 18px; border-radius: 50px; white-space: nowrap; font-size: 13px; font-weight: bold; }
+        .cat-btn { background: rgba(255,255,255,0.05); border: 2px solid transparent; color: white; padding: 10px 18px; border-radius: 50px; white-space: nowrap; font-size: 13px; font-weight: bold; animation: led-loop 5s linear infinite; }
+
+        .search-container { padding: 0 20px 20px; }
+        .search-box { display: flex; background: rgba(0,0,0,0.6); border-radius: 50px; padding: 5px; border: 2px solid var(--primary); }
+        .search-box input { background: none; border: none; color: white; flex: 1; padding: 12px; outline: none; font-size: 16px; width: 100%; }
+        .btn-start { background: var(--primary); border: none; color: #000; padding: 0 20px; border-radius: 50px; font-weight: 900; }
 
         .main-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; padding: 0 20px 150px; }
-        .card { background: var(--surface); border-radius: 15px; padding: 10px; border: 1px solid #222; }
+        .card { background: var(--surface); border-radius: 15px; padding: 10px; border: 2px solid transparent; animation: led-loop 6s linear infinite; }
         .card img { width: 100%; border-radius: 10px; aspect-ratio: 1/1; object-fit: cover; }
-
-        /* --- MINI PLAYER ESTILO YOUTUBE (O QUE VOCÊ PEDIU) --- */
-        #customPipPlayer { 
-            position: fixed; bottom: 100px; left: 10px; 
-            width: 170px; height: 95px; 
-            background: #181818; border-radius: 12px; 
-            border: 1px solid rgba(255,255,255,0.2);
-            z-index: 10001; display: none; overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-            touch-action: none; /* Permite o arraste 360 */
-        }
-
-        .pip-video-area { width: 100%; height: 100%; position: relative; background: #000; }
-        .pip-video-area img { width: 100%; height: 100%; object-fit: cover; opacity: 0.7; }
         
-        /* Botões Play e X exatamente como na sua imagem */
-        .pip-play-btn { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-size: 28px; text-shadow: 0 0 10px rgba(0,0,0,1); }
-        .pip-close-btn { position: absolute; top: 8px; right: 8px; color: white; font-size: 20px; background: rgba(0,0,0,0.6); width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        .full-page { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; display: none; flex-direction: column; overflow-y: auto; }
+        .album-header { padding: 30px 20px; text-align: center; border-bottom: 2px solid var(--primary); }
 
-        /* Estilo para quando ele minimiza na direita */
-        #customPipPlayer.minimized { 
-            width: 55px; height: 55px; border-radius: 50%; 
-            left: calc(100% - 65px) !important; border: 2px solid var(--primary);
+        /* Estilo do Mini Player interno (Barra de baixo) */
+        .mini-player-bar {
+            position: fixed; bottom: 0; left: 0; width: 100%;
+            background: rgba(18, 18, 18, 0.9); backdrop-filter: blur(10px);
+            padding: 10px 20px; border-top: 1px solid #333;
+            display: none; align-items: center; justify-content: space-between; z-index: 10000;
         }
-        #customPipPlayer.minimized .pip-video-area { display: none; }
-        #customPipPlayer.minimized .mini-trigger { display: flex; width: 100%; height: 100%; align-items: center; justify-content: center; color: var(--primary); font-size: 22px; }
 
-        .mini-trigger { display: none; }
-        .full-page { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; display: none; flex-direction: column; }
+        /* Elemento de vídeo invisível necessário para o PiP Real */
+        #pipVideo { width: 0; height: 0; position: absolute; pointer-events: none; opacity: 0; }
+        
+        .btn-pip-trigger {
+            background: var(--primary); color: black; border: none; 
+            padding: 8px 15px; border-radius: 20px; font-weight: bold; font-size: 12px;
+        }
     </style>
 </head>
 <body>
     <div class="bg-animated"></div>
 
+    <video id="pipVideo" playsinline muted loop></video>
+
     <div id="homePage">
         <header style="padding: 20px;">
-            <h1 style="color: var(--primary); font-size: 26px;">LAMONIÊ FLOW</h1>
-            <p style="font-size: 10px; color: #888;">STREAMING PROFESSIONAL EXPERIENCE</p>
+            <h1 style="color: var(--primary);">LAMONIÊ FLOW</h1>
+            <p style="font-size: 10px; font-weight: bold;">STREAMING PROFESSIONAL EXPERIENCE</p>
         </header>
 
         <div class="categories-nav">
-            <button class="cat-btn">Vaquejada</button>
-            <button class="cat-btn">Piseiro</button>
-            <button class="cat-btn">Sertanejo</button>
+            <button class="cat-btn">Destaques</button>
+            <button class="cat-btn" onclick="search('Vaquejada')">Vaquejada</button>
+            <button class="cat-btn" onclick="search('Sertanejo')">Sertanejo</button>
         </div>
 
-        <div class="main-grid" id="grid">
+        <div class="search-container">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Buscar álbum ou artista...">
+                <button class="btn-start" onclick="search()"><i class="fas fa-search"></i></button>
             </div>
+        </div>
+
+        <div class="main-grid" id="grid"></div>
     </div>
 
     <div id="albumPage" class="full-page">
-        <button style="margin:20px; padding:12px; background:#222; color:white; border:1px solid var(--primary); border-radius:50px;" onclick="document.getElementById('albumPage').style.display='none'">🔙 VOLTAR</button>
+        <button style="margin: 15px; background: #222; color: white; padding: 12px 25px; border-radius: 50px;" onclick="fecharPagina('albumPage')">🔙 VOLTAR</button>
         <div id="albumDetailContent"></div>
     </div>
 
-    <div id="customPipPlayer" onclick="restaurarPlayer()">
-        <div class="pip-video-area" id="pipMainContent">
-            <img id="pipCover" src="">
-            <div class="pip-play-btn" onclick="event.stopPropagation(); alternarPlay();">
-                <i id="pipIcon" class="fas fa-pause"></i>
-            </div>
-            <div class="pip-close-btn" onclick="event.stopPropagation(); fecharPlayer();">
-                <i class="fas fa-times"></i>
+    <footer class="mini-player-bar" id="miniPlayer">
+        <div style="display:flex; align-items:center; gap:10px;">
+            <img id="miniCover" src="" style="width:40px; border-radius:5px;">
+            <div>
+                <div id="miniTitle" style="font-size:12px; font-weight:bold;">Música</div>
+                <div id="miniArtist" style="font-size:10px; color:var(--primary);">Artista</div>
             </div>
         </div>
-        <div class="mini-trigger"><i class="fas fa-music"></i></div>
-    </div>
+        <div style="display:flex; gap:15px; align-items:center;">
+            <button class="btn-pip-trigger" onclick="ativarPipReal()">FLUTUAR (PiP)</button>
+            <button onclick="togglePlay()" id="playBtn" style="background:none; border:none; color:white; font-size:20px;"><i class="fas fa-pause"></i></button>
+        </div>
+    </footer>
 
-    <audio id="meuAudio"></audio>
+    <audio id="audioMain"></audio>
 
     <script>
-        const audio = document.getElementById('meuAudio');
-        const player = document.getElementById('customPipPlayer');
+        const audio = document.getElementById('audioMain');
+        const video = document.getElementById('pipVideo'); // O vídeo que fará o PiP
+        const miniPlayer = document.getElementById('miniPlayer');
+        const grid = document.getElementById('grid');
 
-        // Carregamento da Home (Jaíbaras Style)
-        async function iniciarApp() {
-            const artistas = ["Wesley Safadão", "Nattan", "Mari Fernandez", "Henrique e Juliano"];
-            const grid = document.getElementById('grid');
-            for (const nome of artistas) {
-                const res = await fetch(`https://itunes.apple.com/search?term=${nome}&entity=album&limit=1`);
+        const albunsIniciais = ["Marília Mendonça", "Henrique e Juliano", "Wesley Safadão", "Nattan"];
+
+        async function carregarHome() {
+            grid.innerHTML = "";
+            for (const busca of albunsIniciais) {
+                const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(busca)}&entity=album&limit=1&country=BR`);
                 const data = await res.json();
-                if(data.results[0]) {
-                    const alb = data.results[0];
+                if (data.results[0]) {
+                    const t = data.results[0];
                     grid.innerHTML += `
-                        <div class="card" onclick="abrirAlbum('${alb.collectionId}')">
-                            <img src="${alb.artworkUrl100.replace('100x100', '400x400')}">
-                            <h4 style="margin-top:10px; font-size:13px;">${alb.collectionName}</h4>
-                        </div>`;
+                        <div class="card" onclick="abrirAlbum('${t.collectionId}')">
+                            <img src="${t.artworkUrl100.replace('100x100', '400x400')}">
+                            <h4>${t.collectionName}</h4>
+                            <p>${t.artistName}</p>
+                        </div>
+                    `;
                 }
             }
         }
@@ -116,69 +129,84 @@
             document.getElementById('albumPage').style.display = 'flex';
             const res = await fetch(`https://itunes.apple.com/lookup?id=${id}&entity=song`);
             const data = await res.json();
-            const musicas = data.results.slice(1);
-            document.getElementById('albumDetailContent').innerHTML = musicas.map(m => `
-                <div style="padding:15px 20px; border-bottom:1px solid #111;" onclick="tocarMusica('${m.trackName}', '${m.previewUrl}', '${data.results[0].artworkUrl100}')">
-                    ${m.trackName}
+            const album = data.results[0];
+            const tracks = data.results.slice(1);
+
+            document.getElementById('albumDetailContent').innerHTML = `
+                <div class="album-header">
+                    <img src="${album.artworkUrl100.replace('100x100', '600x600')}" style="width:150px; border-radius:10px;">
+                    <h2>${album.collectionName}</h2>
+                </div>
+                <div style="padding: 20px;">
+                    ${tracks.map((t, i) => `
+                        <div style="display:flex; align-items:center; padding:15px 0; border-bottom:1px solid #222;" 
+                             onclick="tocarTrack('${t.trackName}', '${t.artistName}', '${t.previewUrl}', '${album.artworkUrl100}')">
+                            <span style="color:var(--primary); margin-right:15px;">${i+1}</span>
+                            <div style="flex:1;">${t.trackName}</div>
+                            <i class="fas fa-play"></i>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function tocarTrack(name, artist, url, cover) {
+            audio.src = url;
+            audio.play();
+
+            // Sincroniza o áudio com o vídeo invisível (essencial para o PiP não fechar)
+            video.src = url; 
+            video.play();
+
+            miniPlayer.style.display = 'flex';
+            document.getElementById('miniTitle').innerText = name;
+            document.getElementById('miniArtist').innerText = artist;
+            document.getElementById('miniCover').src = cover;
+        }
+
+        // --- FUNCIONALIDADE DE PICTURE-IN-PICTURE REAL ---
+        async function ativarPipReal() {
+            try {
+                if (document.pictureInPictureElement) {
+                    await document.exitPictureInPicture();
+                } else {
+                    if (document.pictureInPictureEnabled) {
+                        await video.requestPictureInPicture();
+                    } else {
+                        alert("PiP não suportado neste navegador.");
+                    }
+                }
+            } catch (error) {
+                console.error("Erro ao ativar PiP:", error);
+            }
+        }
+
+        function togglePlay() {
+            if(audio.paused) { 
+                audio.play(); video.play();
+                document.getElementById('playBtn').innerHTML = '<i class="fas fa-pause"></i>'; 
+            } else { 
+                audio.pause(); video.pause();
+                document.getElementById('playBtn').innerHTML = '<i class="fas fa-play"></i>'; 
+            }
+        }
+
+        function fecharPagina(id) { document.getElementById(id).style.display = 'none'; }
+
+        async function search(q = "") {
+            const term = q || document.getElementById('searchInput').value;
+            const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(term)}&entity=album&limit=10&country=BR`);
+            const data = await res.json();
+            grid.innerHTML = data.results.map(t => `
+                <div class="card" onclick="abrirAlbum('${t.collectionId}')">
+                    <img src="${t.artworkUrl100.replace('100x100', '400x400')}">
+                    <h4>${t.collectionName}</h4>
+                    <p>${t.artistName}</p>
                 </div>
             `).join('');
         }
 
-        function tocarMusica(nome, url, capa) {
-            audio.src = url; audio.play();
-            player.style.display = 'block';
-            player.classList.remove('minimized');
-            document.getElementById('pipCover').src = capa;
-            document.getElementById('pipIcon').className = 'fas fa-pause';
-        }
-
-        function alternarPlay() {
-            if(audio.paused) { audio.play(); document.getElementById('pipIcon').className = 'fas fa-pause'; }
-            else { audio.pause(); document.getElementById('pipIcon').className = 'fas fa-play'; }
-        }
-
-        function fecharPlayer() { player.style.display = 'none'; audio.pause(); }
-
-        function restaurarPlayer() {
-            if(player.classList.contains('minimized')) {
-                player.classList.remove('minimized');
-                player.style.left = '10px';
-                player.style.bottom = '100px';
-                player.style.top = 'auto';
-            }
-        }
-
-        // --- ARRASTE 360º E MINIMIZAR NA DIREITA ---
-        let arrastando = false;
-        let offsetX, offsetY;
-
-        player.addEventListener('touchstart', (e) => {
-            if(player.classList.contains('minimized')) return;
-            arrastando = true;
-            offsetX = e.touches[0].clientX - player.offsetLeft;
-            offsetY = e.touches[0].clientY - player.offsetTop;
-            player.style.transition = 'none';
-        });
-
-        document.addEventListener('touchmove', (e) => {
-            if (!arrastando) return;
-            player.style.left = (e.touches[0].clientX - offsetX) + 'px';
-            player.style.top = (e.touches[0].clientY - offsetY) + 'px';
-            player.style.bottom = 'auto';
-        });
-
-        document.addEventListener('touchend', () => {
-            if (!arrastando) return;
-            arrastando = false;
-            player.style.transition = 'all 0.3s ease';
-            
-            // Se soltar na borda direita (estilo YouTube), ele encolhe
-            if (player.offsetLeft > (window.innerWidth - 100)) {
-                player.classList.add('minimized');
-            }
-        });
-
-        iniciarApp();
+        carregarHome();
     </script>
 </body>
 </html>
