@@ -11,9 +11,42 @@
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         body, html { width: 100%; overflow-x: hidden; background: var(--bg); color: var(--text-main); font-family: -apple-system, sans-serif; }
 
-        header { padding: 25px 15px 10px; }
-        header h1 { color: #2ecc71; font-size: 26px; font-weight: 900; letter-spacing: -1px; }
+        header { padding: 25px 15px 10px; display: flex; justify-content: space-between; align-items: flex-start; }
+        header h1 { color: #2ecc71; font-size: 26px; font-weight: 900; letter-spacing: -1px; flex: 1; }
 
+        /* ADIÇÃO: CONTAINER DA FOGUEIRA (IMG_7291.jpg) */
+        .fogueira-container {
+            width: 130px; /* Encaixa no espaço rabiscado */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(18, 18, 20, 0.95);
+            padding: 8px;
+            border-radius: 12px;
+            border: 1px solid #333;
+            box-shadow: 0 4px 15px rgba(255, 100, 0, 0.2);
+            text-align: center;
+        }
+
+        .fogueira-gif {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            display: block;
+        }
+
+        .fogueira-container p {
+            color: #ff9f43; /* Cor laranja fogueira */
+            font-size: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-top: 6px;
+            letter-spacing: 0.5px;
+            line-height: 1.2;
+        }
+
+        /* LAYOUT PRESERVADO (IMG_7280.jpg, IMG_7286.jpg) */
         .categories-nav { display: flex; overflow-x: auto; padding: 10px 15px; gap: 8px; scrollbar-width: none; }
         .categories-nav::-webkit-scrollbar { display: none; }
         .cat-btn { background: #1c1c1e; border: none; color: white; padding: 10px 20px; border-radius: 25px; font-size: 13px; font-weight: 600; flex-shrink: 0; }
@@ -57,7 +90,13 @@
     </style>
 </head>
 <body>
-    <header><h1>LAMONIÊ FLOW</h1></header>
+    <header>
+        <h1>LAMONIÊ FLOW</h1>
+        <div class="fogueira-container">
+            <img src="https://media.giphy.com/media/26hirw81b1E0nQWkU/giphy.gif" alt="Fogueira de São João" class="fogueira-gif">
+            <p>SÃO JOÃO<br>ESTÁ CHEGANDO</p>
+        </div>
+    </header>
 
     <div class="categories-nav" id="catNav"></div>
     
@@ -110,8 +149,7 @@
 
         const generos = ["Destaques", "Forró", "Vaquejada", "Piseiro", "Sertanejo", "Arrocha", "Brega", "Pagode", "Samba", "Axé", "Funk", "Trap", "Pop", "Rock", "MPB", "Gospel"];
         
-        // ARTISTAS PARA GERAR OS 300 ÁLBUNS
-        const mestresForro = ["Luiz Gonzaga", "Dominguinhos", "Flávio José", "Elba Ramalho", "Wesley Safadão", "Nattan", "Xand Avião", "João Gomes", "Tarcísio do Acordeon", "Vitor Fernandes", "Mastruz com Leite", "Limão com Mel", "Magníficos", "Calcinha Preta", "Aviões do Forró", "Saia Rodada", "Barões da Pisadinha", "Fagner", "Alceu Valença", "Zand"];
+        const mestresForro = ["Luiz Gonzaga", "Dominguinhos", "Flávio José", "Elba Ramalho", " Wesley Safadão", "Nattan", "Xand Avião", "João Gomes", "Tarcísio do Acordeon", "Vitor Fernandes", "Mastruz com Leite", "Limão com Mel", "Magníficos", "Calcinha Preta", "Aviões do Forró"];
 
         function carregarGeneros() {
             document.getElementById('catNav').innerHTML = generos.map(g => `<button class="cat-btn ${g === 'Destaques' ? 'active' : ''}" onclick="selecionarGenero(this, '${g}')">${g}</button>`).join('');
@@ -123,9 +161,8 @@
             if(g === "Destaques") carregar300Albuns(); else search(g);
         }
 
-        // FUNÇÃO PARA CARREGAR OS 300 ÁLBUNS
         async function carregar300Albuns() {
-            grid.innerHTML = "<p style='padding:20px;'>Carregando sua coleção...</p>";
+            grid.innerHTML = "<p style='padding:20px;'>Abrindo o fole...</p>";
             let htmlContent = "";
             for (const artista of mestresForro) {
                 try {
@@ -160,7 +197,7 @@
         async function abrirAlbum(id) {
             const page = document.getElementById('albumPage');
             const content = document.getElementById('albumDetailContent');
-            content.innerHTML = "<p style='padding:50px; text-align:center;'>Abrindo álbum...</p>";
+            content.innerHTML = "<p style='padding:50px; text-align:center;'>Preparando o arraiá...</p>";
             page.style.display = 'flex';
             
             const res = await fetch(`https://itunes.apple.com/lookup?id=${id}&entity=song`);
