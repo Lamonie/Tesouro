@@ -20,7 +20,7 @@
             width: 100%; 
             background: var(--bg); 
             color: var(--text-main); 
-            font-family: 'Circular Std', 'Segoe UI', sans-serif; 
+            font-family: 'Segoe UI', sans-serif; 
             overflow-x: hidden;
         }
 
@@ -29,7 +29,6 @@
         header { padding: 25px 15px 5px; text-align: left; }
         header h1 { color: var(--primary); font-size: 24px; font-weight: 900; }
         
-        /* DATA E HORA COM LOOP DE COR ANIMADA */
         #dataHora { 
             font-size: 12px; 
             font-weight: 800; 
@@ -56,15 +55,38 @@
         .search-box input { background: none; border: none; color: white; flex: 1; padding: 12px; outline: none; font-size: 14px; }
         .btn-start { background: none; border: none; color: var(--text-sub); padding: 0 15px; }
 
+        /* TRAVA DO LAYOUT: 2 POR LINHA SEMPRE */
         .main-grid { 
             display: grid; 
             grid-template-columns: repeat(2, 1fr); 
             gap: 12px; 
             padding: 0 12px 150px;
+            width: 100%;
         }
-        .card { background: #121212; border-radius: 10px; padding: 8px; display: flex; flex-direction: column; }
-        .card img { width: 100%; aspect-ratio: 1/1; border-radius: 6px; object-fit: cover; display: block; }
-        .card h4 { margin: 8px 0 2px; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; }
+        .card { 
+            background: #121212; 
+            border-radius: 10px; 
+            padding: 8px; 
+            display: flex; 
+            flex-direction: column;
+            width: 100%;
+            overflow: hidden;
+        }
+        .card img { 
+            width: 100%; 
+            aspect-ratio: 1/1; 
+            border-radius: 6px; 
+            object-fit: cover; 
+            display: block; 
+        }
+        .card h4 { 
+            margin: 8px 0 2px; 
+            font-size: 13px; 
+            white-space: nowrap; 
+            overflow: hidden; 
+            text-overflow: ellipsis; 
+            color: #fff; 
+        }
         .card p { color: var(--text-sub); font-size: 11px; }
 
         .full-page { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; display: none; flex-direction: column; overflow-y: auto; }
@@ -73,10 +95,6 @@
         .album-header { padding: 20px; text-align: center; }
         .album-header img { width: 220px; height: 220px; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
         
-        .album-details-box { text-align: left; padding: 15px; background: #0a0a0a; margin: 15px; border-radius: 8px; border-left: 3px solid var(--primary); }
-        .detail-item { font-size: 12px; color: #b3b3b3; margin-bottom: 5px; }
-        .detail-item b { color: #fff; }
-
         .track-row { display: flex; align-items: center; padding: 15px; border-bottom: 1px solid #1a1a1a; }
         .track-num { color: var(--text-sub); width: 30px; font-size: 14px; }
         
@@ -126,7 +144,6 @@
         const audio = document.getElementById('audioMain');
         const grid = document.getElementById('grid');
 
-        // FUNÇÃO DATA E HORA
         function atualizarRelogio() {
             const agora = new Date();
             const dia = String(agora.getDate()).padStart(2, '0');
@@ -140,18 +157,16 @@
         setInterval(atualizarRelogio, 1000);
         atualizarRelogio();
 
-        // LISTA AMPLIADA PARA 300 ÁLBUNS (Base de artistas)
         const artistasBase = [
             "Luiz Gonzaga", "Dominguinhos", "Mastruz com Leite", "Wesley Safadão", "Nattanzinho",
             "Mari Fernandez", "João Gomes", "Tarcísio do Acordeon", "Iguinho e Lulinha", "Henry Freitas",
             "Nadson o Ferinha", "Jorge e Mateus", "Henrique e Juliano", "Gusttavo Lima", "Ana Castela",
             "Luan Santana", "Matuê", "Mc Ryan SP", "Luísa Sonza", "Pabllo Vittar", "Felipe Amorim",
             "Limão com Mel", "Magníficos", "Flávio José", "Elba Ramalho", "Alceu Valença", "Zé Vaqueiro",
-            "Xand Avião", "Simone Mendes", "Mano Walter", "Calcinha Preta", "Banda Magníficos", "Dorgival Dantas",
-            "Solange Almeida", "Taty Girl", "Raí Saia Rodada", "Eric Land", "Kadu Martins", "Murilo Huff", "Hugo e Guilherme"
+            "Xand Avião", "Simone Mendes", "Mano Walter", "Calcinha Preta", "Dorgival Dantas", "Taty Girl"
         ];
 
-        const generos = ["Destaques", "Forró", "Vaquejada", "Piseiro", "Sertanejo", "Brega", "Axé", "Pagode", "Funk", "Trap", "Pop", "Rock", "Gospel"];
+        const generos = ["Destaques", "Forró", "Vaquejada", "Piseiro", "Sertanejo", "Brega", "Axé", "Pagode", "Funk", "Trap", "Pop", "Rock"];
 
         function carregarGeneros() {
             document.getElementById('catNav').innerHTML = generos.map(g => `
@@ -167,10 +182,9 @@
 
         async function carregarHome() {
             grid.innerHTML = "";
-            // Fazemos múltiplas buscas para encher a tela com aproximadamente 300 álbuns
             for (const nome of artistasBase) {
                 try {
-                    const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(nome)}&entity=album&limit=8&country=BR`);
+                    const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(nome)}&entity=album&limit=9&country=BR`);
                     const data = await res.json();
                     data.results.forEach(t => renderCard(t));
                 } catch (e) {}
@@ -206,21 +220,12 @@
                 const data = await res.json();
                 const album = data.results[0];
                 const musicas = data.results.slice(1);
-                const dataLancamento = new Date(album.releaseDate).toLocaleDateString('pt-BR');
-
                 document.getElementById('albumDetailContent').innerHTML = `
                     <div class="album-header">
                         <img src="${album.artworkUrl100.replace('100x100', '600x600')}">
                         <h2 style="margin-top:20px; font-size:20px;">${album.collectionName}</h2>
-                        <p style="color:var(--primary); font-size:16px; margin-top:5px;">${album.artistName}</p>
+                        <p style="color:var(--primary); font-size:16px;">${album.artistName}</p>
                     </div>
-
-                    <div class="album-details-box">
-                        <div class="detail-item">📅 Lançamento: <b>${dataLancamento}</b></div>
-                        <div class="detail-item">🎸 Gênero: <b>${album.primaryGenreName}</b></div>
-                        <div class="detail-item">🏢 Gravadora: <b>${album.copyright || 'Independente'}</b></div>
-                    </div>
-
                     <div style="padding-bottom: 150px;">
                         ${musicas.map((m, i) => `
                             <div class="track-row" onclick="tocar('${m.trackName.replace(/'/g, "\\'")}', '${m.artistName.replace(/'/g, "\\'")}', '${m.previewUrl}')">
@@ -229,7 +234,7 @@
                                     <div style="font-size:14px; font-weight:600;">${m.trackName}</div>
                                     <div style="font-size:11px; color:#b3b3b3;">${m.artistName}</div>
                                 </div>
-                                <i class="fas fa-play" style="color:#1db954; font-size:14px;"></i>
+                                <i class="fas fa-play" style="color:#1db954;"></i>
                             </div>
                         `).join('')}
                     </div>
