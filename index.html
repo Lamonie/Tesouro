@@ -11,60 +11,60 @@
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         body, html { width: 100%; overflow-x: hidden; background: var(--bg); color: var(--text-main); font-family: -apple-system, sans-serif; }
 
-        header { padding: 20px 15px 5px; }
-        header h1 { color: var(--primary); font-size: 24px; font-weight: 900; }
-        .timestamp { color: var(--primary); font-size: 10px; padding: 0 15px 10px; opacity: 0.8; }
+        header { padding: 25px 15px 10px; }
+        header h1 { color: var(--primary); font-size: 26px; font-weight: 900; letter-spacing: -1px; }
 
-        .categories-nav { display: flex; overflow-x: auto; padding: 10px 15px; gap: 8px; }
-        .cat-btn { background: #1c1c1e; border: none; color: white; padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 600; flex-shrink: 0; }
+        /* BARRA DE GÊNEROS AMPLIADA */
+        .categories-nav { display: flex; overflow-x: auto; padding: 10px 15px; gap: 8px; scrollbar-width: none; }
+        .categories-nav::-webkit-scrollbar { display: none; }
+        .cat-btn { background: #1c1c1e; border: none; color: white; padding: 10px 20px; border-radius: 25px; font-size: 13px; font-weight: 600; flex-shrink: 0; transition: 0.2s; }
         .cat-btn.active { background: var(--primary); color: #000; }
 
         .search-container { padding: 10px 15px; }
-        .search-box { display: flex; background: #1c1c1e; border-radius: 10px; border: 1px solid #333; align-items: center; }
-        .search-box input { background: none; border: none; color: white; flex: 1; padding: 12px; outline: none; width: 100%; }
+        .search-box { display: flex; background: #1c1c1e; border-radius: 12px; border: 1px solid #333; align-items: center; }
+        .search-box input { background: none; border: none; color: white; flex: 1; padding: 14px; outline: none; width: 100%; font-size: 14px; }
 
-        /* ADIÇÃO: SEÇÃO DE PARADAS (IMG_7285.jpeg) */
-        .charts-section { display: flex; gap: 12px; padding: 15px; overflow-x: auto; }
-        .chart-card { min-width: 160px; aspect-ratio: 1/1; border-radius: 12px; padding: 15px; display: flex; flex-direction: column; justify-content: space-between; position: relative; cursor: pointer; }
+        .charts-section { display: flex; gap: 12px; padding: 15px; overflow-x: auto; scrollbar-width: none; }
+        .charts-section::-webkit-scrollbar { display: none; }
+        .chart-card { min-width: 165px; aspect-ratio: 1/1; border-radius: 15px; padding: 15px; display: flex; flex-direction: column; justify-content: space-between; position: relative; cursor: pointer; }
         .chart-card h3 { font-size: 22px; font-weight: 900; line-height: 1.1; }
-        .chart-card p { font-size: 10px; font-weight: bold; text-transform: uppercase; }
-        .chart-icon { position: absolute; bottom: 15px; left: 15px; background: white; color: black; width: 24px; height: 24px; border-radius: 4px; display: flex; align-items: center; justify-content: center; }
+        .chart-card p { font-size: 10px; font-weight: bold; text-transform: uppercase; opacity: 0.9; }
 
-        /* LAYOUT PRESERVADO (IMG_7280.jpg) */
-        .main-grid { display: flex; flex-wrap: wrap; justify-content: space-between; padding: 10px 15px 150px; }
-        .card { width: 47%; background: #1c1c1e; border-radius: 12px; padding: 8px; margin-bottom: 15px; border: 1px solid #2c2c2e; }
-        .card img { width: 100%; aspect-ratio: 1/1; border-radius: 8px; object-fit: cover; }
+        .main-grid { display: flex; flex-wrap: wrap; justify-content: space-between; padding: 10px 15px 160px; }
+        .card { width: 47%; background: #1c1c1e; border-radius: 14px; padding: 8px; margin-bottom: 18px; border: 1px solid #2c2c2e; }
+        .card img { width: 100%; aspect-ratio: 1/1; border-radius: 10px; object-fit: cover; }
         .card h4 { font-size: 12px; margin-top: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
         .full-page { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; display: none; flex-direction: column; overflow-y: auto; }
-        .btn-voltar { margin: 15px; background: var(--primary); border: none; color: #000; padding: 12px 20px; border-radius: 25px; font-weight: 800; width: fit-content; }
+        .btn-voltar { margin: 15px; background: var(--primary); border: none; color: #000; padding: 12px 25px; border-radius: 30px; font-weight: 800; width: fit-content; font-size: 12px; }
         
-        .track-row { display: flex; align-items: center; padding: 15px; border-bottom: 1px solid #1c1c1e; }
+        .track-row { display: flex; align-items: center; padding: 16px; border-bottom: 1px solid #1c1c1e; }
 
-        /* PLAYER MINIMIZÁVEL */
-        .player { position: fixed; bottom: 0; width: 100%; background: rgba(28,28,30,0.95); backdrop-filter: blur(15px); padding: 10px 20px 30px; border-top: 1px solid #38383a; z-index: 10001; transition: transform 0.3s ease; }
-        .player.minimized { transform: translateY(75%); }
-        .minimize-toggle { width: 36px; height: 5px; background: #48484a; border-radius: 10px; margin: 0 auto 10px; }
-        .play-trigger { background: var(--primary); border: none; width: 42px; height: 42px; border-radius: 50%; color: #000; font-size: 16px; display: flex; align-items: center; justify-content: center; }
+        .player { position: fixed; bottom: 0; width: 100%; background: rgba(20,20,22,0.98); backdrop-filter: blur(20px); padding: 12px 20px 35px; border-top: 1px solid #333; z-index: 10001; transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        .player.minimized { transform: translateY(80%); }
+        .minimize-toggle { width: 40px; height: 5px; background: #3a3a3c; border-radius: 10px; margin: 0 auto 12px; }
+        .play-trigger { background: var(--primary); border: none; width: 45px; height: 45px; border-radius: 50%; color: #000; font-size: 18px; display: flex; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
     <header><h1>LAMONIÊ FLOW</h1></header>
-    <div class="timestamp" id="timeDisplay">05/04/2026 00:00:00</div>
 
     <div class="categories-nav" id="catNav"></div>
-    <div class="search-container"><div class="search-box"><input type="text" id="searchInput" placeholder="O que você quer ouvir?" onchange="search(this.value)"></div></div>
+    
+    <div class="search-container">
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Buscar álbum ou artista..." onchange="search(this.value)">
+        </div>
+    </div>
     
     <div class="charts-section">
         <div class="chart-card" style="background: #6a1b9a;" onclick="search('Top Mundo')">
-            <p>Paradas Musicais</p>
+            <p>Paradas</p>
             <h3>Top<br>Músicas<br>Mundo</h3>
-            <div class="chart-icon"><i class="fas fa-arrow-up"></i></div>
         </div>
         <div class="chart-card" style="background: #4d7c6d;" onclick="search('Top Brasil')">
-            <p>Paradas Musicais</p>
+            <p>Paradas</p>
             <h3>Top<br>Músicas<br>Brasil</h3>
-            <div class="chart-icon"><i class="fas fa-arrow-up"></i></div>
         </div>
     </div>
 
@@ -78,9 +78,9 @@
     <footer class="player" id="player" style="display:none;" onclick="toggleMinimize()">
         <div class="minimize-toggle"></div>
         <div style="display: flex; justify-content: space-between; align-items: center;">
-            <div style="flex: 1; overflow: hidden; margin-right: 10px;">
-                <h4 id="trackTitle" style="font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Música</h4>
-                <p id="trackArtist" style="font-size:11px; color:var(--primary);">Artista</p>
+            <div style="flex: 1; overflow: hidden; margin-right: 15px;">
+                <h4 id="trackTitle" style="font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Música</h4>
+                <p id="trackArtist" style="font-size:12px; color:var(--primary);">Artista</p>
             </div>
             <button onclick="event.stopPropagation(); togglePlay();" id="playBtn" class="play-trigger"><i class="fas fa-pause"></i></button>
         </div>
@@ -89,20 +89,23 @@
     <audio id="audioMain"></audio>
 
     <script>
-        // Atualiza relógio (como na IMG_7277.jpg)
-        setInterval(() => {
-            const now = new Date();
-            document.getElementById('timeDisplay').innerText = now.toLocaleString('pt-BR');
-        }, 1000);
-
         const audio = document.getElementById('audioMain');
         const grid = document.getElementById('grid');
         const player = document.getElementById('player');
-        const generos = ["Destaques", "Forró", "Vaquejada", "Piseiro", "Sertanejo", "Arrocha"];
-        const mestresForro = ["Luiz Gonzaga", "Dominguinhos", "Flávio José", "Elba Ramalho"];
+        
+        // TODOS OS GÊNEROS ADICIONADOS
+        const generos = [
+            "Destaques", "Forró", "Vaquejada", "Piseiro", "Sertanejo", "Arrocha", 
+            "Brega", "Pagode", "Samba", "Axé", "Funk", "Trap", "Rap", "Hip Hop",
+            "Pop", "Rock", "MPB", "Gospel", "Eletrônica", "Reggae", "Blues", "Jazz"
+        ];
+        
+        const mestresForro = ["Luiz Gonzaga", "Dominguinhos", "Flávio José", "Elba Ramalho", "Wesley Safadão", "Nattan"];
 
         function carregarGeneros() {
-            document.getElementById('catNav').innerHTML = generos.map(g => `<button class="cat-btn ${g === 'Destaques' ? 'active' : ''}" onclick="selecionarGenero(this, '${g}')">${g}</button>`).join('');
+            document.getElementById('catNav').innerHTML = generos.map(g => 
+                `<button class="cat-btn ${g === 'Destaques' ? 'active' : ''}" onclick="selecionarGenero(this, '${g}')">${g}</button>`
+            ).join('');
         }
 
         function selecionarGenero(btn, g) {
@@ -130,7 +133,7 @@
 
         async function search(q) {
             grid.innerHTML = "";
-            const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(q)}&entity=album&limit=20&country=BR`);
+            const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(q)}&entity=album&limit=30&country=BR`);
             const data = await res.json();
             data.results.forEach(t => renderCard(t));
         }
@@ -144,17 +147,17 @@
             const musicas = data.results.slice(1);
             
             content.innerHTML = `
-                <div style="text-align:center; padding:20px;">
-                    <img src="${album.artworkUrl100.replace('100x100', '600x600')}" style="width:75%; border-radius:12px;">
-                    <h2 style="margin-top:20px;">${album.collectionName}</h2>
-                    <p style="color:var(--primary);">${album.artistName}</p>
+                <div style="text-align:center; padding:30px 20px;">
+                    <img src="${album.artworkUrl100.replace('100x100', '600x600')}" style="width:80%; border-radius:15px; box-shadow: 0 15px 35px rgba(0,0,0,0.6);">
+                    <h2 style="margin-top:25px; font-size:22px;">${album.collectionName}</h2>
+                    <p style="color:var(--primary); font-weight:bold; margin-top:5px;">${album.artistName}</p>
                 </div>
-                <div style="padding-bottom: 150px;">
+                <div style="padding-bottom: 180px;">
                     ${musicas.map((m, i) => `
                         <div class="track-row" onclick="tocar('${m.trackName.replace(/'/g, "")}', '${m.artistName}', '${m.previewUrl}')">
-                            <span style="color:#48484a; width:30px;">${i+1}</span>
-                            <div style="flex:1;"><div>${m.trackName}</div></div>
-                            <i class="fas fa-play-circle" style="color:var(--primary);"></i>
+                            <span style="color:#48484a; width:35px; font-weight:bold;">${i+1}</span>
+                            <div style="flex:1;"><div style="font-size:15px;">${m.trackName}</div></div>
+                            <i class="fas fa-play-circle" style="color:var(--primary); font-size:20px;"></i>
                         </div>
                     `).join('')}
                 </div>
@@ -167,10 +170,12 @@
             player.classList.remove('minimized');
             document.getElementById('trackTitle').innerText = nome;
             document.getElementById('trackArtist').innerText = artista;
+            document.getElementById('playBtn').innerHTML = '<i class="fas fa-pause"></i>';
         }
 
         function togglePlay() {
-            if(audio.paused) audio.play(); else audio.pause();
+            if(audio.paused) { audio.play(); document.getElementById('playBtn').innerHTML = '<i class="fas fa-pause"></i>'; }
+            else { audio.pause(); document.getElementById('playBtn').innerHTML = '<i class="fas fa-play"></i>'; }
         }
 
         function toggleMinimize() { player.classList.toggle('minimized'); }
