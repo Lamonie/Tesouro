@@ -19,14 +19,12 @@
         .cat-btn { background: #1c1c1e; border: none; color: white; padding: 10px 20px; border-radius: 25px; font-size: 13px; font-weight: 600; flex-shrink: 0; }
         .cat-btn.active { background: var(--primary); color: #000; }
 
-        /* BARRA DE BUSCA COM LUPA E BOTÃO X */
         .search-container { padding: 10px 15px; }
         .search-box { display: flex; background: #1c1c1e; border-radius: 12px; border: 1px solid #333; align-items: center; overflow: hidden; }
         .search-box input { background: none; border: none; color: white; flex: 1; padding: 14px; outline: none; font-size: 14px; width: 100%; }
         
         .clear-btn { background: none; border: none; color: #8e8e93; padding: 0 10px; cursor: pointer; font-size: 14px; display: none; }
         .search-btn { background: none; border: none; color: #8e8e93; padding: 0 15px; cursor: pointer; font-size: 16px; }
-        .search-btn:active, .clear-btn:active { color: var(--primary); }
 
         .charts-section { display: flex; gap: 12px; padding: 15px; overflow-x: auto; scrollbar-width: none; }
         .charts-section::-webkit-scrollbar { display: none; }
@@ -35,7 +33,7 @@
         .chart-card p { font-size: 10px; font-weight: bold; text-transform: uppercase; }
 
         .main-grid { display: flex; flex-wrap: wrap; justify-content: space-between; padding: 10px 15px 160px; }
-        .card { width: 47%; background: #1c1c1e; border-radius: 14px; padding: 8px; margin-bottom: 18px; border: 1px solid #2c2c2e; }
+        .card { width: 47%; background: #1c1c1e; border-radius: 14px; padding: 8px; margin-bottom: 18px; border: 1px solid #2c2c2e; cursor: pointer; }
         .card img { width: 100%; aspect-ratio: 1/1; border-radius: 10px; object-fit: cover; }
         .card h4 { font-size: 12px; margin-top: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
@@ -63,12 +61,8 @@
             <input type="text" id="searchInput" placeholder="Buscar álbum ou artista..." 
                    oninput="toggleClearBtn(this.value)"
                    onkeydown="if(event.key==='Enter') search(this.value)">
-            <button class="clear-btn" id="clearBtn" onclick="limparBusca()">
-                <i class="fas fa-times"></i>
-            </button>
-            <button class="search-btn" onclick="search(document.getElementById('searchInput').value)">
-                <i class="fas fa-search"></i>
-            </button>
+            <button class="clear-btn" id="clearBtn" onclick="limparBusca()"><i class="fas fa-times"></i></button>
+            <button class="search-btn" onclick="search(document.getElementById('searchInput').value)"><i class="fas fa-search"></i></button>
         </div>
     </div>
     
@@ -112,81 +106,105 @@
         function selecionarGenero(btn, g) {
             document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-            limparBusca();
             if(g === "Destaques") carregarDestaques(); else search(g);
         }
 
-        function toggleClearBtn(val) {
-            document.getElementById('clearBtn').style.display = val.length > 0 ? 'block' : 'none';
-        }
-
+        function toggleClearBtn(val) { document.getElementById('clearBtn').style.display = val.length > 0 ? 'block' : 'none'; }
+        
         function limparBusca() {
             const input = document.getElementById('searchInput');
-            input.value = "";
-            toggleClearBtn("");
-            input.focus();
+            input.value = ""; toggleClearBtn(""); input.focus();
         }
 
         async function carregarDestaques() {
-            grid.innerHTML = "";
+            grid.innerHTML = "<p style='padding:20px; color:#8e8e93;'>Carregando mestre do forró...</p>";
+            let htmlContent = "";
             for (const artista of mestresForro) {
-                const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(artista)}&entity=album&limit=4&country=BR`);
-                const data = await res.json();
-                data.results.forEach(t => renderCard(t));
+                try {
+                    const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(artista)}&entity=album&limit=4&country=BR`);
+                    const data = await res.json();
+                    data.results.forEach(t => {
+                        htmlContent += `<div class="card" onclick="abrirAlbum('${t.collectionId}')">
+                            <img src="${t.artworkUrl100.replace('100x100', '400x400')}">
+                            <h4>${t.collectionName}</h4>
+                            <p style="font-size:10px; color:#8e8e93;">${t.artistName}</p>
+                        </div>`;
+                    });
+                } catch(e) { console.error(e); }
             }
-        }
-
-        function renderCard(t) {
-            grid.innerHTML += `<div class="card" onclick="abrirAlbum('${t.collectionId}')">
-                <img src="${t.artworkUrl100.replace('100x100', '400x400')}">
-                <h4>${t.collectionName}</h4>
-                <p style="font-size:10px; color:#8e8e93;">${t.artistName}</p>
-            </div>`;
+            grid.innerHTML = htmlContent;
         }
 
         async function search(q) {
             if(!q) return;
-            grid.innerHTML = "";
-            const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(q)}&entity=album&limit=30&country=BR`);
-            const data = await res.json();
-            data.results.forEach(t => renderCard(t));
+            grid.innerHTML = "<p style='padding:20px; color:#8e8e93;'>Buscando...</p>";
+            try {
+                const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(q)}&entity=album&limit=40&country=BR`);
+                const data = await res.json();
+                grid.innerHTML = "";
+                if(data.results.length === 0) grid.innerHTML = "<p style='padding:20px;'>Nada encontrado.</p>";
+                data.results.forEach(t => {
+                    grid.innerHTML += `<div class="card" onclick="abrirAlbum('${t.collectionId}')">
+                        <img src="${t.artworkUrl100.replace('100x100', '400x400')}">
+                        <h4>${t.collectionName}</h4>
+                        <p style="font-size:10px; color:#8e8e93;">${t.artistName}</p>
+                    </div>`;
+                });
+            } catch(e) { grid.innerHTML = "<p style='padding:20px;'>Erro na conexão.</p>"; }
         }
 
+        // CORREÇÃO: FUNÇÃO ABRIR ÁLBUM COM LIMPEZA DE CACHE
         async function abrirAlbum(id) {
-            document.getElementById('albumPage').style.display = 'flex';
+            const page = document.getElementById('albumPage');
             const content = document.getElementById('albumDetailContent');
-            const res = await fetch(`https://itunes.apple.com/lookup?id=${id}&entity=song`);
-            const data = await res.json();
-            const album = data.results[0];
-            const musicas = data.results.slice(1);
             
-            content.innerHTML = `
-                <div style="text-align:center; padding:30px 20px;">
-                    <img src="${album.artworkUrl100.replace('100x100', '600x600')}" style="width:80%; border-radius:15px;">
-                    <h2 style="margin-top:25px; font-size:22px;">${album.collectionName}</h2>
-                    <p style="color:var(--primary); font-weight:bold; margin-top:5px;">${album.artistName}</p>
-                </div>
+            // Limpa o conteúdo anterior antes de abrir
+            content.innerHTML = "<p style='padding:50px; text-align:center;'>Carregando conteúdo real...</p>";
+            page.style.display = 'flex';
+            
+            try {
+                const res = await fetch(`https://itunes.apple.com/lookup?id=${id}&entity=song`);
+                const data = await res.json();
                 
-                <div class="album-info-box">
-                    <span><b>Lançamento:</b> ${new Date(album.releaseDate).toLocaleDateString('pt-BR')}</span><br>
-                    <span><b>Ano:</b> ${new Date(album.releaseDate).getFullYear()}</span><br>
-                    <span><b>Compositor:</b> ${album.artistName}</span><br>
-                    <span><b>Gravadora:</b> ${album.copyright || "Independente"}</span>
-                </div>
+                if(!data.results || data.results.length < 2) {
+                    content.innerHTML = "<div style='text-align:center; padding:50px;'><h2>Álbum indisponível</h2><p>Este álbum não possui prévias disponíveis no momento.</p></div>";
+                    return;
+                }
 
-                <div style="padding-bottom: 180px;">
-                    ${musicas.map((m, i) => `
-                        <div class="track-row" onclick="tocar('${m.trackName.replace(/'/g, "")}', '${m.artistName}', '${m.previewUrl}')">
-                            <span style="color:#48484a; width:35px; font-weight:bold;">${i+1}</span>
-                            <div style="flex:1;"><div style="font-size:15px;">${m.trackName}</div></div>
-                            <i class="fas fa-play-circle" style="color:var(--primary); font-size:20px;"></i>
-                        </div>
-                    `).join('')}
-                </div>
-            `;
+                const album = data.results[0];
+                const musicas = data.results.slice(1);
+                
+                content.innerHTML = `
+                    <div style="text-align:center; padding:30px 20px;">
+                        <img src="${album.artworkUrl100.replace('100x100', '600x600')}" style="width:80%; border-radius:15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+                        <h2 style="margin-top:25px; font-size:22px;">${album.collectionName}</h2>
+                        <p style="color:var(--primary); font-weight:bold; margin-top:5px;">${album.artistName}</p>
+                    </div>
+                    
+                    <div class="album-info-box">
+                        <span><b>Lançamento:</b> ${new Date(album.releaseDate).toLocaleDateString('pt-BR')}</span><br>
+                        <span><b>Ano:</b> ${new Date(album.releaseDate).getFullYear()}</span><br>
+                        <span><b>Compositor:</b> ${album.artistName}</span><br>
+                        <span><b>Gravadora:</b> ${album.copyright || "Independente"}</span>
+                    </div>
+
+                    <div style="padding-bottom: 180px;">
+                        ${musicas.map((m, i) => `
+                            <div class="track-row" onclick="tocar('${m.trackName.replace(/'/g, "")}', '${m.artistName}', '${m.previewUrl}')">
+                                <span style="color:#48484a; width:35px; font-weight:bold;">${i+1}</span>
+                                <div style="flex:1;"><div style="font-size:15px;">${m.trackName}</div></div>
+                                <i class="fas fa-play-circle" style="color:var(--primary); font-size:20px;"></i>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            } catch(e) {
+                content.innerHTML = "<p style='padding:50px; text-align:center;'>Erro ao carregar álbum. Tente outro.</p>";
+            }
         }
 
         function tocar(nome, artista, url) {
+            if(!url) return alert("Prévia não disponível");
             audio.src = url; audio.play();
             player.style.display = 'block';
             player.classList.remove('minimized');
