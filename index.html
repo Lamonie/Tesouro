@@ -19,12 +19,14 @@
         .cat-btn { background: #1c1c1e; border: none; color: white; padding: 10px 20px; border-radius: 25px; font-size: 13px; font-weight: 600; flex-shrink: 0; }
         .cat-btn.active { background: var(--primary); color: #000; }
 
-        /* BARRA DE BUSCA COM BOTÃO (CORREÇÃO) */
+        /* BARRA DE BUSCA COM LUPA E BOTÃO X */
         .search-container { padding: 10px 15px; }
         .search-box { display: flex; background: #1c1c1e; border-radius: 12px; border: 1px solid #333; align-items: center; overflow: hidden; }
         .search-box input { background: none; border: none; color: white; flex: 1; padding: 14px; outline: none; font-size: 14px; width: 100%; }
-        .search-btn { background: none; border: none; color: #8e8e93; padding: 0 15px; cursor: pointer; font-size: 16px; transition: 0.2s; }
-        .search-btn:active { color: var(--primary); }
+        
+        .clear-btn { background: none; border: none; color: #8e8e93; padding: 0 10px; cursor: pointer; font-size: 14px; display: none; }
+        .search-btn { background: none; border: none; color: #8e8e93; padding: 0 15px; cursor: pointer; font-size: 16px; }
+        .search-btn:active, .clear-btn:active { color: var(--primary); }
 
         .charts-section { display: flex; gap: 12px; padding: 15px; overflow-x: auto; scrollbar-width: none; }
         .charts-section::-webkit-scrollbar { display: none; }
@@ -58,7 +60,12 @@
     
     <div class="search-container">
         <div class="search-box">
-            <input type="text" id="searchInput" placeholder="Buscar álbum ou artista..." onkeydown="if(event.key==='Enter') search(this.value)">
+            <input type="text" id="searchInput" placeholder="Buscar álbum ou artista..." 
+                   oninput="toggleClearBtn(this.value)"
+                   onkeydown="if(event.key==='Enter') search(this.value)">
+            <button class="clear-btn" id="clearBtn" onclick="limparBusca()">
+                <i class="fas fa-times"></i>
+            </button>
             <button class="search-btn" onclick="search(document.getElementById('searchInput').value)">
                 <i class="fas fa-search"></i>
             </button>
@@ -105,7 +112,19 @@
         function selecionarGenero(btn, g) {
             document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
+            limparBusca();
             if(g === "Destaques") carregarDestaques(); else search(g);
+        }
+
+        function toggleClearBtn(val) {
+            document.getElementById('clearBtn').style.display = val.length > 0 ? 'block' : 'none';
+        }
+
+        function limparBusca() {
+            const input = document.getElementById('searchInput');
+            input.value = "";
+            toggleClearBtn("");
+            input.focus();
         }
 
         async function carregarDestaques() {
