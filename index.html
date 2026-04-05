@@ -27,123 +27,52 @@
 
         .bg-static { 
             position: fixed; 
-            top: 0; 
-            left: 0; 
-            width: 100%; 
-            height: 100%; 
+            top: 0; left: 0; width: 100%; height: 100%; 
             background: linear-gradient(180deg, #121212 0%, #000 100%); 
             z-index: -1; 
         }
 
-        header { padding: 30px 20px 10px; }
-        header h1 { color: var(--primary); font-size: 28px; font-weight: 900; letter-spacing: -1px; }
-        header p { color: var(--text-sub); font-size: 12px; font-weight: bold; margin-top: 4px; }
+        header { padding: 25px 15px 5px; }
+        header h1 { color: var(--primary); font-size: 26px; font-weight: 900; }
+        header p { color: var(--text-sub); font-size: 11px; font-weight: bold; }
 
-        .categories-nav { 
-            display: flex; 
-            overflow-x: auto; 
-            padding: 15px 20px; 
-            gap: 12px; 
-            scrollbar-width: none; 
-        }
+        .categories-nav { display: flex; overflow-x: auto; padding: 15px; gap: 10px; scrollbar-width: none; }
         .categories-nav::-webkit-scrollbar { display: none; }
-        
-        .cat-btn { 
-            background: #2a2a2a; 
-            border: none; 
-            color: white; 
-            padding: 8px 16px; 
-            border-radius: 20px; 
-            white-space: nowrap; 
-            font-size: 14px; 
-            font-weight: 600; 
-            cursor: pointer;
-        }
+        .cat-btn { background: #2a2a2a; border: none; color: white; padding: 8px 14px; border-radius: 20px; white-space: nowrap; font-size: 13px; font-weight: 600; }
         .cat-btn.active { background: var(--primary); color: black; }
 
-        .search-container { padding: 10px 20px 20px; }
-        .search-box { 
-            display: flex; 
-            background: #242424; 
-            border-radius: 4px; 
-            padding: 2px; 
-        }
-        .search-box input { 
-            background: none; 
-            border: none; 
-            color: white; 
-            flex: 1; 
-            padding: 12px; 
-            outline: none; 
-            font-size: 14px; 
-        }
-        .btn-start { background: none; border: none; color: var(--text-sub); padding: 0 15px; }
+        .search-container { padding: 5px 15px 15px; }
+        .search-box { display: flex; background: #242424; border-radius: 4px; padding: 2px; }
+        .search-box input { background: none; border: none; color: white; flex: 1; padding: 10px; outline: none; font-size: 14px; }
+        .btn-start { background: none; border: none; color: var(--text-sub); padding: 0 12px; }
 
+        /* GRID AJUSTADA PARA NÃO CORTAR */
         .main-grid { 
             display: grid; 
             grid-template-columns: repeat(2, 1fr); 
-            gap: 16px; 
-            padding: 0 20px 150px; 
+            gap: 12px; 
+            padding: 0 15px 150px; 
         }
-        .card { 
-            background: #181818; 
-            border-radius: 8px; 
-            padding: 12px; 
-        }
-        .card img { 
-            width: 100%; 
-            border-radius: 4px; 
-            aspect-ratio: 1/1; 
-            object-fit: cover; 
-        }
-        .card h4 { margin: 12px 0 4px; font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .card p { color: var(--text-sub); font-size: 12px; }
+        .card { background: #181818; border-radius: 8px; padding: 10px; overflow: hidden; }
+        .card img { width: 100%; border-radius: 4px; aspect-ratio: 1/1; object-fit: cover; display: block; }
+        .card h4 { margin: 10px 0 2px; font-size: 13px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .card p { color: var(--text-sub); font-size: 11px; }
 
-        .full-page { 
-            position: fixed; 
-            top: 0; 
-            left: 0; 
-            width: 100%; 
-            height: 100%; 
-            background: #121212; 
-            z-index: 9999; 
-            display: none; 
-            flex-direction: column; 
-            overflow-y: auto; 
-        }
-        .btn-voltar {
-            margin: 20px;
-            background: rgba(0,0,0,0.5);
-            border: none;
-            color: white;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-weight: bold;
-            width: fit-content;
-        }
-        .album-header { 
-            padding: 20px; 
-            background: linear-gradient(180deg, #282828 0%, #121212 100%); 
-            text-align: center; 
-        }
-        .album-header img { width: 200px; height: 200px; border-radius: 4px; }
+        .full-page { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; display: none; flex-direction: column; overflow-y: auto; }
+        .btn-voltar { margin: 15px; background: rgba(255,255,255,0.1); border: none; color: white; padding: 8px 16px; border-radius: 20px; font-weight: bold; width: fit-content; }
+        
+        /* DETALHES DO ÁLBUM */
+        .album-header { padding: 20px; background: linear-gradient(180deg, #222 0%, #000 100%); text-align: center; }
+        .album-header img { width: 180px; height: 180px; border-radius: 4px; box-shadow: 0 8px 20px rgba(0,0,0,0.5); }
+        .album-info-box { margin-top: 15px; text-align: left; background: rgba(255,255,255,0.03); padding: 15px; border-radius: 8px; }
+        .info-tag { font-size: 11px; color: var(--text-sub); margin-bottom: 4px; }
+        .info-tag span { color: var(--primary); font-weight: bold; margin-left: 5px; }
 
-        .player { 
-            position: fixed; 
-            bottom: 0; 
-            width: 100%; 
-            background: #000; 
-            padding: 10px 20px 25px; 
-            border-top: 1px solid #282828; 
-            z-index: 10001; 
-            display: none; 
-        }
-        .play-trigger { background: white; border: none; width: 45px; height: 45px; border-radius: 50%; color: black; }
+        .player { position: fixed; bottom: 0; width: 100%; background: #000; padding: 10px 15px 25px; border-top: 1px solid #282828; z-index: 10001; display: none; }
+        .play-trigger { background: white; border: none; width: 42px; height: 42px; border-radius: 50%; color: black; }
 
-        .track-row { display: flex; align-items: center; padding: 12px 20px; }
-        .track-num { color: var(--text-sub); width: 30px; font-size: 14px; }
-        .track-meta { flex: 1; }
-        .track-meta div { font-size: 14px; }
+        .track-row { display: flex; align-items: center; padding: 12px 15px; border-bottom: 1px solid #111; }
+        .track-num { color: var(--text-sub); width: 25px; font-size: 13px; }
     </style>
 </head>
 <body>
@@ -155,8 +84,7 @@
             <p>SÓ HITS</p>
         </header>
 
-        <div class="categories-nav" id="catNav">
-            </div>
+        <div class="categories-nav" id="catNav"></div>
 
         <div class="search-container">
             <div class="search-box">
@@ -169,15 +97,15 @@
     </div>
 
     <div id="albumPage" class="full-page">
-        <button class="btn-voltar" onclick="fecharPagina('albumPage')"><i class="fas fa-chevron-left"></i> VOLTAR</button>
+        <button class="btn-voltar" onclick="fecharPagina('albumPage')">🔙 VOLTAR</button>
         <div id="albumDetailContent"></div>
     </div>
 
     <footer class="player" id="player">
         <div style="display: flex; justify-content: space-between; align-items: center;">
-            <div class="player-info">
-                <h4 id="trackTitle" style="font-size:14px;">Música</h4>
-                <p id="trackArtist" style="font-size:12px; color:var(--primary);">Artista</p>
+            <div style="flex:1; overflow:hidden;">
+                <h4 id="trackTitle" style="font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Música</h4>
+                <p id="trackArtist" style="font-size:11px; color:var(--primary);">Artista</p>
             </div>
             <button onclick="togglePlay()" id="playBtn" class="play-trigger"><i class="fas fa-pause"></i></button>
         </div>
@@ -189,7 +117,6 @@
         const audio = document.getElementById('audioMain');
         const grid = document.getElementById('grid');
 
-        // LISTA DE 30 ÁLBUNS/ARTISTAS PARA A HOME
         const albunsIniciais = [
             "Luiz Gonzaga", "Dominguinhos", "Sivuca", "Mestrinho", "Elba Ramalho", 
             "Flávio José", "Alceu Valença", "Mastruz com Leite", "Limão com Mel", "Magníficos",
@@ -199,16 +126,10 @@
             "Luan Santana", "Matuê", "Mc Ryan SP", "Luísa Sonza", "Pabllo Vittar"
         ];
 
-        // TODOS OS GÊNEROS
-        const generos = [
-            "Destaques", "Forró", "Vaquejada", "Piseiro", "Sertanejo", "Brega", "Arrocha", 
-            "MPB", "Axé", "Pagode", "Samba", "Funk", "Trap", "Rap", "Pop", "Rock", 
-            "Gospel", "Eletrônica", "Reggae", "Lo-fi", "Jazz", "Blues", "Clássica", "Country"
-        ];
+        const generos = ["Destaques", "Forró", "Vaquejada", "Piseiro", "Sertanejo", "MPB", "Axé", "Pagode", "Funk", "Trap", "Pop", "Rock", "Gospel", "Reggae"];
 
         function carregarGeneros() {
-            const nav = document.getElementById('catNav');
-            nav.innerHTML = generos.map(g => `
+            document.getElementById('catNav').innerHTML = generos.map(g => `
                 <button class="cat-btn ${g === 'Destaques' ? 'active' : ''}" onclick="selecionarGenero(this, '${g}')">${g}</button>
             `).join('');
         }
@@ -253,7 +174,7 @@
                         <p>${t.artistName}</p>
                     </div>
                 `).join('');
-            } catch (e) { grid.innerHTML = "<p>Erro na busca.</p>"; }
+            } catch (e) { grid.innerHTML = "<p>Erro.</p>"; }
         }
 
         async function abrirAlbum(id) {
@@ -264,26 +185,34 @@
                 const data = await res.json();
                 const album = data.results[0];
                 const tracks = data.results.slice(1);
+                const ano = new Date(album.releaseDate).getFullYear();
+                const dataCompleta = new Date(album.releaseDate).toLocaleDateString('pt-BR');
 
                 document.getElementById('albumDetailContent').innerHTML = `
                     <div class="album-header">
                         <img src="${album.artworkUrl100.replace('100x100', '600x600')}">
-                        <h2 style="margin-top:20px;">${album.collectionName}</h2>
-                        <p style="color:#b3b3b3;">${album.artistName}</p>
+                        <h2 style="margin-top:15px; font-size:18px;">${album.collectionName}</h2>
+                        <p style="color:var(--primary); font-weight:bold;">${album.artistName}</p>
+                        
+                        <div class="album-info-box">
+                            <div class="info-tag">Lançamento: <span>${dataCompleta} (${ano})</span></div>
+                            <div class="info-tag">Gênero: <span>${album.primaryGenreName}</span></div>
+                            <div class="info-tag">Gravadora: <span>${album.copyright || 'Independente'}</span></div>
+                        </div>
                     </div>
-                    <div style="padding-bottom: 150px; background: #121212;">
+                    <div style="padding-bottom: 150px; background: #000;">
                         ${tracks.map((t, i) => `
                             <div class="track-row" onclick="tocarTrack('${t.trackName.replace(/'/g, "\\'")}', '${t.artistName.replace(/'/g, "\\'")}', '${t.previewUrl}')">
                                 <span class="track-num">${i+1}</span>
-                                <div class="track-meta">
-                                    <div>${t.trackName}</div>
+                                <div style="flex:1;">
+                                    <div style="font-size:14px;">${t.trackName}</div>
                                 </div>
-                                <i class="fas fa-play" style="color:#b3b3b3; font-size:12px;"></i>
+                                <i class="fas fa-play" style="color:#444; font-size:12px;"></i>
                             </div>
                         `).join('')}
                     </div>
                 `;
-            } catch (e) {}
+            } catch (e) { document.getElementById('albumDetailContent').innerHTML = "<p>Erro ao carregar detalhes.</p>"; }
         }
 
         function tocarTrack(name, artist, url) {
