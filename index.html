@@ -10,7 +10,7 @@
         
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         
-        body { background: var(--bg); color: var(--text-main); font-family: -apple-system, sans-serif; min-height: 100vh; }
+        body { background: var(--bg); color: var(--text-main); font-family: -apple-system, sans-serif; min-height: 100vh; overflow-x: hidden; }
 
         body::before {
             content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -35,7 +35,17 @@
         .card { width: 47%; background: rgba(255,255,255,0.04); border-radius: 15px; padding: 8px; margin-bottom: 20px; }
         .card img { width: 100%; aspect-ratio: 1/1; border-radius: 12px; object-fit: cover; }
 
-        .player { position: fixed; bottom: 35px; left: 15px; right: 15px; background: var(--player-bg); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); padding: 12px 20px; border-radius: 25px; border: 1px solid rgba(255, 255, 255, 0.15); z-index: 10002; }
+        /* PLAYER COM EFEITO DE ESCONDE-ESCONDE SUAVE */
+        .player { 
+            position: fixed; bottom: 35px; left: 15px; right: 15px; 
+            background: var(--player-bg); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); 
+            padding: 12px 20px; border-radius: 25px; border: 1px solid rgba(255, 255, 255, 0.15); 
+            z-index: 10002; transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s;
+        }
+        
+        /* Classe que esconde o player */
+        .player-hidden { transform: translateY(120px); opacity: 0; }
+
         .player-controls { display: flex; align-items: center; gap: 15px; }
         .mini-art { width: 50px; height: 50px; border-radius: 10px; object-fit: cover; }
 
@@ -92,13 +102,34 @@
         const playerBar = document.getElementById('player');
         const albumPage = document.getElementById('albumPage');
 
-        // FUNÇÃO DO MICROFONE VOLTANDO A FUNCIONAR
+        // LÓGICA DE ESCONDE-ESCONDE (SCROLL)
+        let lastScrollY = window.scrollY;
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > lastScrollY && window.scrollY > 50) {
+                // Deslizando para baixo: esconde
+                playerBar.classList.add('player-hidden');
+            } else {
+                // Deslizando para cima: mostra
+                playerBar.classList.remove('player-hidden');
+            }
+            lastScrollY = window.scrollY;
+        });
+
+        // Aplicar também dentro da página de álbum
+        albumPage.addEventListener('scroll', () => {
+            if (albumPage.scrollTop > lastScrollY && albumPage.scrollTop > 50) {
+                playerBar.classList.add('player-hidden');
+            } else {
+                playerBar.classList.remove('player-hidden');
+            }
+            lastScrollY = albumPage.scrollTop;
+        });
+
         function ativarMicrofone() {
             const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
             recognition.lang = 'pt-BR';
             recognition.start();
-            document.getElementById('micBtn').style.color = '#ff3b30'; // Fica vermelho enquanto ouve
-
+            document.getElementById('micBtn').style.color = '#ff3b30';
             recognition.onresult = (event) => {
                 const texto = event.results[0][0].transcript;
                 document.getElementById('searchInput').value = texto;
@@ -146,7 +177,6 @@
             const res = await fetch(`https://itunes.apple.com/lookup?id=${id}&entity=song`);
             const data = await res.json();
             const album = data.results[0]; const songs = data.results.slice(1);
-            
             document.getElementById('albumDetailContent').innerHTML = `
                 <div style="text-align:center; padding:30px;"><img src="${art.replace('100x100', '600x600')}" style="width:250px; border-radius:20px;">
                 <h2 style="margin-top:25px;">${album.collectionName}</h2><p style="color:var(--primary);">${album.artistName}</p></div>
@@ -176,6 +206,7 @@
             const m = window.listaTocando[index];
             audio.src = m.previewUrl; audio.play();
             playerBar.style.display = 'block';
+            playerBar.classList.remove('player-hidden');
             document.getElementById('playerArt').src = art;
             document.getElementById('trackTitle').innerText = m.trackName;
             atualizarUI();
@@ -187,7 +218,6 @@
                 ic.className = 'fas fa-play-circle track-play-icon';
                 ic.style.color = 'white';
             });
-
             if (window.albumVisualizadoId === window.albumAtivoId) {
                 const row = document.getElementById(`row_${window.albumAtivoId}_${window.musicaIndex}`);
                 const icon = document.getElementById(`btn_list_${window.albumAtivoId}_${window.musicaIndex}`);
