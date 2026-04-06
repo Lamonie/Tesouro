@@ -17,253 +17,151 @@
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--bg); color: var(--text-main); font-family: -apple-system, sans-serif; min-height: 100vh; overflow-x: hidden; }
+        body { background: var(--bg); color: var(--text-main); font-family: -apple-system, sans-serif; min-height: 100vh; }
 
         header { padding: 25px 20px 10px; }
         header h1 { color: var(--primary); font-size: 26px; font-weight: 900; }
 
-        .nav-wrapper { display: flex; align-items: center; padding: 10px 15px; gap: 10px; }
-        .genres-main-btn { background: rgba(255, 255, 255, 0.1); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 10px 20px; border-radius: 12px; font-weight: bold; }
-        
-        .categories-nav { display: none; overflow-x: auto; gap: 10px; scrollbar-width: none; }
-        .cat-btn { background: rgba(40, 40, 42, 0.8); border: 1px solid rgba(255, 255, 255, 0.05); color: #ccc; padding: 10px 18px; border-radius: 10px; font-size: 14px; flex-shrink: 0; }
-        .cat-btn.selected { background: var(--playing-color); color: black; }
-
         .search-container { padding: 10px 15px; }
         .search-box { display: flex; background: var(--gray-card); border-radius: 12px; align-items: center; padding: 0 12px; gap: 10px; }
-        .search-box i { color: #888; font-size: 18px; padding: 10px 5px; }
+        .search-box i { color: #888; font-size: 18px; padding: 10px 5px; cursor: pointer; }
         .search-box input { background: none; border: none; color: white; flex: 1; padding: 12px 0; outline: none; font-size: 16px; }
 
         .main-grid { display: flex; flex-wrap: wrap; justify-content: space-between; padding: 10px 15px 180px; }
         .card { width: 47%; background: var(--gray-card); border-radius: 15px; padding: 8px; margin-bottom: 20px; }
         .card img { width: 100%; aspect-ratio: 1/1; border-radius: 10px; object-fit: cover; }
 
-        .player { 
-            position: fixed; bottom: 30px; left: 12px; right: 12px; 
-            background: var(--player-bg); border-radius: 18px; border: 1px solid rgba(255,255,255,0.1);
-            padding: 10px 15px; z-index: 10002; transition: transform 0.4s ease, opacity 0.4s;
-        }
-        .player-hidden { transform: translateY(150px); opacity: 0; }
-
         .full-page { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 10001; display: none; flex-direction: column; overflow-y: auto; }
-        .btn-voltar { margin: 15px; background: rgba(255,255,255,0.1); border: none; color: #fff; padding: 10px 20px; border-radius: 20px; font-weight: bold; width: fit-content; }
+        .btn-voltar { margin: 15px; background: rgba(255,255,255,0.1); border: none; color: #fff; padding: 10px 20px; border-radius: 20px; font-weight: bold; cursor: pointer; }
         
-        .track-row { display: flex; align-items: center; padding: 16px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .track-info { flex: 1; overflow: hidden; }
-        .track-title { color: white; font-size: 15px; transition: color 0.3s; }
-        .track-row.playing .track-title { color: var(--active-song) !important; font-weight: bold; }
-        
-        .track-actions { display: flex; align-items: center; gap: 25px; margin-left: 10px; }
-        .list-play-btn { font-size: 24px; color: white; }
-        .list-play-btn.active { color: var(--playing-color) !important; }
+        /* Box de Detalhes do Álbum */
+        .album-details-container { padding: 0 20px 20px; text-align: center; }
+        .album-info-text { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; margin-top: 15px; text-align: left; }
+        .album-info-text p { font-size: 14px; margin-bottom: 5px; color: #bbb; }
+        .album-info-text b { color: var(--primary); }
 
-        .np-container { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
-        .np-art { width: 80%; aspect-ratio: 1/1; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .track-row { display: flex; align-items: center; padding: 16px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .track-info { flex: 1; }
+        .track-title { color: white; font-size: 15px; font-weight: 500; }
+        
+        .player { position: fixed; bottom: 30px; left: 12px; right: 12px; background: var(--player-bg); border-radius: 18px; padding: 10px 15px; z-index: 10002; border: 1px solid rgba(255,255,255,0.1); }
     </style>
 </head>
 <body>
 
     <header><h1>LAMONIÊ FLOW</h1></header>
     
-    <div class="nav-wrapper">
-        <button class="genres-main-btn" onclick="toggleGenresMenu()" id="mainGenreBtn">Gêneros</button>
-        <div class="categories-nav" id="catNav"></div>
-    </div>
-
     <div class="search-container">
         <div class="search-box">
-            <i class="fas fa-microphone" id="micIconButton" onclick="iniciarVoz()"></i>
-            <input type="text" id="searchInput" placeholder="Buscar música..." oninput="controlarBotaoLimpar()" onkeyup="if(event.key==='Enter') carregarPorGenero(this.value)">
-            <i class="fas fa-times-circle" id="btnClear" style="display:none;" onclick="limparBusca()"></i>
-            <i class="fas fa-search" onclick="carregarPorGenero(document.getElementById('searchInput').value)"></i>
+            <i class="fas fa-microphone" id="btnMic" onclick="iniciarVoz()"></i>
+            <input type="text" id="searchInput" placeholder="Buscar música ou artista..." onkeyup="if(event.key==='Enter') buscar(this.value)">
+            <i class="fas fa-times-circle" id="btnLimpar" style="display:none;" onclick="limpar()"></i>
+            <i class="fas fa-search" onclick="buscar(document.getElementById('searchInput').value)"></i>
         </div>
     </div>
 
     <div id="grid" class="main-grid"></div>
 
-    <div id="albumPage" class="full-page" onscroll="handleScroll(this)">
+    <div id="albumPage" class="full-page">
         <button class="btn-voltar" onclick="fecharPagina()">← VOLTAR</button>
-        <div id="albumDetailContent"></div>
+        <div id="albumContent"></div>
     </div>
 
-    <div id="nowPlayingPage" class="full-page" style="background: linear-gradient(to bottom, #1a1a1a, #000);">
-        <button class="btn-voltar" onclick="fecharNowPlaying()">↓ VOLTAR</button>
-        <div class="np-container">
-            <img id="npArt" class="np-art" src="">
-            <div id="npTitle" style="font-size:20px; font-weight:bold; margin-top:25px; text-align:center;">Música</div>
-            <div id="npArtist" style="color:var(--primary); margin-top:5px;">Artista</div>
-            <div style="display:flex; align-items:center; gap:35px; margin-top:40px;">
-                <button class="btn-voltar" style="background:none; font-size:25px;" onclick="anterior()"><i class="fas fa-backward"></i></button>
-                <button class="btn-voltar" style="background:white; color:black; width:65px; height:65px; border-radius:50%; font-size:25px; display:flex; justify-content:center; align-items:center;" onclick="togglePlay()" id="npPlayBtn"><i class="fas fa-pause"></i></button>
-                <button class="btn-voltar" style="background:none; font-size:25px;" onclick="proxima()"><i class="fas fa-forward"></i></button>
-            </div>
-        </div>
-    </div>
-
-    <footer class="player" id="player" style="display:none;" onclick="irParaOAlbumAtivo()">
+    <footer class="player" id="player" style="display:none;">
         <div style="display:flex; align-items:center; gap:12px;">
-            <img id="playerArt" src="" style="width:45px; height:45px; border-radius:8px;">
-            <div style="flex:1; overflow:hidden;"><div id="trackTitleBar" style="font-weight:bold; font-size:14px; white-space:nowrap; text-overflow:ellipsis; overflow:hidden;">Música</div></div>
-            <div style="display:flex; align-items:center; gap:20px;">
-                <button onclick="event.stopPropagation(); togglePlay();" id="playBtn" style="background:none; border:none; color:var(--playing-color); font-size:26px;"><i class="fas fa-pause"></i></button>
-                <button onclick="event.stopPropagation(); proxima();" style="background:none; border:none; color:white; font-size:22px;"><i class="fas fa-step-forward"></i></button>
-            </div>
+            <img id="pArt" src="" style="width:45px; height:45px; border-radius:8px;">
+            <div style="flex:1; overflow:hidden;"><div id="pTitle" style="font-weight:bold; font-size:14px; white-space:nowrap; text-overflow:ellipsis; overflow:hidden;">Título</div></div>
+            <i class="fas fa-pause" id="pPlay" onclick="toggle()" style="color:var(--playing-color); font-size:24px;"></i>
         </div>
     </footer>
 
-    <audio id="audioMain"></audio>
+    <audio id="mainAudio"></audio>
 
     <script>
-        const audio = document.getElementById('audioMain');
-        const playerBar = document.getElementById('player');
-        const searchInput = document.getElementById('searchInput');
-        const btnClear = document.getElementById('btnClear');
+        const audio = document.getElementById('mainAudio');
+        const input = document.getElementById('searchInput');
 
-        function controlarBotaoLimpar() {
-            btnClear.style.display = searchInput.value.length > 0 ? 'block' : 'none';
-        }
-
-        function limparBusca() { 
-            searchInput.value = ''; 
-            controlarBotaoLimpar();
-            searchInput.focus(); 
-        }
-
+        // FUNÇÃO DO MICROFONE CORRIGIDA
         function iniciarVoz() {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!SpeechRecognition) return alert("Não suportado.");
-            const recognition = new SpeechRecognition();
-            recognition.lang = 'pt-BR';
-            document.getElementById('micIconButton').style.color = "red";
-            recognition.onresult = (e) => {
-                searchInput.value = e.results[0][0].transcript;
-                controlarBotaoLimpar();
-                carregarPorGenero(searchInput.value);
+            const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!Recognition) return alert("Navegador não suporta voz.");
+            
+            const rec = new Recognition();
+            rec.lang = 'pt-BR';
+            document.getElementById('btnMic').style.color = "red";
+            
+            rec.onresult = (e) => {
+                const texto = e.results[0][0].transcript;
+                input.value = texto;
+                document.getElementById('btnLimpar').style.display = 'block';
+                buscar(texto);
             };
-            recognition.onend = () => document.getElementById('micIconButton').style.color = "#888";
-            recognition.start();
+            rec.onend = () => document.getElementById('btnMic').style.color = "#888";
+            rec.start();
         }
 
-        let lastScrollY = 0;
-        function handleScroll(el) {
-            const current = (el === window) ? window.scrollY : el.scrollTop;
-            if (current > lastScrollY && current > 50) playerBar.classList.add('player-hidden');
-            else playerBar.classList.remove('player-hidden');
-            lastScrollY = current;
-        }
-        window.addEventListener('scroll', () => handleScroll(window));
+        function limpar() { input.value = ''; document.getElementById('btnLimpar').style.display = 'none'; }
 
-        async function carregarPorGenero(g) {
-            if(!g) return;
-            const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(g)}&entity=album&limit=60`);
-            const data = await res.json();
-            document.getElementById('grid').innerHTML = data.results.map(t => `
-                <div class="card" onclick="abrirAlbum('${t.collectionId}', '${t.artworkUrl100}')">
-                    <img src="${t.artworkUrl100.replace('100x100', '400x400')}">
-                    <p style="margin-top:8px; font-weight:600; font-size:13px; color:#eee; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${t.collectionName}</p>
+        async function buscar(termo) {
+            if(!termo) return;
+            const r = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(termo)}&entity=album&limit=40`);
+            const d = await r.json();
+            document.getElementById('grid').innerHTML = d.results.map(a => `
+                <div class="card" onclick="abrir('${a.collectionId}', '${a.artworkUrl100}')">
+                    <img src="${a.artworkUrl100.replace('100x100', '400x400')}">
+                    <p style="margin-top:8px; font-weight:600; font-size:13px; color:#eee;">${a.collectionName}</p>
                 </div>`).join('');
         }
 
-        async function abrirAlbum(id, art) {
+        // FUNÇÃO DE ABRIR ÁLBUM COM DESCRIÇÃO COMPLETA
+        async function abrir(id, capa) {
             document.getElementById('albumPage').style.display = 'flex';
-            const res = await fetch(`https://itunes.apple.com/lookup?id=${id}&entity=song`);
-            const data = await res.json();
-            window.listaVisualizada = data.results.slice(1);
-            window.capaVisualizada = art;
-            window.currentAlbumOpenId = id;
-            renderizarLista();
-        }
+            const r = await fetch(`https://itunes.apple.com/lookup?id=${id}&entity=song`);
+            const d = await r.json();
+            
+            const info = d.results[0]; // Dados do álbum
+            const musicas = d.results.slice(1); // Lista de músicas
+            const ano = new Date(info.releaseDate).getFullYear();
 
-        function irParaOAlbumAtivo() {
-            if (window.albumAtivoId) abrirAlbum(window.albumAtivoId, window.capaAtiva);
-        }
+            document.getElementById('albumContent').innerHTML = `
+                <div class="album-details-container">
+                    <img src="${capa.replace('100x100', '600x600')}" style="width:220px; border-radius:15px; box-shadow: 0 10px 20px rgba(0,0,0,0.5);">
+                    
+                    <div class="album-info-text">
+                        <p><b>Gênero:</b> ${info.primaryGenreName}</p>
+                        <p><b>Lançamento:</b> ${ano}</p>
+                        <p><b>Compositor/Artista:</b> ${info.artistName}</p>
+                        <p><b>Gravadora:</b> ${info.copyright || 'Independente'}</p>
+                    </div>
+                </div>
 
-        function baixar(url) {
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = "musica.m4a";
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        }
-
-        function renderizarLista() {
-            const art = window.capaVisualizada;
-            document.getElementById('albumDetailContent').innerHTML = `
-                <div style="text-align:center; padding:35px;"><img src="${art.replace('100x100', '600x600')}" style="width:200px; border-radius:15px;"></div>
-                ${window.listaVisualizada.map((m, i) => `
-                    <div class="track-row ${window.musicaIndex === i && window.albumAtivoId === window.currentAlbumOpenId ? 'playing' : ''}">
-                        <div class="track-info" onclick="tocar(${i}, true)">
+                ${musicas.map(m => `
+                    <div class="track-row" onclick="tocar('${m.previewUrl}', '${m.trackName}', '${capa}')">
+                        <div class="track-info">
                             <div class="track-title">${m.trackName}</div>
-                            <div style="font-size:12px; color:#777;">${m.artistName}</div>
+                            <div style="font-size:12px; color:#666;">${m.artistName}</div>
                         </div>
-                        <div class="track-actions">
-                            <i class="fas fa-download" style="color:#666; font-size:20px;" onclick="baixar('${m.previewUrl}')"></i>
-                            <i class="fas fa-play-circle list-play-btn ${window.musicaIndex === i && window.albumAtivoId === window.currentAlbumOpenId && !audio.paused ? 'active' : ''}" onclick="tocar(${i}, false)"></i>
-                        </div>
+                        <i class="fas fa-play-circle" style="font-size:22px; color:#fff;"></i>
                     </div>`).join('')}`;
         }
 
-        function tocar(index, abrirCapa) {
-            const m = window.listaVisualizada[index];
-            if (window.musicaIndex === index && window.albumAtivoId === window.currentAlbumOpenId) {
-                if (abrirCapa) abrirNowPlaying(); else togglePlay();
-            } else {
-                window.musicaIndex = index;
-                window.listaTocando = window.listaVisualizada;
-                window.albumAtivoId = window.currentAlbumOpenId;
-                window.capaAtiva = window.capaVisualizada;
-                audio.src = m.previewUrl;
-                audio.play();
-                playerBar.style.display = 'block';
-                document.getElementById('playerArt').src = window.capaAtiva;
-                document.getElementById('trackTitleBar').innerText = m.trackName;
-                if (abrirCapa) abrirNowPlaying();
-            }
-            atualizarUI();
+        function tocar(url, nome, capa) {
+            audio.src = url;
+            audio.play();
+            document.getElementById('player').style.display = 'block';
+            document.getElementById('pArt').src = capa;
+            document.getElementById('pTitle').innerText = nome;
+            document.getElementById('pPlay').className = 'fas fa-pause';
         }
 
-        function atualizarUI() {
-            renderizarLista();
-            const icon = audio.paused ? '<i class="fas fa-play"></i>' : '<i class="fas fa-pause"></i>';
-            document.getElementById('playBtn').innerHTML = icon;
-            document.getElementById('npPlayBtn').innerHTML = icon;
+        function toggle() {
+            if(audio.paused) { audio.play(); document.getElementById('pPlay').className = 'fas fa-pause'; }
+            else { audio.pause(); document.getElementById('pPlay').className = 'fas fa-play'; }
         }
 
-        function togglePlay() { audio.paused ? audio.play() : audio.pause(); atualizarUI(); }
-        function abrirNowPlaying() {
-            const m = window.listaTocando[window.musicaIndex];
-            document.getElementById('npArt').src = window.capaAtiva.replace('100x100', '600x600');
-            document.getElementById('npTitle').innerText = m.trackName;
-            document.getElementById('npArtist').innerText = m.artistName;
-            document.getElementById('nowPlayingPage').style.display = 'flex';
-        }
-
-        function proxima() { if (window.musicaIndex < window.listaTocando.length - 1) tocar(window.musicaIndex + 1, false); }
-        function anterior() { if (window.musicaIndex > 0) tocar(window.musicaIndex - 1, false); }
-        function fecharNowPlaying() { document.getElementById('nowPlayingPage').style.display = 'none'; }
         function fecharPagina() { document.getElementById('albumPage').style.display = 'none'; }
         
-        const listaGeneros = ["Forró", "Sertanejo", "MPB", "Piseiro", "Vaquejada", "Samba"];
-        document.getElementById('catNav').innerHTML = listaGeneros.map(g => `<button class="cat-btn" onclick="selecionarGenero(this, '${g}')">${g}</button>`).join('');
-
-        function toggleGenresMenu() {
-            const nav = document.getElementById('catNav');
-            const isVisible = nav.style.display === 'flex';
-            nav.style.display = isVisible ? 'none' : 'flex';
-            document.getElementById('mainGenreBtn').classList.toggle('active', !isVisible);
-        }
-
-        function selecionarGenero(btn, g) {
-            document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('selected'));
-            btn.classList.add('selected');
-            carregarPorGenero(g);
-        }
-
-        carregarPorGenero("Luiz Gonzaga");
-        audio.onended = proxima;
-        audio.onplay = atualizarUI;
-        audio.onpause = atualizarUI;
+        buscar("Luiz Gonzaga");
     </script>
 </body>
 </html>
