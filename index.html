@@ -27,7 +27,6 @@
         .card { width: 47%; background: rgba(255,255,255,0.04); border-radius: 15px; padding: 8px; margin-bottom: 20px; }
         .card img { width: 100%; aspect-ratio: 1/1; border-radius: 12px; object-fit: cover; }
 
-        /* ARRUMADO: Mini player voltou ao tamanho original elegante */
         .player { 
             position: fixed; bottom: 35px; left: 15px; right: 15px; 
             background: var(--player-bg); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); 
@@ -45,9 +44,7 @@
         .track-row { display: flex; align-items: center; padding: 16px; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .track-row.is-playing .track-title { color: var(--active-song) !important; font-weight: bold; }
 
-        /* ARRUMADO: Separação dos botões da lista */
         .track-actions { display: flex; align-items: center; gap: 35px; margin-left: 10px; }
-        
         .album-meta { background: rgba(255,255,255,0.06); margin: 15px; padding: 20px; border-radius: 18px; font-size: 13px; color: #bbb; text-align: center; }
 
         .np-container { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
@@ -61,9 +58,11 @@
         .np-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 10px; height: 10px; border-radius: 50%; background: #fff; }
         .np-time { display: flex; justify-content: space-between; font-size: 11px; color: #555; margin-top: 8px; }
 
-        .np-controls { display: flex; align-items: center; gap: 40px; margin-top: 10px; }
-        .np-btn { background: none; border: none; color: white; font-size: 30px; }
+        /* CONTROLES TELA CHEIA */
+        .np-controls { display: flex; align-items: center; gap: 25px; margin-top: 10px; }
+        .np-btn { background: none; border: none; color: white; font-size: 24px; transition: color 0.3s; }
         .np-btn-main { font-size: 55px; }
+        .btn-active { color: var(--playing-color) !important; } /* Cor amarela quando ativado */
     </style>
 </head>
 <body>
@@ -99,9 +98,11 @@
                 <div class="np-time"><span id="npCurrent">0:00</span><span id="npDuration">0:00</span></div>
             </div>
             <div class="np-controls">
+                <button class="np-btn" id="shuffleBtn" onclick="toggleShuffle()"><i class="fas fa-random"></i></button>
                 <button class="np-btn" onclick="anterior()"><i class="fas fa-backward"></i></button>
                 <button class="np-btn np-btn-main" onclick="togglePlay()" id="npPlayBtn"><i class="fas fa-pause"></i></button>
                 <button class="np-btn" onclick="proxima()"><i class="fas fa-forward"></i></button>
+                <button class="np-btn" id="repeatBtn" onclick="toggleRepeat()"><i class="fas fa-redo"></i></button>
             </div>
         </div>
     </div>
@@ -129,6 +130,9 @@
         const nowPlayingPage = document.getElementById('nowPlayingPage');
         const npSlider = document.getElementById('npSlider');
 
+        let isShuffle = false;
+        let isRepeat = false;
+
         let lastScrollY = window.scrollY;
         window.addEventListener('scroll', () => {
             if (window.scrollY > lastScrollY && window.scrollY > 50) { playerBar.classList.add('player-hidden'); }
@@ -153,6 +157,16 @@
             document.getElementById('npDuration').innerText = formatTime(dur);
             npSlider.max = Math.floor(dur); npSlider.value = Math.floor(cur);
             atualizarUI();
+        };
+
+        // Quando a música acaba
+        audio.onended = () => {
+            if (isRepeat) {
+                audio.currentTime = 0;
+                audio.play();
+            } else {
+                proxima();
+            }
         };
 
         npSlider.oninput = () => { audio.currentTime = npSlider.value; };
@@ -218,6 +232,28 @@
         function fecharNowPlaying() { nowPlayingPage.style.display = 'none'; }
         function fecharPagina() { albumPage.style.display = 'none'; }
 
+        // Lógica Aleatório e Repetir
+        function toggleShuffle() {
+            isShuffle = !isShuffle;
+            document.getElementById('shuffleBtn').classList.toggle('btn-active', isShuffle);
+        }
+
+        function toggleRepeat() {
+            isRepeat = !isRepeat;
+            document.getElementById('repeatBtn').classList.toggle('btn-active', isRepeat);
+        }
+
+        function proxima() { 
+            if (isShuffle) {
+                let r = Math.floor(Math.random() * window.listaTocando.length);
+                tocar(window.albumAtivoId, r, window.capaAtiva);
+            } else if(window.musicaIndex + 1 < window.listaTocando.length) {
+                tocar(window.albumAtivoId, window.musicaIndex + 1, window.capaAtiva);
+            }
+        }
+
+        function anterior() { if(window.musicaIndex - 1 >= 0) tocar(window.albumAtivoId, window.musicaIndex - 1, window.capaAtiva); }
+
         function atualizarUI() {
             document.querySelectorAll('.track-row').forEach(r => r.classList.remove('is-playing'));
             if (window.albumVisualizadoId === window.albumAtivoId) {
@@ -230,8 +266,6 @@
         }
 
         function togglePlay() { audio.paused ? audio.play() : audio.pause(); atualizarUI(); }
-        function proxima() { if(window.musicaIndex + 1 < window.listaTocando.length) tocar(window.albumAtivoId, window.musicaIndex + 1, window.capaAtiva); }
-        function anterior() { if(window.musicaIndex - 1 >= 0) tocar(window.albumAtivoId, window.musicaIndex - 1, window.capaAtiva); }
         async function baixarMusica(u, n) { const r = await fetch(u); const b = await r.blob(); const l = document.createElement('a'); l.href = window.URL.createObjectURL(b); l.download = `${n}.mp3`; l.click(); }
 
         carregarPorGenero("Início");
