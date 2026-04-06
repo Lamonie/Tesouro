@@ -21,7 +21,6 @@
         .search-box { display: flex; background: #1c1c1e; border-radius: 12px; border: 1px solid #333; align-items: center; position: relative; }
         .search-box input { background: none; border: none; color: white; flex: 1; padding: 14px 85px 14px 14px; outline: none; font-size: 14px; }
         
-        /* BOTÕES DA BARRA DE BUSCA */
         .search-controls { display: flex; align-items: center; gap: 10px; padding-right: 10px; }
         .mic-btn { color: var(--primary); cursor: pointer; font-size: 18px; padding: 5px; }
         .mic-btn.active { color: #ff3b30; animation: pulse 1.5s infinite; }
@@ -108,16 +107,47 @@
         let musicaIndex = 0;
         let jaRepetiu = false;
 
+        // Lista de artistas para a carga inicial pesada
+        const artistasIniciais = ["Gleidson Gavião", "Gaviões do Forró", "Toca do Vale", "Luiz Gonzaga", "Flávio José"];
+
         function carregarGeneros() {
             document.getElementById('catNav').innerHTML = ["Destaques", "Forró", "Vaquejada", "Piseiro", "Sertanejo", "Arrocha", "Brega", "Pagode", "Axé", "MPB", "Gospel"].map(g => 
-                `<button class="cat-btn ${g==='Destaques'?'active':''}" onclick="filtrarGeral(this, '${g}')">${g}</button>`
+                `<button class="cat-btn ${g==='Destaques'?'active':''}" onclick="gerenciarFiltro(this, '${g}')">${g}</button>`
             ).join('');
         }
 
-        async function carregarAlbuns(termo = "Luiz Gonzaga") {
-            const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(termo)}&entity=album&limit=50`);
+        async function carregarAlbuns(termo = "") {
+            grid.innerHTML = "<p style='padding:20px;'>Carregando centenas de álbuns...</p>";
+            
+            // Se for carga inicial (vazio ou Destaques), busca todos os artistas da lista
+            let buscaFinal = termo;
+            if (termo === "" || termo === "Destaques") {
+                // Busca combinada para trazer mais volume
+                const promessas = artistasIniciais.map(a => 
+                    fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(a)}&entity=album&limit=100`).then(r => r.json())
+                );
+                const resultados = await Promise.all(promessas);
+                const todosAlbuns = resultados.flatMap(data => data.results);
+                // Remove duplicados e embaralha para ficar variado
+                const albunsUnicos = Array.from(new Set(todosAlbuns.map(a => a.collectionId)))
+                    .map(id => todosAlbuns.find(a => a.collectionId === id))
+                    .sort(() => Math.random() - 0.5);
+                
+                renderizarGrid(albunsUnicos);
+                return;
+            }
+
+            const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(termo)}&entity=album&limit=200`);
             const data = await res.json();
-            grid.innerHTML = data.results.map(t => `
+            renderizarGrid(data.results);
+        }
+
+        function renderizarGrid(albuns) {
+            if (!albuns || albuns.length === 0) {
+                grid.innerHTML = "<p style='padding:20px;'>Nenhum álbum encontrado.</p>";
+                return;
+            }
+            grid.innerHTML = albuns.map(t => `
                 <div class="card" onclick="abrirAlbum('${t.collectionId}')">
                     <img src="${t.artworkUrl100.replace('100x100', '400x400')}">
                     <h4>${t.collectionName}</h4>
@@ -125,16 +155,24 @@
             `).join('');
         }
 
-        // BUSCA POR VOZ
+        function gerenciarFiltro(btn, g) {
+            document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            // Se clicar em Destaques, ele reseta para a carga inicial completa
+            if (g === "Destaques") {
+                carregarAlbuns("");
+            } else {
+                carregarAlbuns(g);
+            }
+        }
+
         function comecarVoz() {
             window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (window.SpeechRecognition) {
                 const recognition = new SpeechRecognition();
                 recognition.lang = 'pt-BR';
-                
                 recognition.onstart = () => micBtn.classList.add('active');
                 recognition.onend = () => micBtn.classList.remove('active');
-                
                 recognition.onresult = (e) => {
                     const texto = e.results[0][0].transcript;
                     searchInput.value = texto;
@@ -142,8 +180,6 @@
                     buscar();
                 };
                 recognition.start();
-            } else {
-                alert("Busca por voz não suportada neste navegador.");
             }
         }
 
@@ -213,10 +249,8 @@
                 icon.classList.remove('fa-pause-circle');
                 icon.classList.add('fa-play-circle');
             });
-
             const currentTrackRow = document.getElementById(`track_${musicaIndex}`);
             const currentIcon = document.getElementById(`icon_${musicaIndex}`);
-            
             if (currentTrackRow) currentTrackRow.classList.add('playing');
             if (currentIcon && !audio.paused) {
                 currentIcon.classList.remove('fa-play-circle');
@@ -225,18 +259,11 @@
         }
 
         audio.onended = function() {
-            if (repeatBtn.classList.contains('active')) {
-                audio.play();
-            } else if (!jaRepetiu) {
-                jaRepetiu = true;
-                audio.currentTime = 0;
-                audio.play();
-            } else {
-                if (shuffleBtn.classList.contains('active')) {
-                    tocar(Math.floor(Math.random() * listaAtual.length));
-                } else if (musicaIndex + 1 < listaAtual.length) {
-                    tocar(musicaIndex + 1);
-                }
+            if (repeatBtn.classList.contains('active')) { audio.play(); } 
+            else if (!jaRepetiu) { jaRepetiu = true; audio.currentTime = 0; audio.play(); } 
+            else {
+                if (shuffleBtn.classList.contains('active')) { tocar(Math.floor(Math.random() * listaAtual.length)); } 
+                else if (musicaIndex + 1 < listaAtual.length) { tocar(musicaIndex + 1); }
             }
         };
 
@@ -258,17 +285,11 @@
             atualizarTrackPlaying();
         }
 
-        function filtrarGeral(btn, g) {
-            document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            carregarAlbuns(g);
-        }
-
         function fecharPagina() { document.getElementById('albumPage').style.display = 'none'; }
         function togglePlayer() { player.classList.toggle('minimized'); }
         
         carregarGeneros();
-        carregarAlbuns();
+        carregarAlbuns(""); // Carga inicial pesada
     </script>
 </body>
 </html>
