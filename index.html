@@ -106,8 +106,10 @@
         let listaAtual = [];
         let musicaIndex = 0;
         let jaRepetiu = false;
+        
+        // Memória para os álbuns de destaque não mudarem
+        let albunsDestaqueFixos = [];
 
-        // Lista de artistas para a carga inicial pesada
         const artistasIniciais = ["Gleidson Gavião", "Gaviões do Forró", "Toca do Vale", "Luiz Gonzaga", "Flávio José"];
 
         function carregarGeneros() {
@@ -117,27 +119,31 @@
         }
 
         async function carregarAlbuns(termo = "") {
-            grid.innerHTML = "<p style='padding:20px;'>Carregando centenas de álbuns...</p>";
-            
-            // Se for carga inicial (vazio ou Destaques), busca todos os artistas da lista
-            let buscaFinal = termo;
-            if (termo === "" || termo === "Destaques") {
-                // Busca combinada para trazer mais volume
-                const promessas = artistasIniciais.map(a => 
-                    fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(a)}&entity=album&limit=100`).then(r => r.json())
-                );
-                const resultados = await Promise.all(promessas);
-                const todosAlbuns = resultados.flatMap(data => data.results);
-                // Remove duplicados e embaralha para ficar variado
-                const albunsUnicos = Array.from(new Set(todosAlbuns.map(a => a.collectionId)))
-                    .map(id => todosAlbuns.find(a => a.collectionId === id))
-                    .sort(() => Math.random() - 0.5);
-                
-                renderizarGrid(albunsUnicos);
+            // Se for Destaques e já tivermos os álbuns salvos, apenas mostra eles
+            if ((termo === "" || termo === "Destaques") && albunsDestaqueFixos.length > 0) {
+                renderizarGrid(albunsDestaqueFixos);
                 return;
             }
 
-            const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(termo)}&entity=album&limit=200`);
+            grid.innerHTML = "<p style='padding:20px;'>Carregando...</p>";
+            
+            if (termo === "" || termo === "Destaques") {
+                const promessas = artistasIniciais.map(a => 
+                    fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(a)}&entity=album&limit=50`).then(r => r.json())
+                );
+                const resultados = await Promise.all(promessas);
+                const todosAlbuns = resultados.flatMap(data => data.results);
+                
+                const albunsUnicos = Array.from(new Set(todosAlbuns.map(a => a.collectionId)))
+                    .map(id => todosAlbuns.find(a => a.collectionId === id));
+                
+                // Salva na memória a primeira vez
+                albunsDestaqueFixos = albunsUnicos;
+                renderizarGrid(albunsDestaqueFixos);
+                return;
+            }
+
+            const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(termo)}&entity=album&limit=150`);
             const data = await res.json();
             renderizarGrid(data.results);
         }
@@ -158,12 +164,7 @@
         function gerenciarFiltro(btn, g) {
             document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-            // Se clicar em Destaques, ele reseta para a carga inicial completa
-            if (g === "Destaques") {
-                carregarAlbuns("");
-            } else {
-                carregarAlbuns(g);
-            }
+            carregarAlbuns(g);
         }
 
         function comecarVoz() {
@@ -289,7 +290,7 @@
         function togglePlayer() { player.classList.toggle('minimized'); }
         
         carregarGeneros();
-        carregarAlbuns(""); // Carga inicial pesada
+        carregarAlbuns(""); // Carga inicial que ficará salva
     </script>
 </body>
 </html>
