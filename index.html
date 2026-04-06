@@ -20,39 +20,48 @@
         header { padding: 30px 20px 15px; background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.1); }
         header h1 { color: var(--primary); font-size: 28px; font-weight: 900; }
 
-        /* NOVO: Estilo do Botão Principal Gêneros */
+        /* Ajuste: Container para alinhar botão e lista na mesma linha */
+        .nav-container { 
+            display: flex; 
+            align-items: center; 
+            padding: 10px 15px; 
+            gap: 10px; 
+            overflow: hidden;
+        }
+
+        /* Ajuste: Borda de LED o mais fino possível (1px) */
         .genres-toggle-btn {
             background: #000;
             color: white;
-            border: 2px solid #c0c0c0; /* Prata LED */
-            box-shadow: 0 0 10px rgba(192, 192, 192, 0.5);
-            padding: 10px 20px;
-            border-radius: 12px;
+            border: 1px solid #c0c0c0; 
+            box-shadow: 0 0 3px rgba(192, 192, 192, 0.2);
+            padding: 8px 15px;
+            border-radius: 10px;
             font-weight: bold;
-            margin: 15px 15px 5px;
             cursor: pointer;
-            display: inline-block;
+            flex-shrink: 0;
+            font-size: 14px;
         }
 
-        /* NOVO: Barra de Gêneros Ocultável e Deslizante */
+        /* Ajuste: Barra de Gêneros ao lado, deslizante */
         .categories-nav { 
-            display: none; /* Começa escondida */
+            display: none; 
             overflow-x: auto; 
-            padding: 10px 15px; 
-            gap: 12px; 
+            gap: 8px; 
             white-space: nowrap;
             scrollbar-width: none;
+            flex: 1;
         }
         .categories-nav::-webkit-scrollbar { display: none; }
         
         .cat-btn { 
             background: #000; 
-            border: 2px solid #c0c0c0; /* Prata LED */
-            box-shadow: 0 0 8px rgba(192, 192, 192, 0.3);
+            border: 1px solid #c0c0c0; 
+            box-shadow: 0 0 2px rgba(192, 192, 192, 0.2);
             color: white; 
-            padding: 10px 20px; 
-            border-radius: 20px; 
-            font-size: 14px; 
+            padding: 8px 16px; 
+            border-radius: 18px; 
+            font-size: 13px; 
             font-weight: 600; 
             flex-shrink: 0; 
         }
@@ -91,9 +100,10 @@
 
     <header><h1>LAMONIÊ FLOW</h1></header>
 
-    <div class="genres-toggle-btn" onclick="toggleGenres()">Gêneros</div>
-    
-    <div class="categories-nav" id="catNav"></div>
+    <div class="nav-container">
+        <div class="genres-toggle-btn" onclick="toggleGenres()">Gêneros</div>
+        <div class="categories-nav" id="catNav"></div>
+    </div>
 
     <div class="search-container">
         <div class="search-box">
@@ -132,14 +142,9 @@
         const playerBar = document.getElementById('player');
         const albumPage = document.getElementById('albumPage');
 
-        // NOVO: Função para abrir e fechar a barra de gêneros
         function toggleGenres() {
             const nav = document.getElementById('catNav');
-            if (nav.style.display === 'flex') {
-                nav.style.display = 'none';
-            } else {
-                nav.style.display = 'flex';
-            }
+            nav.style.display = (nav.style.display === 'flex') ? 'none' : 'flex';
         }
 
         let lastScrollY = window.scrollY;
@@ -184,7 +189,6 @@
 
         function voltarParaAlbumAtivo() { if (window.albumAtivoId) abrirAlbum(window.albumAtivoId, window.capaAtiva); }
 
-        // LISTA DE GÊNEROS ITUNES
         const generos = ["Início", "Forró", "Vaquejada", "Piseiro", "Sertanejo", "Brega", "Arrocha", "Axé", "Pagode", "Samba", "Gospel", "Rock", "Pop", "Hip-Hop"];
         document.getElementById('catNav').innerHTML = generos.map(g => `<button class="cat-btn" onclick="carregarPorGenero('${g}')">${g}</button>`).join('');
 
