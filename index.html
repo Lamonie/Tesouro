@@ -10,24 +10,17 @@
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         body, html { width: 100%; overflow-x: hidden; background: var(--bg); color: var(--text-main); font-family: -apple-system, sans-serif; }
 
-        /* HEADER E LOGO */
         header { padding: 25px 15px 10px; }
         header h1 { color: var(--primary); font-size: 26px; font-weight: 900; letter-spacing: -1px; }
 
-        /* BARRA DE GÊNEROS */
-        .categories-nav { display: flex; overflow-x: auto; padding: 10px 15px; gap: 8px; scrollbar-width: none; border-bottom: 1px solid #1c1c1e; }
-        .categories-nav::-webkit-scrollbar { display: none; }
-        .cat-btn { background: #1c1c1e; border: none; color: white; padding: 10px 20px; border-radius: 25px; font-size: 13px; font-weight: 600; flex-shrink: 0; cursor: pointer; transition: 0.3s; }
+        .categories-nav { display: flex; overflow-x: auto; padding: 10px 15px; gap: 8px; border-bottom: 1px solid #1c1c1e; }
+        .cat-btn { background: #1c1c1e; border: none; color: white; padding: 10px 20px; border-radius: 25px; font-size: 13px; font-weight: 600; flex-shrink: 0; cursor: pointer; }
         .cat-btn.active { background: var(--primary); color: #000; }
 
-        /* BUSCA E GRID */
         .search-container { padding: 15px; }
-        .search-box { display: flex; background: #1c1c1e; border-radius: 12px; border: 1px solid #333; align-items: center; overflow: hidden; position: relative; }
+        .search-box { display: flex; background: #1c1c1e; border-radius: 12px; border: 1px solid #333; align-items: center; position: relative; }
         .search-box input { background: none; border: none; color: white; flex: 1; padding: 14px 45px 14px 14px; outline: none; font-size: 14px; }
-        
-        /* BOTÃO DE LIMPAR (X) */
-        .clear-btn { position: absolute; right: 45px; color: #8e8e93; cursor: pointer; display: none; font-size: 18px; padding: 5px; }
-        
+        .clear-btn { position: absolute; right: 45px; color: #8e8e93; cursor: pointer; display: none; font-size: 18px; }
         .search-btn { background: none; border: none; color: #8e8e93; padding: 0 15px; cursor: pointer; }
 
         .main-grid { display: flex; flex-wrap: wrap; justify-content: space-between; padding: 10px 15px 160px; }
@@ -35,26 +28,23 @@
         .card img { width: 100%; aspect-ratio: 1/1; border-radius: 10px; object-fit: cover; }
         .card h4 { font-size: 12px; margin-top: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        /* PÁGINA DO ÁLBUM */
         .full-page { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; display: none; flex-direction: column; overflow-y: auto; }
-        .btn-voltar { margin: 15px; background: var(--primary); border: none; color: #000; padding: 10px 20px; border-radius: 30px; font-weight: 800; width: fit-content; cursor: pointer; }
+        .btn-voltar { margin: 15px; background: var(--primary); border: none; color: #000; padding: 10px 20px; border-radius: 30px; font-weight: 800; cursor: pointer; }
         .track-row { display: flex; align-items: center; padding: 16px; border-bottom: 1px solid #1c1c1e; cursor: pointer; }
         .track-play-icon { color: var(--primary); font-size: 20px; margin-left: auto; }
 
-        /* PLAYER */
-        .player { position: fixed; bottom: 0; width: 100%; background: rgba(20,20,22,0.98); backdrop-filter: blur(20px); padding: 10px 20px 35px; border-top: 1px solid #333; z-index: 10001; transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        .player { position: fixed; bottom: 0; width: 100%; background: rgba(20,20,22,0.98); backdrop-filter: blur(20px); padding: 10px 20px 35px; border-top: 1px solid #333; z-index: 10001; transition: 0.4s; }
         .player.minimized { transform: translateY(calc(100% - 65px)); } 
         .handle-area { width: 100%; height: 30px; display: flex; justify-content: center; align-items: center; cursor: pointer; }
         .handle { width: 40px; height: 4px; background: #3a3a3c; border-radius: 10px; }
         .player-controls { display: flex; align-items: center; justify-content: space-between; gap: 15px; }
         .control-icon { color: #8e8e93; font-size: 20px; cursor: pointer; }
-        .control-icon.active { color: var(--primary); }
-        .play-trigger { background: var(--primary); border: none; width: 48px; height: 48px; border-radius: 50%; color: #000; font-size: 20px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .control-icon.active { color: var(--primary) !important; }
+        .play-trigger { background: var(--primary); border: none; width: 48px; height: 48px; border-radius: 50%; color: #000; font-size: 20px; display: flex; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
     <header><h1>LAMONIÊ FLOW</h1></header>
-    
     <div class="categories-nav" id="catNav"></div>
 
     <div class="search-container">
@@ -80,8 +70,8 @@
                 <p id="trackArtist" style="font-size:12px; color:var(--primary);">Artista</p>
             </div>
             <div style="display:flex; align-items:center; gap:20px;">
-                <i class="fas fa-random control-icon" id="shuffleBtn" onclick="this.classList.toggle('active')" title="Aleatório"></i>
-                <i class="fas fa-redo control-icon" id="repeatBtn" onclick="this.classList.toggle('active')" title="Repetir"></i>
+                <i class="fas fa-random control-icon" id="shuffleBtn" onclick="this.classList.toggle('active')"></i>
+                <i class="fas fa-redo control-icon" id="repeatBtn" onclick="this.classList.toggle('active')"></i>
                 <button onclick="togglePlay()" id="playBtn" class="play-trigger"><i class="fas fa-pause"></i></button>
             </div>
         </div>
@@ -95,7 +85,12 @@
         const grid = document.getElementById('grid');
         const searchInput = document.getElementById('searchInput');
         const clearBtn = document.getElementById('clearBtn');
-        
+        const shuffleBtn = document.getElementById('shuffleBtn');
+        const repeatBtn = document.getElementById('repeatBtn');
+
+        let listaAtual = [];
+        let musicaIndex = 0;
+
         const generos = ["Destaques", "Forró", "Vaquejada", "Piseiro", "Sertanejo", "Arrocha", "Brega", "Pagode", "Axé", "MPB", "Gospel"];
 
         function carregarGeneros() {
@@ -115,60 +110,36 @@
             `).join('');
         }
 
-        // MOSTRAR OU ESCONDER O X
-        function verificarInput() {
-            clearBtn.style.display = searchInput.value.length > 0 ? 'block' : 'none';
-        }
-
-        // LIMPAR O CAMPO AO CLICAR NO X
-        function limparBusca() {
-            searchInput.value = '';
-            verificarInput();
-            searchInput.focus();
-        }
+        function verificarInput() { clearBtn.style.display = searchInput.value.length > 0 ? 'block' : 'none'; }
+        function limparBusca() { searchInput.value = ''; verificarInput(); searchInput.focus(); }
 
         function buscar() {
-            const termo = searchInput.value;
-            if (termo.trim() !== "") {
-                carregarAlbuns(termo);
+            if (searchInput.value.trim() !== "") {
+                carregarAlbuns(searchInput.value);
                 document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
             }
         }
 
-        searchInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') buscar(); });
-
-        function filtrarGeral(btn, g) {
-            document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            carregarAlbuns(g);
-        }
-
         async function abrirAlbum(id) {
-            const page = document.getElementById('albumPage');
-            page.style.display = 'flex';
+            document.getElementById('albumPage').style.display = 'flex';
             const res = await fetch(`https://itunes.apple.com/lookup?id=${id}&entity=song`);
             const data = await res.json();
             const album = data.results[0];
-            const musicas = data.results.slice(1);
+            listaAtual = data.results.slice(1);
             
             const dataLancamento = new Date(album.releaseDate).toLocaleDateString('pt-BR');
-            const gravadora = album.copyright || "Independente";
 
             document.getElementById('albumDetailContent').innerHTML = `
                 <div style="text-align:center; padding:30px 20px;">
-                    <img src="${album.artworkUrl100.replace('100x100', '600x600')}" style="width:260px; border-radius:15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+                    <img src="${album.artworkUrl100.replace('100x100', '600x600')}" style="width:260px; border-radius:15px;">
                     <h2 style="margin-top:20px;">${album.collectionName}</h2>
-                    <p style="color:var(--primary); font-weight:bold; margin-top:10px;">${album.artistName}</p>
-                    
-                    <div style="font-size:12px; color:#8e8e93; margin-top:15px; line-height:1.6; background:#1c1c1e; padding:15px; border-radius:10px; margin-inline:20px;">
-                        <p><b>Lançamento:</b> ${dataLancamento}</p>
-                        <p><b>Gênero:</b> ${album.primaryGenreName}</p>
-                        <p><b>Gravadora:</b> ${gravadora}</p>
+                    <div style="font-size:12px; color:#8e8e93; margin-top:15px; background:#1c1c1e; padding:15px; border-radius:10px;">
+                        <p><b>Lançamento:</b> ${dataLancamento} | <b>Gênero:</b> ${album.primaryGenreName}</p>
+                        <p><b>Gravadora:</b> ${album.copyright || "Independente"}</p>
                     </div>
                 </div>
-
-                ${musicas.map((m, i) => `
-                    <div class="track-row" onclick="tocar('${m.trackName.replace(/'/g, "\\'")}', '${m.artistName.replace(/'/g, "\\'")}', '${m.previewUrl}')">
+                ${listaAtual.map((m, i) => `
+                    <div class="track-row" onclick="tocar(${i})">
                         <span style="color:#48484a; width:30px;">${i+1}</span>
                         <div style="flex:1;">
                             <div style="font-size:14px; color:white;">${m.trackName}</div>
@@ -181,23 +152,41 @@
             `;
         }
 
-        function tocar(nome, artista, url) {
-            audio.src = url; audio.play();
+        function tocar(index) {
+            musicaIndex = index;
+            const m = listaAtual[musicaIndex];
+            audio.src = m.previewUrl;
+            audio.play();
             player.style.display = 'block';
             player.classList.remove('minimized');
-            document.getElementById('trackTitle').innerText = nome;
-            document.getElementById('trackArtist').innerText = artista;
+            document.getElementById('trackTitle').innerText = m.trackName;
+            document.getElementById('trackArtist').innerText = m.artistName;
             document.getElementById('playBtn').innerHTML = '<i class="fas fa-pause"></i>';
         }
 
-        function togglePlayer() { player.classList.toggle('minimized'); }
-        
+        audio.onended = function() {
+            if (repeatBtn.classList.contains('active')) {
+                audio.play();
+            } else if (shuffleBtn.classList.contains('active')) {
+                tocar(Math.floor(Math.random() * listaAtual.length));
+            } else if (musicaIndex + 1 < listaAtual.length) {
+                tocar(musicaIndex + 1);
+            }
+        };
+
         function togglePlay() {
             if(audio.paused) { audio.play(); document.getElementById('playBtn').innerHTML = '<i class="fas fa-pause"></i>'; }
             else { audio.pause(); document.getElementById('playBtn').innerHTML = '<i class="fas fa-play"></i>'; }
         }
 
+        function filtrarGeral(btn, g) {
+            document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            carregarAlbuns(g);
+        }
+
         function fecharPagina() { document.getElementById('albumPage').style.display = 'none'; }
+        function togglePlayer() { player.classList.toggle('minimized'); }
         
         carregarGeneros();
         carregarAlbuns();
