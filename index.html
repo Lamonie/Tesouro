@@ -33,13 +33,15 @@
         
         .track-row { display: flex; align-items: center; padding: 16px; border-bottom: 1px solid #1c1c1e; cursor: pointer; }
         .track-row.playing .track-title { color: var(--primary) !important; font-weight: bold; }
-        .track-play-icon { color: #48484a; font-size: 20px; margin-left: auto; padding: 10px; }
+        .track-play-icon { color: #48484a; font-size: 20px; margin-left: auto; padding: 10px; transition: 0.2s; }
         .track-row.playing .track-play-icon { color: var(--primary) !important; }
 
-        .player { position: fixed; bottom: 0; width: 100%; background: var(--player-bg); backdrop-filter: blur(15px); padding: 10px 15px 30px; border-top: 1px solid #333; z-index: 10001; transition: transform 0.4s ease; }
-        .player.minimized { transform: translateY(calc(100% - 70px)); } 
-        .handle-area { width: 100%; height: 35px; display: flex; justify-content: center; align-items: center; cursor: pointer; }
+        /* AJUSTE NA BARRA PARA ESCONDER MAIS */
+        .player { position: fixed; bottom: 0; width: 100%; background: var(--player-bg); backdrop-filter: blur(15px); padding: 5px 15px 30px; border-top: 1px solid #333; z-index: 10001; transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+        .player.minimized { transform: translateY(calc(100% - 45px)); } 
+        .handle-area { width: 100%; height: 30px; display: flex; justify-content: center; align-items: center; cursor: pointer; margin-bottom: 5px; }
         .handle { width: 40px; height: 4px; background: #3a3a3c; border-radius: 10px; }
+        
         .player-controls { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
         .control-icon { color: #8e8e93; font-size: 18px; cursor: pointer; }
         .control-icon.active { color: var(--primary) !important; }
@@ -141,18 +143,26 @@
                     </div>
                 </div>
                 ${listaAtual.map((m, i) => `
-                    <div class="track-row" id="track_${i}" onclick="tocar(${i})">
+                    <div class="track-row" id="track_${i}" onclick="gerenciarPlay(${i})">
                         <span style="color:#48484a; width:30px; font-size:12px;">${i+1}</span>
                         <div style="flex:1;">
                             <div class="track-title" style="font-size:14px; color:white;">${m.trackName}</div>
                             <div style="font-size:11px; color:#8e8e93;">Compositor: ${m.artistName}</div>
                         </div>
-                        <i class="fas fa-play-circle track-play-icon" onclick="event.stopPropagation(); tocar(${i})"></i>
+                        <i class="fas fa-play-circle track-play-icon" id="icon_${i}"></i>
                     </div>
                 `).join('')}
-                <div style="height:160px;"></div>
+                <div style="height:180px;"></div>
             `;
             atualizarTrackPlaying();
+        }
+
+        function gerenciarPlay(index) {
+            if (musicaIndex === index && !audio.paused) {
+                togglePlay();
+            } else {
+                tocar(index);
+            }
         }
 
         function tocar(index) {
@@ -171,8 +181,19 @@
 
         function atualizarTrackPlaying() {
             document.querySelectorAll('.track-row').forEach(row => row.classList.remove('playing'));
+            document.querySelectorAll('.track-play-icon').forEach(icon => {
+                icon.classList.remove('fa-pause-circle');
+                icon.classList.add('fa-play-circle');
+            });
+
             const currentTrackRow = document.getElementById(`track_${musicaIndex}`);
+            const currentIcon = document.getElementById(`icon_${musicaIndex}`);
+            
             if (currentTrackRow) currentTrackRow.classList.add('playing');
+            if (currentIcon && !audio.paused) {
+                currentIcon.classList.remove('fa-play-circle');
+                currentIcon.classList.add('fa-pause-circle');
+            }
         }
 
         audio.onended = function() {
@@ -191,6 +212,9 @@
             }
         };
 
+        audio.onplay = atualizarTrackPlaying;
+        audio.onpause = atualizarTrackPlaying;
+
         audio.ontimeupdate = function() {
             if (audio.duration) {
                 const curMins = Math.floor(audio.currentTime / 60);
@@ -201,8 +225,14 @@
         };
 
         function togglePlay() {
-            if(audio.paused) { audio.play(); document.getElementById('playBtn').innerHTML = '<i class="fas fa-pause"></i>'; }
-            else { audio.pause(); document.getElementById('playBtn').innerHTML = '<i class="fas fa-play"></i>'; }
+            if(audio.paused) { 
+                audio.play(); 
+                document.getElementById('playBtn').innerHTML = '<i class="fas fa-pause"></i>'; 
+            } else { 
+                audio.pause(); 
+                document.getElementById('playBtn').innerHTML = '<i class="fas fa-play"></i>'; 
+            }
+            atualizarTrackPlaying();
         }
 
         function filtrarGeral(btn, g) {
@@ -212,7 +242,10 @@
         }
 
         function fecharPagina() { document.getElementById('albumPage').style.display = 'none'; }
-        function togglePlayer() { player.classList.toggle('minimized'); }
+        
+        function togglePlayer() { 
+            player.classList.toggle('minimized'); 
+        }
         
         carregarGeneros();
         carregarAlbuns();
