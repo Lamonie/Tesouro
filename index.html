@@ -18,8 +18,8 @@
         .cat-btn.active { background: var(--primary); color: #000; }
 
         .search-container { padding: 15px; }
-        .search-box { display: flex; background: #1c1c1e; border-radius: 12px; border: 1px solid #333; align-items: center; }
-        .search-box input { background: none; border: none; color: white; flex: 1; padding: 14px; outline: none; font-size: 14px; }
+        .search-box { display: flex; background: #1c1c1e; border-radius: 12px; border: 1px solid #333; align-items: center; padding: 0 15px; }
+        .search-box input { background: none; border: none; color: white; flex: 1; padding: 14px 0; outline: none; font-size: 14px; }
         
         .main-grid { display: flex; flex-wrap: wrap; justify-content: space-between; padding: 10px 15px 160px; }
         .card { width: 47%; background: #1c1c1e; border-radius: 14px; padding: 8px; margin-bottom: 18px; border: 1px solid #2c2c2e; cursor: pointer; }
@@ -43,8 +43,6 @@
         .handle { width: 40px; height: 4px; background: rgba(255,255,255,0.3); border-radius: 10px; }
         
         .player-controls { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-        .control-icon { color: #8e8e93; font-size: 22px; cursor: pointer; }
-        .control-icon.active { color: var(--primary) !important; }
         .play-trigger { background: var(--primary); border: none; width: 46px; height: 46px; border-radius: 50%; color: #000; font-size: 18px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
         #timeLabel { font-size: 11px; color: var(--primary); min-width: 75px; text-align: center; font-family: monospace; }
     </style>
@@ -55,7 +53,8 @@
     <div class="search-container">
         <div class="search-box">
             <input type="text" id="searchInput" placeholder="O que você quer ouvir?" oninput="verificarInput()">
-            <i class="fas fa-microphone" id="micBtn" style="color:var(--primary); margin-right:15px; cursor:pointer;" onclick="comecarVoz()"></i>
+            <i class="fas fa-microphone" style="color:var(--primary); margin-right:15px; cursor:pointer;"></i>
+            <i class="fas fa-search" style="color:var(--primary); cursor:pointer;" onclick="carregarAlbuns(document.getElementById('searchInput').value)"></i>
         </div>
     </div>
     <div class="main-grid" id="grid"></div>
@@ -74,7 +73,7 @@
             </div>
             <span id="timeLabel">0:00 / 0:30</span>
             <div style="display:flex; align-items:center; gap:20px;">
-                <i class="fas fa-redo-alt control-icon" id="repeatBtn" onclick="toggleRepeat()"></i>
+                <i class="fas fa-redo-alt" id="repeatBtn" style="color:#8e8e93; cursor:pointer;" onclick="this.classList.toggle('active')"></i>
                 <button onclick="togglePlay()" id="playBtn" class="play-trigger"><i class="fas fa-pause"></i></button>
             </div>
         </div>
@@ -84,45 +83,17 @@
 
     <script>
         const audio = document.getElementById('audioMain');
-        const player = document.getElementById('player');
         const grid = document.getElementById('grid');
-        const repeatBtn = document.getElementById('repeatBtn');
-        const timeLabel = document.getElementById('timeLabel');
-        
+        const artistasIniciais = ["Luiz Gonzaga", "Gleidson Gavião", "Flávio José", "Dorgival Dantas", "Mastruz com Leite", "Noca do Acordeon", "Limão com Mel", "Toca do Vale"];
         let listaAtual = [];
         let musicaIndex = 0;
-        let albunsIniciaisFixos = [];
-
-        const artistasIniciais = ["Luiz Gonzaga", "Mastruz com Leite", "Gaviões do Forró", "Gleidson Gavião", "Toca do Vale", "Flávio José", "Limão com Mel", "Calcinha Preta"];
-
-        function carregarGeneros() {
-            document.getElementById('catNav').innerHTML = ["Início", "Forró", "Vaquejada", "Piseiro", "Sertanejo", "Brega"].map(g => 
-                `<button class="cat-btn ${g==='Início'?'active':''}" onclick="gerenciarFiltro(this, '${g}')">${g}</button>`
-            ).join('');
-        }
 
         async function carregarAlbuns(termo = "") {
-            if ((termo === "" || termo === "Início") && albunsIniciaisFixos.length > 0) {
-                renderizarGrid(albunsIniciaisFixos);
-                return;
-            }
-            grid.innerHTML = "<p style='padding:20px;'>Carregando álbuns...</p>";
-            
-            // Busca expandida para preencher o início
-            const termoBusca = (termo === "" || termo === "Início") ? artistasIniciais.join(' OR ') : termo;
-            const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(termoBusca)}&entity=album&limit=200`);
+            grid.innerHTML = "<p style='padding:20px;'>Carregando...</p>";
+            const busca = termo === "" ? artistasIniciais.join(' OR ') : termo;
+            const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(busca)}&entity=album&limit=200`);
             const data = await res.json();
-            
-            if (termo === "" || termo === "Início") albunsIniciaisFixos = data.results;
-            renderizarGrid(data.results);
-        }
-
-        function renderizarGrid(albuns) {
-            if(!albuns || albuns.length === 0) {
-                grid.innerHTML = "<p style='padding:20px;'>Nenhum álbum encontrado.</p>";
-                return;
-            }
-            grid.innerHTML = albuns.map(t => `
+            grid.innerHTML = data.results.map(t => `
                 <div class="card" onclick="abrirAlbum('${t.collectionId}')">
                     <img src="${t.artworkUrl100.replace('100x100', '400x400')}">
                     <h4>${t.collectionName}</h4>
@@ -133,11 +104,8 @@
         async function abrirAlbum(id) {
             const res = await fetch(`https://itunes.apple.com/lookup?id=${id}&entity=song`);
             const data = await res.json();
-            if(!data.results || data.results.length === 0) return;
-
             const album = data.results[0];
             listaAtual = data.results.slice(1);
-            const ano = new Date(album.releaseDate).getFullYear();
             
             document.getElementById('albumPage').style.display = 'flex';
             document.getElementById('albumDetailContent').innerHTML = `
@@ -147,11 +115,11 @@
                     <p style="color:var(--primary); font-weight:bold;">${album.artistName}</p>
                 </div>
                 <div class="album-info-box">
-                    <b>Lançamento:</b> ${ano} | <b>Gênero:</b> ${album.primaryGenreName}<br>
+                    <b>Lançamento:</b> ${new Date(album.releaseDate).getFullYear()} | <b>Gênero:</b> ${album.primaryGenreName}<br>
                     <b>Gravadora:</b> ${album.copyright || 'Independente'}
                 </div>
                 ${listaAtual.map((m, i) => `
-                    <div class="track-row" id="track_${i}" onclick="gerenciarPlay(${i})">
+                    <div class="track-row" id="track_${i}" onclick="tocar(${i})">
                         <span style="color:#48484a; width:30px; font-size:12px;">${i+1}</span>
                         <div style="flex:1;">
                             <div class="track-title" style="font-size:14px; color:white;">${m.trackName}</div>
@@ -162,73 +130,30 @@
                 `).join('')}
                 <div style="height:150px;"></div>
             `;
-            atualizarTrackPlaying();
-        }
-
-        function gerenciarPlay(index) {
-            if (musicaIndex === index && !audio.paused) { togglePlay(); } else { tocar(index); }
         }
 
         function tocar(index) {
             musicaIndex = index;
             const m = listaAtual[musicaIndex];
-            if (!m) return;
             audio.src = m.previewUrl;
-            audio.play().catch(e => console.log("Erro ao tocar"));
-            player.style.display = 'block';
+            audio.play();
+            document.getElementById('player').style.display = 'block';
             document.getElementById('trackTitle').innerText = m.trackName;
             document.getElementById('trackArtist').innerText = m.artistName;
-            document.getElementById('playBtn').innerHTML = '<i class="fas fa-pause"></i>';
-            atualizarTrackPlaying();
+            
+            document.querySelectorAll('.track-row').forEach(r => r.classList.remove('playing'));
+            document.getElementById(`track_${index}`).classList.add('playing');
         }
 
-        function atualizarTrackPlaying() {
-            document.querySelectorAll('.track-row').forEach(row => row.classList.remove('playing'));
-            document.querySelectorAll('.track-play-icon').forEach(icon => {
-                icon.classList.remove('fa-pause-circle');
-                icon.classList.add('fa-play-circle');
-            });
-            const currentTrackRow = document.getElementById(`track_${musicaIndex}`);
-            const currentIcon = document.getElementById(`icon_${musicaIndex}`);
-            if (currentTrackRow) currentTrackRow.classList.add('playing');
-            if (currentIcon && !audio.paused) {
-                currentIcon.classList.remove('fa-play-circle');
-                currentIcon.classList.add('fa-pause-circle');
-            }
-        }
-
-        audio.onended = () => {
-            if (repeatBtn.classList.contains('active')) {
-                audio.currentTime = 0; audio.play();
-            } else if (musicaIndex + 1 < listaAtual.length) {
-                tocar(musicaIndex + 1);
-            }
-        };
-
-        function toggleRepeat() { repeatBtn.classList.toggle('active'); }
-        function togglePlay() { 
-            if(audio.paused) {
-                audio.play();
-                document.getElementById('playBtn').innerHTML = '<i class="fas fa-pause"></i>';
-            } else {
-                audio.pause();
-                document.getElementById('playBtn').innerHTML = '<i class="fas fa-play"></i>';
-            }
-            atualizarTrackPlaying();
-        }
+        function togglePlay() { audio.paused ? audio.play() : audio.pause(); }
         function fecharPagina() { document.getElementById('albumPage').style.display = 'none'; }
-        function togglePlayer() { player.classList.toggle('minimized'); }
-        function gerenciarFiltro(btn, g) { 
-            document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active'); carregarAlbuns(g); 
-        }
+        function togglePlayer() { document.getElementById('player').classList.toggle('minimized'); }
 
-        audio.ontimeupdate = () => {
-            const cur = Math.floor(audio.currentTime);
-            timeLabel.innerText = `0:${cur < 10 ? '0' : ''}${cur} / 0:30`;
-        };
+        document.getElementById('catNav').innerHTML = ["Início", "Forró", "Vaquejada", "Piseiro"].map(g => 
+            `<button class="cat-btn ${g==='Início'?'active':''}" onclick="carregarAlbuns('${g}')">${g}</button>`
+        ).join('');
 
-        carregarGeneros(); carregarAlbuns("");
+        carregarAlbuns("");
     </script>
 </body>
 </html>
