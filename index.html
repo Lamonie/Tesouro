@@ -27,15 +27,17 @@
         .card { width: 47%; background: rgba(255,255,255,0.04); border-radius: 15px; padding: 8px; margin-bottom: 20px; }
         .card img { width: 100%; aspect-ratio: 1/1; border-radius: 12px; object-fit: cover; }
 
+        /* BARRA ESCONDE-ESCONDE */
         .player { 
             position: fixed; bottom: 35px; left: 15px; right: 15px; 
             background: var(--player-bg); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); 
             padding: 8px 15px; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.1); 
-            z-index: 10002; transition: transform 0.4s ease, opacity 0.4s;
+            z-index: 10002; transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s;
         }
-        .player-hidden { transform: translateY(110px); opacity: 0; }
+        .player-hidden { transform: translateY(120px); opacity: 0; }
         .mini-art { width: 45px; height: 45px; border-radius: 8px; object-fit: cover; }
 
+        /* PÁGINAS FULL SCREEN */
         .full-page { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 10001; display: none; flex-direction: column; overflow-y: auto; }
         .now-playing-page { z-index: 10003; background: linear-gradient(to bottom, #151515, #000); }
 
@@ -58,11 +60,10 @@
         .np-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 10px; height: 10px; border-radius: 50%; background: #fff; }
         .np-time { display: flex; justify-content: space-between; font-size: 11px; color: #555; margin-top: 8px; }
 
-        /* CONTROLES TELA CHEIA */
         .np-controls { display: flex; align-items: center; gap: 25px; margin-top: 10px; }
         .np-btn { background: none; border: none; color: white; font-size: 24px; transition: color 0.3s; }
         .np-btn-main { font-size: 55px; }
-        .btn-active { color: var(--playing-color) !important; } /* Cor amarela quando ativado */
+        .btn-active { color: var(--playing-color) !important; }
     </style>
 </head>
 <body>
@@ -133,12 +134,23 @@
         let isShuffle = false;
         let isRepeat = false;
 
-        let lastScrollY = window.scrollY;
-        window.addEventListener('scroll', () => {
-            if (window.scrollY > lastScrollY && window.scrollY > 50) { playerBar.classList.add('player-hidden'); }
-            else { playerBar.classList.remove('player-hidden'); }
-            lastScrollY = window.scrollY;
-        });
+        // AJUSTE: Função central para esconder a barra
+        let lastScrollY = 0;
+        function handleScroll(target) {
+            const currentScroll = target.scrollTop || window.scrollY;
+            if (currentScroll > lastScrollY && currentScroll > 50) {
+                playerBar.classList.add('player-hidden');
+            } else {
+                playerBar.classList.remove('player-hidden');
+            }
+            lastScrollY = currentScroll;
+        }
+
+        // Evento de rolagem na tela de início
+        window.addEventListener('scroll', () => handleScroll(window));
+
+        // AJUSTE: Evento de rolagem dentro da página do álbum (Corrigido para sumir lá também)
+        albumPage.addEventListener('scroll', () => handleScroll(albumPage));
 
         function ativarMicrofone() {
             const rec = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
@@ -159,15 +171,7 @@
             atualizarUI();
         };
 
-        // Quando a música acaba
-        audio.onended = () => {
-            if (isRepeat) {
-                audio.currentTime = 0;
-                audio.play();
-            } else {
-                proxima();
-            }
-        };
+        audio.onended = () => { if (isRepeat) { audio.currentTime = 0; audio.play(); } else { proxima(); } };
 
         npSlider.oninput = () => { audio.currentTime = npSlider.value; };
         function formatTime(s) { const min = Math.floor(s/60); const seg = Math.floor(s%60); return `${min}:${seg<10?'0':''}${seg}`; }
@@ -187,7 +191,10 @@
         }
 
         async function abrirAlbum(id, art) {
-            window.albumVisualizadoId = id; albumPage.style.display = 'flex';
+            window.albumVisualizadoId = id; 
+            albumPage.style.display = 'flex';
+            albumPage.scrollTop = 0; // Resetar scroll ao abrir novo álbum
+            lastScrollY = 0;
             const res = await fetch(`https://itunes.apple.com/lookup?id=${id}&entity=song`);
             const data = await res.json();
             const album = data.results[0]; const songs = data.results.slice(1);
@@ -230,26 +237,14 @@
         }
 
         function fecharNowPlaying() { nowPlayingPage.style.display = 'none'; }
-        function fecharPagina() { albumPage.style.display = 'none'; }
+        function fecharPagina() { albumPage.style.display = 'none'; playerBar.classList.remove('player-hidden'); }
 
-        // Lógica Aleatório e Repetir
-        function toggleShuffle() {
-            isShuffle = !isShuffle;
-            document.getElementById('shuffleBtn').classList.toggle('btn-active', isShuffle);
-        }
-
-        function toggleRepeat() {
-            isRepeat = !isRepeat;
-            document.getElementById('repeatBtn').classList.toggle('btn-active', isRepeat);
-        }
+        function toggleShuffle() { isShuffle = !isShuffle; document.getElementById('shuffleBtn').classList.toggle('btn-active', isShuffle); }
+        function toggleRepeat() { isRepeat = !isRepeat; document.getElementById('repeatBtn').classList.toggle('btn-active', isRepeat); }
 
         function proxima() { 
-            if (isShuffle) {
-                let r = Math.floor(Math.random() * window.listaTocando.length);
-                tocar(window.albumAtivoId, r, window.capaAtiva);
-            } else if(window.musicaIndex + 1 < window.listaTocando.length) {
-                tocar(window.albumAtivoId, window.musicaIndex + 1, window.capaAtiva);
-            }
+            if (isShuffle) { let r = Math.floor(Math.random() * window.listaTocando.length); tocar(window.albumAtivoId, r, window.capaAtiva); } 
+            else if(window.musicaIndex + 1 < window.listaTocando.length) { tocar(window.albumAtivoId, window.musicaIndex + 1, window.capaAtiva); }
         }
 
         function anterior() { if(window.musicaIndex - 1 >= 0) tocar(window.albumAtivoId, window.musicaIndex - 1, window.capaAtiva); }
