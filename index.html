@@ -22,8 +22,12 @@
 
         /* BUSCA E GRID */
         .search-container { padding: 15px; }
-        .search-box { display: flex; background: #1c1c1e; border-radius: 12px; border: 1px solid #333; align-items: center; overflow: hidden; }
-        .search-box input { background: none; border: none; color: white; flex: 1; padding: 14px; outline: none; font-size: 14px; }
+        .search-box { display: flex; background: #1c1c1e; border-radius: 12px; border: 1px solid #333; align-items: center; overflow: hidden; position: relative; }
+        .search-box input { background: none; border: none; color: white; flex: 1; padding: 14px 45px 14px 14px; outline: none; font-size: 14px; }
+        
+        /* BOTÃO DE LIMPAR (X) */
+        .clear-btn { position: absolute; right: 45px; color: #8e8e93; cursor: pointer; display: none; font-size: 18px; padding: 5px; }
+        
         .search-btn { background: none; border: none; color: #8e8e93; padding: 0 15px; cursor: pointer; }
 
         .main-grid { display: flex; flex-wrap: wrap; justify-content: space-between; padding: 10px 15px 160px; }
@@ -55,7 +59,8 @@
 
     <div class="search-container">
         <div class="search-box">
-            <input type="text" id="searchInput" placeholder="Buscar álbum, artista ou gênero...">
+            <input type="text" id="searchInput" placeholder="Buscar álbum, artista ou gênero..." oninput="verificarInput()">
+            <i class="fas fa-times-circle clear-btn" id="clearBtn" onclick="limparBusca()"></i>
             <button class="search-btn" onclick="buscar()"><i class="fas fa-search"></i></button>
         </div>
     </div>
@@ -88,6 +93,8 @@
         const audio = document.getElementById('audioMain');
         const player = document.getElementById('player');
         const grid = document.getElementById('grid');
+        const searchInput = document.getElementById('searchInput');
+        const clearBtn = document.getElementById('clearBtn');
         
         const generos = ["Destaques", "Forró", "Vaquejada", "Piseiro", "Sertanejo", "Arrocha", "Brega", "Pagode", "Axé", "MPB", "Gospel"];
 
@@ -108,15 +115,27 @@
             `).join('');
         }
 
+        // MOSTRAR OU ESCONDER O X
+        function verificarInput() {
+            clearBtn.style.display = searchInput.value.length > 0 ? 'block' : 'none';
+        }
+
+        // LIMPAR O CAMPO AO CLICAR NO X
+        function limparBusca() {
+            searchInput.value = '';
+            verificarInput();
+            searchInput.focus();
+        }
+
         function buscar() {
-            const termo = document.getElementById('searchInput').value;
+            const termo = searchInput.value;
             if (termo.trim() !== "") {
                 carregarAlbuns(termo);
                 document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
             }
         }
 
-        document.getElementById('searchInput').addEventListener('keypress', (e) => { if (e.key === 'Enter') buscar(); });
+        searchInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') buscar(); });
 
         function filtrarGeral(btn, g) {
             document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
@@ -132,7 +151,6 @@
             const album = data.results[0];
             const musicas = data.results.slice(1);
             
-            // FORMATAÇÃO DA DATA
             const dataLancamento = new Date(album.releaseDate).toLocaleDateString('pt-BR');
             const gravadora = album.copyright || "Independente";
 
