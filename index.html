@@ -6,7 +6,7 @@
     <title>LAMONIÊ FLOW</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --primary: #94b3ce; --bg: #000000; --text-main: #ffffff; --player-bg: rgba(30, 30, 30, 0.75); --playing-color: #ffff00; }
+        :root { --primary: #94b3ce; --bg: #000000; --text-main: #ffffff; --player-bg: rgba(30, 30, 30, 0.75); --playing-color: #ffff00; --active-song: #007bff; }
         
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         
@@ -24,7 +24,6 @@
 
         .categories-nav { display: flex; overflow-x: auto; padding: 15px; gap: 12px; }
         .cat-btn { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); color: white; padding: 12px 25px; border-radius: 25px; font-size: 14px; font-weight: 600; flex-shrink: 0; transition: transform 0.1s; }
-        .cat-btn:active { transform: scale(0.92); }
         .cat-btn.active { background: var(--primary); color: #000; }
 
         .search-container { padding: 10px 15px; }
@@ -35,28 +34,26 @@
         .card { width: 47%; background: rgba(255,255,255,0.04); border-radius: 15px; padding: 8px; margin-bottom: 20px; }
         .card img { width: 100%; aspect-ratio: 1/1; border-radius: 12px; object-fit: cover; }
 
-        /* PLAYER COM EFEITO DE ESCONDE-ESCONDE SUAVE */
         .player { 
             position: fixed; bottom: 35px; left: 15px; right: 15px; 
             background: var(--player-bg); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); 
             padding: 12px 20px; border-radius: 25px; border: 1px solid rgba(255, 255, 255, 0.15); 
             z-index: 10002; transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s;
         }
-        
-        /* Classe que esconde o player */
         .player-hidden { transform: translateY(120px); opacity: 0; }
-
         .player-controls { display: flex; align-items: center; gap: 15px; }
         .mini-art { width: 50px; height: 50px; border-radius: 10px; object-fit: cover; }
 
         .full-page { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); backdrop-filter: blur(35px); -webkit-backdrop-filter: blur(35px); z-index: 10001; display: none; flex-direction: column; overflow-y: auto; }
-        .btn-voltar { margin: 15px; background: var(--primary); border: none; color: #000; padding: 12px 25px; border-radius: 35px; font-weight: 800; }
+        .btn-voltar { margin: 15px; background: var(--primary); border: none; color: #000; padding: 12px 25px; border-radius: 35px; font-weight: 800; width: fit-content; }
         
-        .track-row { display: flex; align-items: center; padding: 18px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .track-row { display: flex; align-items: center; padding: 18px; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; }
+        .track-row:active { background: rgba(255,255,255,0.05); }
         .track-actions { display: flex; align-items: center; gap: 25px; margin-left: 10px; }
         
+        /* ESTILO DA MÚSICA TOCANDO */
+        .track-row.is-playing .track-title { color: var(--active-song) !important; font-weight: bold; }
         .track-row.is-playing .track-play-icon { color: var(--playing-color) !important; }
-        .track-row.is-playing .track-title { color: #007bff; font-weight: bold; }
 
         .album-meta { background: rgba(255,255,255,0.06); margin: 15px; padding: 20px; border-radius: 18px; font-size: 13px; color: #bbb; text-align: center; }
     </style>
@@ -102,41 +99,28 @@
         const playerBar = document.getElementById('player');
         const albumPage = document.getElementById('albumPage');
 
-        // LÓGICA DE ESCONDE-ESCONDE (SCROLL)
         let lastScrollY = window.scrollY;
         window.addEventListener('scroll', () => {
-            if (window.scrollY > lastScrollY && window.scrollY > 50) {
-                // Deslizando para baixo: esconde
-                playerBar.classList.add('player-hidden');
-            } else {
-                // Deslizando para cima: mostra
-                playerBar.classList.remove('player-hidden');
-            }
+            if (window.scrollY > lastScrollY && window.scrollY > 50) { playerBar.classList.add('player-hidden'); }
+            else { playerBar.classList.remove('player-hidden'); }
             lastScrollY = window.scrollY;
         });
 
-        // Aplicar também dentro da página de álbum
         albumPage.addEventListener('scroll', () => {
-            if (albumPage.scrollTop > lastScrollY && albumPage.scrollTop > 50) {
-                playerBar.classList.add('player-hidden');
-            } else {
-                playerBar.classList.remove('player-hidden');
-            }
+            if (albumPage.scrollTop > lastScrollY && albumPage.scrollTop > 50) { playerBar.classList.add('player-hidden'); }
+            else { playerBar.classList.remove('player-hidden'); }
             lastScrollY = albumPage.scrollTop;
         });
 
         function ativarMicrofone() {
             const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-            recognition.lang = 'pt-BR';
-            recognition.start();
+            recognition.lang = 'pt-BR'; recognition.start();
             document.getElementById('micBtn').style.color = '#ff3b30';
             recognition.onresult = (event) => {
                 const texto = event.results[0][0].transcript;
                 document.getElementById('searchInput').value = texto;
                 carregarPorGenero(texto);
-                document.getElementById('micBtn').style.color = '#8e8e93';
             };
-            recognition.onerror = () => { document.getElementById('micBtn').style.color = '#8e8e93'; };
             recognition.onend = () => { document.getElementById('micBtn').style.color = '#8e8e93'; };
         }
 
@@ -177,19 +161,20 @@
             const res = await fetch(`https://itunes.apple.com/lookup?id=${id}&entity=song`);
             const data = await res.json();
             const album = data.results[0]; const songs = data.results.slice(1);
+            
             document.getElementById('albumDetailContent').innerHTML = `
                 <div style="text-align:center; padding:30px;"><img src="${art.replace('100x100', '600x600')}" style="width:250px; border-radius:20px;">
                 <h2 style="margin-top:25px;">${album.collectionName}</h2><p style="color:var(--primary);">${album.artistName}</p></div>
                 <div class="album-meta"><b>Ano:</b> ${new Date(album.releaseDate).getFullYear()} | <b>Gênero:</b> ${album.primaryGenreName}</div>
                 ${songs.map((m, i) => `
-                    <div class="track-row" id="row_${id}_${i}">
+                    <div class="track-row" id="row_${id}_${i}" onclick="tocar('${id}', ${i}, '${art}')">
                         <span style="color:#777; width:30px;">${i+1}</span>
                         <div style="flex:1; margin-left:12px; overflow:hidden;">
                             <div class="track-title" style="font-size:15px; color:white;">${m.trackName}</div>
                         </div>
                         <div class="track-actions">
-                            <i class="fas fa-download" style="color:#8e8e93; font-size:18px;" onclick="baixarMusica('${m.previewUrl}', '${m.trackName}')"></i>
-                            <i class="fas fa-play-circle track-play-icon" id="btn_list_${id}_${i}" style="font-size:24px; color:white;" onclick="tocar('${id}', ${i}, '${art}')"></i>
+                            <i class="fas fa-download" style="color:#8e8e93; font-size:18px;" onclick="event.stopPropagation(); baixarMusica('${m.previewUrl}', '${m.trackName}')"></i>
+                            <i class="fas fa-play-circle track-play-icon" id="btn_list_${id}_${i}" style="font-size:24px; color:white;"></i>
                         </div>
                     </div>`).join('')}<div style="height:180px;"></div>`;
             window.listaVisualizada = songs; 
@@ -198,8 +183,7 @@
 
         function tocar(albumId, index, art) {
             if (window.albumAtivoId === albumId && window.musicaIndex === index) {
-                togglePlay();
-                return;
+                togglePlay(); return;
             }
             window.albumAtivoId = albumId; window.musicaIndex = index;
             window.listaTocando = window.listaVisualizada; window.capaAtiva = art;
@@ -218,10 +202,11 @@
                 ic.className = 'fas fa-play-circle track-play-icon';
                 ic.style.color = 'white';
             });
+
             if (window.albumVisualizadoId === window.albumAtivoId) {
                 const row = document.getElementById(`row_${window.albumAtivoId}_${window.musicaIndex}`);
                 const icon = document.getElementById(`btn_list_${window.albumAtivoId}_${window.musicaIndex}`);
-                if(row) row.classList.add('is-playing');
+                if(row) row.classList.add('is-playing'); // Isso deixa o título azul via CSS
                 if(icon) {
                     icon.className = audio.paused ? 'fas fa-play-circle track-play-icon' : 'fas fa-pause-circle track-play-icon';
                     icon.style.color = 'var(--playing-color)';
