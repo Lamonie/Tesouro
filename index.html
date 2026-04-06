@@ -6,7 +6,7 @@
     <title>LAMONIÊ FLOW</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --primary: #94b3ce; --bg: #000000; --text-main: #ffffff; }
+        :root { --primary: #94b3ce; --bg: #000000; --text-main: #ffffff; --player-bg: #111111; }
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         body, html { width: 100%; overflow-x: hidden; background: var(--bg); color: var(--text-main); font-family: -apple-system, sans-serif; }
 
@@ -14,6 +14,7 @@
         header h1 { color: var(--primary); font-size: 26px; font-weight: 900; letter-spacing: -1px; }
 
         .categories-nav { display: flex; overflow-x: auto; padding: 10px 15px; gap: 8px; border-bottom: 1px solid #1c1c1e; }
+        .categories-nav::-webkit-scrollbar { display: none; }
         .cat-btn { background: #1c1c1e; border: none; color: white; padding: 10px 20px; border-radius: 25px; font-size: 13px; font-weight: 600; flex-shrink: 0; cursor: pointer; }
         .cat-btn.active { background: var(--primary); color: #000; }
 
@@ -29,18 +30,31 @@
         .card h4 { font-size: 12px; margin-top: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
         .full-page { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; display: none; flex-direction: column; overflow-y: auto; }
-        .btn-voltar { margin: 15px; background: var(--primary); border: none; color: #000; padding: 10px 20px; border-radius: 30px; font-weight: 800; cursor: pointer; }
-        .track-row { display: flex; align-items: center; padding: 16px; border-bottom: 1px solid #1c1c1e; cursor: pointer; }
-        .track-play-icon { color: var(--primary); font-size: 20px; margin-left: auto; }
+        .btn-voltar { margin: 15px; background: var(--primary); border: none; color: #000; padding: 10px 20px; border-radius: 30px; font-weight: 800; width: fit-content; cursor: pointer; }
+        
+        .track-row { display: flex; align-items: center; padding: 16px; border-bottom: 1px solid #1c1c1e; cursor: pointer; position: relative; }
+        
+        /* ESTILO PARA A MÚSICA QUE ESTÁ TOCANDO */
+        .track-row.playing { color: var(--primary); font-weight: 600; }
+        .track-row.playing .track-title { color: var(--primary); }
 
-        .player { position: fixed; bottom: 0; width: 100%; background: rgba(20,20,22,0.98); backdrop-filter: blur(20px); padding: 10px 20px 35px; border-top: 1px solid #333; z-index: 10001; transition: 0.4s; }
-        .player.minimized { transform: translateY(calc(100% - 65px)); } 
+        .track-play-icon { color: var(--primary); font-size: 20px; margin-left: auto; display: none; }
+        
+        /* O ÍCONE SÓ APARECE NA MÚSICA TOCANDO */
+        .track-row.playing .track-play-icon { display: block; }
+
+        .player { position: fixed; bottom: 0; width: 100%; background: var(--player-bg); backdrop-filter: blur(15px); padding: 10px 15px 30px; border-top: 1px solid #333; z-index: 10001; transition: 0.4s; }
+        .player.minimized { transform: translateY(calc(100% - 70px)); } 
         .handle-area { width: 100%; height: 30px; display: flex; justify-content: center; align-items: center; cursor: pointer; }
         .handle { width: 40px; height: 4px; background: #3a3a3c; border-radius: 10px; }
-        .player-controls { display: flex; align-items: center; justify-content: space-between; gap: 15px; }
-        .control-icon { color: #8e8e93; font-size: 20px; cursor: pointer; }
+        
+        .player-controls { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+        .control-icon { color: #8e8e93; font-size: 18px; cursor: pointer; }
         .control-icon.active { color: var(--primary) !important; }
-        .play-trigger { background: var(--primary); border: none; width: 48px; height: 48px; border-radius: 50%; color: #000; font-size: 20px; display: flex; align-items: center; justify-content: center; }
+        .play-trigger { background: var(--primary); border: none; width: 44px; height: 44px; border-radius: 50%; color: #000; font-size: 18px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        
+        /* ESTILO DO CONTADOR DE TEMPO */
+        #timeLabel { font-size: 12px; color: var(--primary); font-family: monospace; }
     </style>
 </head>
 <body>
@@ -69,7 +83,10 @@
                 <h4 id="trackTitle" style="font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Música</h4>
                 <p id="trackArtist" style="font-size:12px; color:var(--primary);">Artista</p>
             </div>
-            <div style="display:flex; align-items:center; gap:20px;">
+            
+            <span id="timeLabel">0:00 / 0:30</span>
+            
+            <div style="display:flex; align-items:center; gap:15px;">
                 <i class="fas fa-random control-icon" id="shuffleBtn" onclick="this.classList.toggle('active')"></i>
                 <i class="fas fa-redo control-icon" id="repeatBtn" onclick="this.classList.toggle('active')"></i>
                 <button onclick="togglePlay()" id="playBtn" class="play-trigger"><i class="fas fa-pause"></i></button>
@@ -87,6 +104,7 @@
         const clearBtn = document.getElementById('clearBtn');
         const shuffleBtn = document.getElementById('shuffleBtn');
         const repeatBtn = document.getElementById('repeatBtn');
+        const timeLabel = document.getElementById('timeLabel');
 
         let listaAtual = [];
         let musicaIndex = 0;
@@ -131,25 +149,29 @@
 
             document.getElementById('albumDetailContent').innerHTML = `
                 <div style="text-align:center; padding:30px 20px;">
-                    <img src="${album.artworkUrl100.replace('100x100', '600x600')}" style="width:260px; border-radius:15px;">
+                    <img src="${album.artworkUrl100.replace('100x100', '600x600')}" style="width:260px; border-radius:15px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
                     <h2 style="margin-top:20px;">${album.collectionName}</h2>
+                    <p style="color:var(--primary); font-weight:bold; margin-top:5px;">${album.artistName}</p>
                     <div style="font-size:12px; color:#8e8e93; margin-top:15px; background:#1c1c1e; padding:15px; border-radius:10px;">
                         <p><b>Lançamento:</b> ${dataLancamento} | <b>Gênero:</b> ${album.primaryGenreName}</p>
                         <p><b>Gravadora:</b> ${album.copyright || "Independente"}</p>
                     </div>
                 </div>
                 ${listaAtual.map((m, i) => `
-                    <div class="track-row" onclick="tocar(${i})">
-                        <span style="color:#48484a; width:30px;">${i+1}</span>
+                    <div class="track-row" id="track_${i}" onclick="tocar(${i})">
+                        <span style="color:#48484a; width:30px; font-size:12px;">${i+1}</span>
                         <div style="flex:1;">
-                            <div style="font-size:14px; color:white;">${m.trackName}</div>
+                            <div class="track-title" style="font-size:14px; color:white;">${m.trackName}</div>
                             <div style="font-size:11px; color:#8e8e93;">Compositor: ${m.artistName}</div>
                         </div>
-                        <i class="far fa-play-circle track-play-icon"></i>
+                        <i class="fas fa-play track-play-icon"></i>
                     </div>
                 `).join('')}
                 <div style="height:160px;"></div>
             `;
+            
+            // GARANTIR QUE A MÚSICA ATUAL JÁ ABRA AZUL NO ÁLBUM
+            atualizarTrackPlaying();
         }
 
         function tocar(index) {
@@ -162,15 +184,45 @@
             document.getElementById('trackTitle').innerText = m.trackName;
             document.getElementById('trackArtist').innerText = m.artistName;
             document.getElementById('playBtn').innerHTML = '<i class="fas fa-pause"></i>';
+            
+            // ATUALIZAR A COR DA MÚSICA NA LISTA
+            atualizarTrackPlaying();
         }
 
+        // LÓGICA PARA DESTACAR A MÚSICA TOCANDO EM AZUL
+        function atualizarTrackPlaying() {
+            // Remove a classe 'playing' de todas as músicas
+            document.querySelectorAll('.track-row').forEach(row => row.classList.remove('playing'));
+            
+            // Adiciona a classe 'playing' apenas à música atual
+            const currentTrackRow = document.getElementById(`track_${musicaIndex}`);
+            if (currentTrackRow) {
+                currentTrackRow.classList.add('playing');
+            }
+        }
+
+        // LÓGICA DE FIM DE MÚSICA (AGORA PULA AUTOMATICAMENTE)
         audio.onended = function() {
             if (repeatBtn.classList.contains('active')) {
                 audio.play();
             } else if (shuffleBtn.classList.contains('active')) {
                 tocar(Math.floor(Math.random() * listaAtual.length));
             } else if (musicaIndex + 1 < listaAtual.length) {
+                // PULA AUTOMATICAMENTE PARA A PRÓXIMA
                 tocar(musicaIndex + 1);
+            }
+        };
+
+        // LÓGICA DO CONTADOR DE TEMPO NO PLAYER
+        audio.ontimeupdate = function() {
+            if (audio.duration) {
+                const curMins = Math.floor(audio.currentTime / 60);
+                const curSecs = Math.floor(audio.currentTime - curMins * 60);
+                const durMins = Math.floor(audio.duration / 60);
+                const durSecs = Math.floor(audio.duration - durMins * 60);
+                
+                // Formatação: 0:00 / 0:30
+                timeLabel.innerText = `${curMins}:${curSecs < 10 ? '0' : ''}${curSecs} / ${durMins}:${durSecs < 10 ? '0' : ''}${durSecs}`;
             }
         };
 
