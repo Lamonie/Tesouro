@@ -51,11 +51,11 @@
         .track-row:active { background: rgba(255,255,255,0.05); }
         .track-actions { display: flex; align-items: center; gap: 25px; margin-left: 10px; }
         
-        /* ESTILO DA MÚSICA TOCANDO */
         .track-row.is-playing .track-title { color: var(--active-song) !important; font-weight: bold; }
         .track-row.is-playing .track-play-icon { color: var(--playing-color) !important; }
 
-        .album-meta { background: rgba(255,255,255,0.06); margin: 15px; padding: 20px; border-radius: 18px; font-size: 13px; color: #bbb; text-align: center; }
+        .album-meta { background: rgba(255,255,255,0.06); margin: 15px; padding: 20px; border-radius: 18px; font-size: 13px; color: #bbb; text-align: center; line-height: 1.6; }
+        .composer-name { font-size: 11px; color: #777; margin-top: 2px; }
     </style>
 </head>
 <body>
@@ -162,15 +162,26 @@
             const data = await res.json();
             const album = data.results[0]; const songs = data.results.slice(1);
             
+            // FORMATAÇÃO DA DATA E DESCRIÇÃO DO ÁLBUM
+            const dataLancamento = new Date(album.releaseDate).toLocaleDateString('pt-BR');
+            const gravadora = album.copyright || "Independente";
+
             document.getElementById('albumDetailContent').innerHTML = `
                 <div style="text-align:center; padding:30px;"><img src="${art.replace('100x100', '600x600')}" style="width:250px; border-radius:20px;">
                 <h2 style="margin-top:25px;">${album.collectionName}</h2><p style="color:var(--primary);">${album.artistName}</p></div>
-                <div class="album-meta"><b>Ano:</b> ${new Date(album.releaseDate).getFullYear()} | <b>Gênero:</b> ${album.primaryGenreName}</div>
+                
+                <div class="album-meta">
+                    <b>Gênero:</b> ${album.primaryGenreName}<br>
+                    <b>Lançamento:</b> ${dataLancamento}<br>
+                    <b>Gravadora:</b> ${gravadora}
+                </div>
+
                 ${songs.map((m, i) => `
                     <div class="track-row" id="row_${id}_${i}" onclick="tocar('${id}', ${i}, '${art}')">
                         <span style="color:#777; width:30px;">${i+1}</span>
                         <div style="flex:1; margin-left:12px; overflow:hidden;">
                             <div class="track-title" style="font-size:15px; color:white;">${m.trackName}</div>
+                            <div class="composer-name">${m.artistName}</div>
                         </div>
                         <div class="track-actions">
                             <i class="fas fa-download" style="color:#8e8e93; font-size:18px;" onclick="event.stopPropagation(); baixarMusica('${m.previewUrl}', '${m.trackName}')"></i>
@@ -206,7 +217,7 @@
             if (window.albumVisualizadoId === window.albumAtivoId) {
                 const row = document.getElementById(`row_${window.albumAtivoId}_${window.musicaIndex}`);
                 const icon = document.getElementById(`btn_list_${window.albumAtivoId}_${window.musicaIndex}`);
-                if(row) row.classList.add('is-playing'); // Isso deixa o título azul via CSS
+                if(row) row.classList.add('is-playing');
                 if(icon) {
                     icon.className = audio.paused ? 'fas fa-play-circle track-play-icon' : 'fas fa-pause-circle track-play-icon';
                     icon.style.color = 'var(--playing-color)';
