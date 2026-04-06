@@ -6,14 +6,14 @@
     <title>LAMONIÊ FLOW</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --primary: #94b3ce; --bg: #000000; --text-main: #ffffff; --player-bg: rgba(30, 30, 30, 0.75); --playing-color: #ffff00; --active-song: #007bff; }
+        :root { --primary: #94b3ce; --bg: #000000; --text-main: #ffffff; --player-bg: rgba(30, 30, 30, 0.85); --playing-color: #ffff00; --active-song: #007bff; }
         
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         
         body { background: #000000; color: var(--text-main); font-family: -apple-system, sans-serif; min-height: 100vh; overflow-x: hidden; }
         body::before { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000000; z-index: -1; }
 
-        header { padding: 30px 20px 15px; background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.1); }
+        header { padding: 30px 20px 15px; background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.1); }
         header h1 { color: var(--primary); font-size: 28px; font-weight: 900; }
 
         .categories-nav { display: flex; overflow-x: auto; padding: 15px; gap: 12px; }
@@ -27,41 +27,43 @@
         .card { width: 47%; background: rgba(255,255,255,0.04); border-radius: 15px; padding: 8px; margin-bottom: 20px; }
         .card img { width: 100%; aspect-ratio: 1/1; border-radius: 12px; object-fit: cover; }
 
-        /* MINI PLAYER INFERIOR */
+        /* ARRUMADO: Mini player voltou ao tamanho original elegante */
         .player { 
             position: fixed; bottom: 35px; left: 15px; right: 15px; 
-            background: var(--player-bg); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); 
-            padding: 12px 20px; border-radius: 25px; border: 1px solid rgba(255, 255, 255, 0.15); 
-            z-index: 10002; transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s;
+            background: var(--player-bg); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); 
+            padding: 8px 15px; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.1); 
+            z-index: 10002; transition: transform 0.4s ease, opacity 0.4s;
         }
-        .player-hidden { transform: translateY(120px); opacity: 0; }
+        .player-hidden { transform: translateY(110px); opacity: 0; }
+        .mini-art { width: 45px; height: 45px; border-radius: 8px; object-fit: cover; }
 
-        /* TELAS CHEIAS (ÁLBUM E REPRODUÇÃO) */
         .full-page { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 10001; display: none; flex-direction: column; overflow-y: auto; }
-        .now-playing-page { z-index: 10003; background: linear-gradient(to bottom, #1a1a1a, #000); }
+        .now-playing-page { z-index: 10003; background: linear-gradient(to bottom, #151515, #000); }
 
-        .btn-voltar { margin: 15px; background: rgba(255,255,255,0.1); border: none; color: #fff; padding: 10px 20px; border-radius: 20px; font-weight: bold; width: fit-content; z-index: 10; }
+        .btn-voltar { margin: 15px; background: rgba(255,255,255,0.1); border: none; color: #fff; padding: 10px 20px; border-radius: 20px; font-weight: bold; width: fit-content; }
         
-        .track-row { display: flex; align-items: center; padding: 18px; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; }
+        .track-row { display: flex; align-items: center; padding: 16px; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .track-row.is-playing .track-title { color: var(--active-song) !important; font-weight: bold; }
 
+        /* ARRUMADO: Separação dos botões da lista */
+        .track-actions { display: flex; align-items: center; gap: 35px; margin-left: 10px; }
+        
         .album-meta { background: rgba(255,255,255,0.06); margin: 15px; padding: 20px; border-radius: 18px; font-size: 13px; color: #bbb; text-align: center; }
 
-        /* ESTILO DA TELA DE REPRODUÇÃO IGUAL APPLE MUSIC */
-        .np-container { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 20px; }
-        .np-art { width: 85%; aspect-ratio: 1/1; border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); object-fit: cover; }
-        .np-info { width: 100%; text-align: left; padding: 40px 20px 10px; }
-        .np-title { font-size: 22px; font-weight: bold; margin-bottom: 5px; }
-        .np-artist { font-size: 18px; color: var(--active-song); }
+        .np-container { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+        .np-art { width: 85%; aspect-ratio: 1/1; border-radius: 15px; box-shadow: 0 15px 40px rgba(0,0,0,0.6); object-fit: cover; }
+        .np-info { width: 100%; text-align: left; padding: 30px 20px 0; }
+        .np-title { font-size: 20px; font-weight: bold; margin-bottom: 4px; }
+        .np-artist { font-size: 16px; color: var(--active-song); }
 
         .np-progress-area { width: 100%; padding: 20px; }
-        .np-slider { width: 100%; height: 5px; border-radius: 5px; -webkit-appearance: none; background: #333; outline: none; }
-        .np-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; border-radius: 50%; background: #fff; }
-        .np-time { display: flex; justify-content: space-between; font-size: 12px; color: #666; margin-top: 10px; }
+        .np-slider { width: 100%; height: 4px; border-radius: 5px; -webkit-appearance: none; background: #333; }
+        .np-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 10px; height: 10px; border-radius: 50%; background: #fff; }
+        .np-time { display: flex; justify-content: space-between; font-size: 11px; color: #555; margin-top: 8px; }
 
-        .np-controls { display: flex; align-items: center; gap: 50px; margin-top: 20px; }
-        .np-btn { background: none; border: none; color: white; font-size: 35px; cursor: pointer; }
-        .np-btn-main { font-size: 60px; color: #fff; }
+        .np-controls { display: flex; align-items: center; gap: 40px; margin-top: 10px; }
+        .np-btn { background: none; border: none; color: white; font-size: 30px; }
+        .np-btn-main { font-size: 55px; }
     </style>
 </head>
 <body>
@@ -72,8 +74,8 @@
         <div class="search-box">
             <input type="text" id="searchInput" placeholder="Buscar...">
             <div style="display:flex; gap:25px; color:#8e8e93; align-items: center;">
-                <i class="fas fa-microphone" id="micBtn" onclick="ativarMicrofone()" style="cursor:pointer; padding: 5px;"></i>
-                <i class="fas fa-search" onclick="realizarBuscaManual()" style="cursor:pointer;"></i>
+                <i class="fas fa-microphone" id="micBtn" onclick="ativarMicrofone()"></i>
+                <i class="fas fa-search" onclick="realizarBuscaManual()"></i>
             </div>
         </div>
     </div>
@@ -94,10 +96,7 @@
             </div>
             <div class="np-progress-area">
                 <input type="range" class="np-slider" id="npSlider" value="0" min="0" step="1">
-                <div class="np-time">
-                    <span id="npCurrent">0:00</span>
-                    <span id="npDuration">0:00</span>
-                </div>
+                <div class="np-time"><span id="npCurrent">0:00</span><span id="npDuration">0:00</span></div>
             </div>
             <div class="np-controls">
                 <button class="np-btn" onclick="anterior()"><i class="fas fa-backward"></i></button>
@@ -108,15 +107,15 @@
     </div>
 
     <footer class="player" id="player" style="display:none;" onclick="abrirNowPlaying()">
-        <div class="player-controls">
+        <div class="player-controls" style="display:flex; align-items:center; gap:12px;">
             <img id="playerArt" src="" class="mini-art">
             <div style="flex:1; overflow:hidden;">
-                <div style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-weight:bold; font-size:15px;" id="trackTitle">Música</div>
-                <div id="timeInfo" style="font-size:11px; color:#aaa;">0:00 / 0:00</div>
+                <div style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-weight:bold; font-size:14px;" id="trackTitle">Música</div>
+                <div id="timeInfo" style="font-size:10px; color:#aaa;">0:00 / 0:00</div>
             </div>
-            <div style="display:flex; align-items:center; gap:30px;">
-                <button onclick="event.stopPropagation(); togglePlay();" id="playBtn" style="background:none; border:none; color:var(--playing-color); font-size:30px;"><i class="fas fa-pause"></i></button>
-                <i class="fas fa-step-forward" style="color:white; font-size:24px;" onclick="event.stopPropagation(); proxima();"></i>
+            <div style="display:flex; align-items:center; gap:25px;">
+                <button onclick="event.stopPropagation(); togglePlay();" id="playBtn" style="background:none; border:none; color:var(--playing-color); font-size:26px;"><i class="fas fa-pause"></i></button>
+                <i class="fas fa-step-forward" style="color:white; font-size:22px;" onclick="event.stopPropagation(); proxima();"></i>
             </div>
         </div>
     </footer>
@@ -138,39 +137,26 @@
         });
 
         function ativarMicrofone() {
-            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-            recognition.lang = 'pt-BR'; recognition.start();
+            const rec = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            rec.lang = 'pt-BR'; rec.start();
             document.getElementById('micBtn').style.color = '#ff3b30';
-            recognition.onresult = (event) => {
-                const texto = event.results[0][0].transcript;
-                document.getElementById('searchInput').value = texto;
-                carregarPorGenero(texto);
-            };
-            recognition.onend = () => { document.getElementById('micBtn').style.color = '#8e8e93'; };
+            rec.onresult = (e) => { document.getElementById('searchInput').value = e.results[0][0].transcript; carregarPorGenero(e.results[0][0].transcript); };
+            rec.onend = () => { document.getElementById('micBtn').style.color = '#8e8e93'; };
         }
 
-        function realizarBuscaManual() {
-            const valor = document.getElementById('searchInput').value;
-            if(valor) carregarPorGenero(valor);
-        }
+        function realizarBuscaManual() { const v = document.getElementById('searchInput').value; if(v) carregarPorGenero(v); }
 
         audio.ontimeupdate = () => {
-            const cur = audio.currentTime;
-            const dur = audio.duration || 0;
+            const cur = audio.currentTime; const dur = audio.duration || 0;
             document.getElementById('timeInfo').innerText = `${formatTime(cur)} / ${formatTime(dur)}`;
             document.getElementById('npCurrent').innerText = formatTime(cur);
             document.getElementById('npDuration').innerText = formatTime(dur);
-            npSlider.max = Math.floor(dur);
-            npSlider.value = Math.floor(cur);
+            npSlider.max = Math.floor(dur); npSlider.value = Math.floor(cur);
             atualizarUI();
         };
 
         npSlider.oninput = () => { audio.currentTime = npSlider.value; };
-
-        function formatTime(s) {
-            const min = Math.floor(s / 60); const seg = Math.floor(s % 60);
-            return `${min}:${seg < 10 ? '0' : ''}${seg}`;
-        }
+        function formatTime(s) { const min = Math.floor(s/60); const seg = Math.floor(s%60); return `${min}:${seg<10?'0':''}${seg}`; }
 
         const generos = ["Início", "Forró", "Vaquejada", "Piseiro", "Sertanejo", "Brega", "Arrocha"];
         document.getElementById('catNav').innerHTML = generos.map(g => `<button class="cat-btn" onclick="carregarPorGenero('${g}')">${g}</button>`).join('');
@@ -187,47 +173,38 @@
         }
 
         async function abrirAlbum(id, art) {
-            window.albumVisualizadoId = id;
-            albumPage.style.display = 'flex';
+            window.albumVisualizadoId = id; albumPage.style.display = 'flex';
             const res = await fetch(`https://itunes.apple.com/lookup?id=${id}&entity=song`);
             const data = await res.json();
             const album = data.results[0]; const songs = data.results.slice(1);
-            
             document.getElementById('albumDetailContent').innerHTML = `
-                <div style="text-align:center; padding:30px;"><img src="${art.replace('100x100', '600x600')}" style="width:250px; border-radius:20px;">
-                <h2 style="margin-top:25px;">${album.collectionName}</h2><p style="color:var(--primary);">${album.artistName}</p></div>
+                <div style="text-align:center; padding:30px;"><img src="${art.replace('100x100', '600x600')}" style="width:220px; border-radius:15px;">
+                <h2 style="margin-top:20px;">${album.collectionName}</h2><p style="color:var(--primary);">${album.artistName}</p></div>
                 <div class="album-meta"><b>Gênero:</b> ${album.primaryGenreName}<br><b>Lançamento:</b> ${new Date(album.releaseDate).toLocaleDateString('pt-BR')}<br><b>Gravadora:</b> ${album.copyright || "Independente"}</div>
                 ${songs.map((m, i) => `
                     <div class="track-row" id="row_${id}_${i}" onclick="tocar('${id}', ${i}, '${art}')">
-                        <span style="color:#777; width:30px;">${i+1}</span>
-                        <div style="flex:1; margin-left:12px; overflow:hidden;">
-                            <div class="track-title" style="font-size:15px; color:white;">${m.trackName}</div>
-                            <div style="font-size:11px; color:#777; margin-top:2px;">${m.artistName}</div>
+                        <span style="color:#777; width:25px;">${i+1}</span>
+                        <div style="flex:1; margin-left:10px; overflow:hidden;">
+                            <div class="track-title" style="font-size:14px; color:white;">${m.trackName}</div>
+                            <div style="font-size:11px; color:#555;">${m.artistName}</div>
                         </div>
                         <div class="track-actions">
-                            <i class="fas fa-download" style="color:#8e8e93; font-size:18px;" onclick="event.stopPropagation(); baixarMusica('${m.previewUrl}', '${m.trackName}')"></i>
-                            <i class="fas fa-play-circle track-play-icon" id="btn_list_${id}_${i}" style="font-size:24px; color:white;"></i>
+                            <i class="fas fa-download" style="color:#666; font-size:18px;" onclick="event.stopPropagation(); baixarMusica('${m.previewUrl}', '${m.trackName}')"></i>
+                            <i class="fas fa-play-circle" style="font-size:22px; color:white;"></i>
                         </div>
-                    </div>`).join('')}<div style="height:180px;"></div>`;
-            window.listaVisualizada = songs; 
-            atualizarUI();
+                    </div>`).join('')}<div style="height:150px;"></div>`;
+            window.listaVisualizada = songs; atualizarUI();
         }
 
         function tocar(albumId, index, art) {
-            if (window.albumAtivoId === albumId && window.musicaIndex === index) {
-                abrirNowPlaying(); return;
-            }
             window.albumAtivoId = albumId; window.musicaIndex = index;
             window.listaTocando = window.listaVisualizada; window.capaAtiva = art;
             const m = window.listaTocando[index];
             audio.src = m.previewUrl; audio.play();
-            
             playerBar.style.display = 'block';
             document.getElementById('playerArt').src = art;
             document.getElementById('trackTitle').innerText = m.trackName;
-            
-            abrirNowPlaying();
-            atualizarUI();
+            abrirNowPlaying(); atualizarUI();
         }
 
         function abrirNowPlaying() {
@@ -255,12 +232,7 @@
         function togglePlay() { audio.paused ? audio.play() : audio.pause(); atualizarUI(); }
         function proxima() { if(window.musicaIndex + 1 < window.listaTocando.length) tocar(window.albumAtivoId, window.musicaIndex + 1, window.capaAtiva); }
         function anterior() { if(window.musicaIndex - 1 >= 0) tocar(window.albumAtivoId, window.musicaIndex - 1, window.capaAtiva); }
-
-        async function baixarMusica(url, nome) {
-            const res = await fetch(url); const blob = await res.blob();
-            const link = document.createElement('a'); link.href = window.URL.createObjectURL(blob);
-            link.download = `${nome}.mp3`; link.click();
-        }
+        async function baixarMusica(u, n) { const r = await fetch(u); const b = await r.blob(); const l = document.createElement('a'); l.href = window.URL.createObjectURL(b); l.download = `${n}.mp3`; l.click(); }
 
         carregarPorGenero("Início");
     </script>
