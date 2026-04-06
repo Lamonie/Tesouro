@@ -45,8 +45,7 @@
         .track-play-icon { color: #48484a; font-size: 20px; margin-left: auto; padding: 10px; transition: 0.2s; }
         .track-row.playing .track-play-icon { color: var(--primary) !important; }
         
-        /* Botão de download na lista */
-        .download-btn { color: #8e8e93; font-size: 16px; padding: 10px; cursor: pointer; }
+        .download-btn { color: #8e8e93; font-size: 16px; padding: 10px; cursor: pointer; margin-left: 10px; }
         .download-btn:active { color: var(--primary); }
 
         .player { 
@@ -77,7 +76,7 @@
     <div class="categories-nav" id="catNav"></div>
     <div class="search-container">
         <div class="search-box">
-            <input type="text" id="searchInput" placeholder="O que você quer ouvir?" oninput="verificarInput()">
+            <input type="text" id="searchInput" placeholder="Buscar álbum, artista ou gênero..." oninput="verificarInput()">
             <div class="search-controls">
                 <i class="fas fa-microphone mic-btn" id="micBtn" onclick="comecarVoz()"></i>
                 <i class="fas fa-times-circle clear-btn" id="clearBtn" onclick="limparBusca()"></i>
@@ -124,14 +123,10 @@
         let musicaIndex = 0;
         let albunsIniciaisFixos = []; 
 
-        const artistasIniciais = [
-            "Gleidson Gavião", "Gaviões do Forró", "Luiz Gonzaga", "Flávio José", 
-            "Dorgival Dantas", "Mastruz com Leite", "Zezé Di Camargo", "Reginaldo Rossi",
-            "Toca do Vale", "Limão com Mel", "Calcinha Preta", "Elba Ramalho"
-        ];
+        const artistasIniciais = ["Gleidson Gavião", "Gaviões do Forró", "Luiz Gonzaga", "Flávio José", "Mastruz com Leite", "Zezé Di Camargo", "Toca do Vale", "Limão com Mel"];
 
         function carregarGeneros() {
-            document.getElementById('catNav').innerHTML = ["Início", "Forró", "Vaquejada", "Piseiro", "Sertanejo", "Arrocha", "Brega", "Pagode", "Axé", "MPB", "Gospel"].map(g => 
+            document.getElementById('catNav').innerHTML = ["Início", "Forró", "Vaquejada", "Piseiro", "Sertanejo", "Brega", "Pagode"].map(g => 
                 `<button class="cat-btn ${g==='Início'?'active':''}" onclick="gerenciarFiltro(this, '${g}')">${g}</button>`
             ).join('');
         }
@@ -144,7 +139,7 @@
             grid.innerHTML = "<p style='padding:20px;'>Carregando sua coleção...</p>";
             if (termo === "" || termo === "Início") {
                 const promessas = artistasIniciais.map(a => 
-                    fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(a)}&entity=album&limit=60`).then(r => r.json())
+                    fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(a)}&entity=album&limit=50`).then(r => r.json())
                 );
                 const resultados = await Promise.all(promessas);
                 let todosAlbuns = resultados.flatMap(data => data.results);
@@ -197,14 +192,25 @@
         function limparBusca() { searchInput.value = ''; verificarInput(); searchInput.focus(); }
         function buscar() { if (searchInput.value.trim() !== "") { carregarAlbuns(searchInput.value); document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active')); } }
 
-        // Função para baixar a música
-        function baixarMusica(url, nome) {
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = `${nome}_30s.m4a`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+        async function baixarMusica(url, nome) {
+            try {
+                const response = await fetch(url);
+                const blob = await response.blob();
+                const blobUrl = window.URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = blobUrl;
+                link.download = `${nome}_30s.m4a`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                window.URL.revokeObjectURL(blobUrl);
+            } catch (error) {
+                const link = document.createElement('a');
+                link.href = url;
+                link.target = '_blank';
+                link.download = nome;
+                link.click();
+            }
         }
 
         async function abrirAlbum(id) {
@@ -219,7 +225,7 @@
 
             document.getElementById('albumDetailContent').innerHTML = `
                 <div style="text-align:center; padding:30px 20px 10px;">
-                    <img src="${album.artworkUrl100.replace('100x100', '600x600')}" style="width:260px; border-radius:15px; box-shadow: 0 8px 25px rgba(0,0,0,0.5);">
+                    <img src="${album.artworkUrl100.replace('100x100', '600x600')}" style="width:260px; border-radius:15px;">
                     <h2 style="margin-top:20px;">${album.collectionName}</h2>
                     <p style="color:var(--primary); font-weight:bold; margin-bottom:10px;">${album.artistName}</p>
                 </div>
@@ -257,10 +263,7 @@
             document.getElementById('trackTitle').innerText = m.trackName;
             document.getElementById('trackArtist').innerText = m.artistName;
             document.getElementById('playBtn').innerHTML = '<i class="fas fa-pause"></i>';
-            
-            // Configura o botão de download do player principal
             document.getElementById('mainDownloadBtn').onclick = () => baixarMusica(m.previewUrl, m.trackName);
-            
             atualizarTrackPlaying();
         }
 
@@ -270,10 +273,8 @@
             if (repeatBtn.classList.contains('active')) {
                 audio.currentTime = 0;
                 audio.play();
-            } else {
-                if (musicaIndex + 1 < listaAtual.length) {
-                    tocar(musicaIndex + 1);
-                }
+            } else if (musicaIndex + 1 < listaAtual.length) {
+                tocar(musicaIndex + 1);
             }
         };
 
