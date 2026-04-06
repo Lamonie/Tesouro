@@ -6,7 +6,7 @@
     <title>LAMONIÊ FLOW</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --primary: #94b3ce; --bg: #000000; --text-main: #ffffff; --player-bg: #111111; }
+        :root { --primary: #94b3ce; --bg: #000000; --text-main: #ffffff; --player-bg: rgba(25, 25, 25, 0.7); } /* Fundo semi-transparente para o efeito vidro */
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         body, html { width: 100%; overflow-x: hidden; background: var(--bg); color: var(--text-main); font-family: -apple-system, sans-serif; }
 
@@ -42,10 +42,22 @@
         .track-play-icon { color: #48484a; font-size: 20px; margin-left: auto; padding: 10px; transition: 0.2s; }
         .track-row.playing .track-play-icon { color: var(--primary) !important; }
 
-        .player { position: fixed; bottom: 0; width: 100%; background: var(--player-bg); backdrop-filter: blur(15px); padding: 5px 15px 30px; border-top: 1px solid #333; z-index: 10001; transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+        /* AQUI ESTÁ O EFEITO DE VIDRO DO IPHONE */
+        .player { 
+            position: fixed; 
+            bottom: 0; 
+            width: 100%; 
+            background: var(--player-bg); 
+            backdrop-filter: blur(20px); /* O "embaçado" de vidro */
+            -webkit-backdrop-filter: blur(20px); 
+            padding: 5px 15px 30px; 
+            border-top: 1px solid rgba(255, 255, 255, 0.1); 
+            z-index: 10001; 
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); 
+        }
         .player.minimized { transform: translateY(calc(100% - 45px)); } 
         .handle-area { width: 100%; height: 30px; display: flex; justify-content: center; align-items: center; cursor: pointer; margin-bottom: 5px; }
-        .handle { width: 40px; height: 4px; background: #3a3a3c; border-radius: 10px; }
+        .handle { width: 40px; height: 4px; background: rgba(255, 255, 255, 0.3); border-radius: 10px; }
         
         .player-controls { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
         .control-icon { color: #8e8e93; font-size: 18px; cursor: pointer; }
@@ -106,10 +118,8 @@
         let listaAtual = [];
         let musicaIndex = 0;
         let jaRepetiu = false;
-        
         let albunsDestaqueFixos = [];
 
-        // LISTA PESADA E VARIADA PARA A PÁGINA INICIAL
         const artistasIniciais = [
             "Gleidson Gavião", "Gaviões do Forró", "Luiz Gonzaga", "Flávio José", 
             "Dorgival Dantas", "Mastruz com Leite", "Zezé Di Camargo", "Reginaldo Rossi",
@@ -127,28 +137,20 @@
                 renderizarGrid(albunsDestaqueFixos);
                 return;
             }
-
-            grid.innerHTML = "<p style='padding:20px;'>Preparando centenas de sucessos...</p>";
-            
+            grid.innerHTML = "<p style='padding:20px;'>Preparando sucessos...</p>";
             if (termo === "" || termo === "Destaques") {
-                // Busca individual para cada artista para garantir volume e variedade
                 const promessas = artistasIniciais.map(a => 
                     fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(a)}&entity=album&limit=60`).then(r => r.json())
                 );
-                
                 const resultados = await Promise.all(promessas);
                 let todosAlbuns = resultados.flatMap(data => data.results);
-                
-                // Filtra para não repetir álbuns e mistura a ordem
                 const albunsUnicos = Array.from(new Set(todosAlbuns.map(a => a.collectionId)))
                     .map(id => todosAlbuns.find(a => a.collectionId === id))
                     .sort(() => Math.random() - 0.5);
-                
                 albunsDestaqueFixos = albunsUnicos;
                 renderizarGrid(albunsDestaqueFixos);
                 return;
             }
-
             const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(termo)}&entity=album&limit=200`);
             const data = await res.json();
             renderizarGrid(data.results);
@@ -192,13 +194,7 @@
 
         function verificarInput() { clearBtn.style.display = searchInput.value.length > 0 ? 'block' : 'none'; }
         function limparBusca() { searchInput.value = ''; verificarInput(); searchInput.focus(); }
-
-        function buscar() {
-            if (searchInput.value.trim() !== "") {
-                carregarAlbuns(searchInput.value);
-                document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
-            }
-        }
+        function buscar() { if (searchInput.value.trim() !== "") { carregarAlbuns(searchInput.value); document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active')); } }
 
         async function abrirAlbum(id) {
             document.getElementById('albumPage').style.display = 'flex';
@@ -206,23 +202,18 @@
             const data = await res.json();
             const album = data.results[0];
             listaAtual = data.results.slice(1);
-            
             document.getElementById('albumDetailContent').innerHTML = `
                 <div style="text-align:center; padding:30px 20px;">
                     <img src="${album.artworkUrl100.replace('100x100', '600x600')}" style="width:260px; border-radius:15px;">
                     <h2 style="margin-top:20px;">${album.collectionName}</h2>
                     <p style="color:var(--primary); font-weight:bold;">${album.artistName}</p>
-                    <div style="font-size:12px; color:#8e8e93; margin-top:15px; background:#1c1c1e; padding:15px; border-radius:10px; text-align:left;">
-                        <p><b>Lançamento:</b> ${new Date(album.releaseDate).toLocaleDateString('pt-BR')} | <b>Gênero:</b> ${album.primaryGenreName}</p>
-                        <p><b>Gravadora:</b> ${album.copyright || "Independente"}</p>
-                    </div>
                 </div>
                 ${listaAtual.map((m, i) => `
                     <div class="track-row" id="track_${i}" onclick="gerenciarPlay(${i})">
                         <span style="color:#48484a; width:30px; font-size:12px;">${i+1}</span>
                         <div style="flex:1;">
                             <div class="track-title" style="font-size:14px; color:white;">${m.trackName}</div>
-                            <div style="font-size:11px; color:#8e8e93;">Compositor: ${m.artistName}</div>
+                            <div style="font-size:11px; color:#8e8e93;">${m.artistName}</div>
                         </div>
                         <i class="fas fa-play-circle track-play-icon" id="icon_${i}"></i>
                     </div>
@@ -232,18 +223,13 @@
             atualizarTrackPlaying();
         }
 
-        function gerenciarPlay(index) {
-            if (musicaIndex === index && !audio.paused) { togglePlay(); } else { tocar(index); }
-        }
-
+        function gerenciarPlay(index) { if (musicaIndex === index && !audio.paused) { togglePlay(); } else { tocar(index); } }
         function tocar(index) {
             musicaIndex = index;
-            jaRepetiu = false;
             const m = listaAtual[musicaIndex];
             audio.src = m.previewUrl;
             audio.play();
             player.style.display = 'block';
-            player.classList.remove('minimized');
             document.getElementById('trackTitle').innerText = m.trackName;
             document.getElementById('trackArtist').innerText = m.artistName;
             document.getElementById('playBtn').innerHTML = '<i class="fas fa-pause"></i>';
@@ -252,49 +238,23 @@
 
         function atualizarTrackPlaying() {
             document.querySelectorAll('.track-row').forEach(row => row.classList.remove('playing'));
-            document.querySelectorAll('.track-play-icon').forEach(icon => {
-                icon.classList.remove('fa-pause-circle');
-                icon.classList.add('fa-play-circle');
-            });
+            document.querySelectorAll('.track-play-icon').forEach(icon => { icon.classList.remove('fa-pause-circle'); icon.classList.add('fa-play-circle'); });
             const currentTrackRow = document.getElementById(`track_${musicaIndex}`);
             const currentIcon = document.getElementById(`icon_${musicaIndex}`);
             if (currentTrackRow) currentTrackRow.classList.add('playing');
-            if (currentIcon && !audio.paused) {
-                currentIcon.classList.remove('fa-play-circle');
-                currentIcon.classList.add('fa-pause-circle');
-            }
+            if (currentIcon && !audio.paused) { currentIcon.classList.remove('fa-play-circle'); currentIcon.classList.add('fa-pause-circle'); }
         }
 
-        audio.onended = function() {
-            if (repeatBtn.classList.contains('active')) { audio.play(); } 
-            else if (!jaRepetiu) { jaRepetiu = true; audio.currentTime = 0; audio.play(); } 
-            else {
-                if (shuffleBtn.classList.contains('active')) { tocar(Math.floor(Math.random() * listaAtual.length)); } 
-                else if (musicaIndex + 1 < listaAtual.length) { tocar(musicaIndex + 1); }
-            }
-        };
-
-        audio.onplay = atualizarTrackPlaying;
-        audio.onpause = atualizarTrackPlaying;
-
-        audio.ontimeupdate = function() {
-            if (audio.duration) {
-                const curMins = Math.floor(audio.currentTime / 60);
-                const curSecs = Math.floor(audio.currentTime - curMins * 60);
-                let totalSecs = curSecs + (jaRepetiu ? 30 : 0);
-                timeLabel.innerText = `0:${totalSecs < 10 ? '0' : ''}${totalSecs} / 1:00`;
-            }
-        };
-
-        function togglePlay() {
-            if(audio.paused) { audio.play(); document.getElementById('playBtn').innerHTML = '<i class="fas fa-pause"></i>'; }
-            else { audio.pause(); document.getElementById('playBtn').innerHTML = '<i class="fas fa-play"></i>'; }
-            atualizarTrackPlaying();
-        }
-
+        function togglePlay() { if(audio.paused) { audio.play(); document.getElementById('playBtn').innerHTML = '<i class="fas fa-pause"></i>'; } else { audio.pause(); document.getElementById('playBtn').innerHTML = '<i class="fas fa-play"></i>'; } atualizarTrackPlaying(); }
         function fecharPagina() { document.getElementById('albumPage').style.display = 'none'; }
         function togglePlayer() { player.classList.toggle('minimized'); }
-        
+
+        audio.ontimeupdate = function() {
+            const curMins = Math.floor(audio.currentTime / 60);
+            const curSecs = Math.floor(audio.currentTime - curMins * 60);
+            timeLabel.innerText = `${curMins}:${curSecs < 10 ? '0' : ''}${curSecs} / 1:00`;
+        };
+
         carregarGeneros();
         carregarAlbuns(""); 
     </script>
