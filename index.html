@@ -10,10 +10,8 @@
         
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         
-        /* ALTERAÇÃO: Fundo da tela de início totalmente preto */
         body { background: #000000; color: var(--text-main); font-family: -apple-system, sans-serif; min-height: 100vh; overflow-x: hidden; }
 
-        /* Removido o efeito aurora para manter o preto sólido */
         body::before {
             content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: #000000; z-index: -1;
@@ -22,9 +20,43 @@
         header { padding: 30px 20px 15px; background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.1); }
         header h1 { color: var(--primary); font-size: 28px; font-weight: 900; }
 
-        .categories-nav { display: flex; overflow-x: auto; padding: 15px; gap: 12px; }
-        .cat-btn { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); color: white; padding: 12px 25px; border-radius: 25px; font-size: 14px; font-weight: 600; flex-shrink: 0; transition: transform 0.1s; }
-        .cat-btn.active { background: var(--primary); color: #000; }
+        /* NOVO: Estilo do Botão Principal Gêneros */
+        .genres-toggle-btn {
+            background: #000;
+            color: white;
+            border: 2px solid #c0c0c0; /* Prata LED */
+            box-shadow: 0 0 10px rgba(192, 192, 192, 0.5);
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-weight: bold;
+            margin: 15px 15px 5px;
+            cursor: pointer;
+            display: inline-block;
+        }
+
+        /* NOVO: Barra de Gêneros Ocultável e Deslizante */
+        .categories-nav { 
+            display: none; /* Começa escondida */
+            overflow-x: auto; 
+            padding: 10px 15px; 
+            gap: 12px; 
+            white-space: nowrap;
+            scrollbar-width: none;
+        }
+        .categories-nav::-webkit-scrollbar { display: none; }
+        
+        .cat-btn { 
+            background: #000; 
+            border: 2px solid #c0c0c0; /* Prata LED */
+            box-shadow: 0 0 8px rgba(192, 192, 192, 0.3);
+            color: white; 
+            padding: 10px 20px; 
+            border-radius: 20px; 
+            font-size: 14px; 
+            font-weight: 600; 
+            flex-shrink: 0; 
+        }
+        .cat-btn.active { background: var(--primary); color: #000; border-color: var(--primary); }
 
         .search-container { padding: 10px 15px; }
         .search-box { display: flex; background: rgba(255, 255, 255, 0.07); border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); align-items: center; padding: 0 15px; }
@@ -58,7 +90,11 @@
 <body>
 
     <header><h1>LAMONIÊ FLOW</h1></header>
+
+    <div class="genres-toggle-btn" onclick="toggleGenres()">Gêneros</div>
+    
     <div class="categories-nav" id="catNav"></div>
+
     <div class="search-container">
         <div class="search-box">
             <input type="text" id="searchInput" placeholder="Buscar...">
@@ -95,6 +131,16 @@
         const audio = document.getElementById('audioMain');
         const playerBar = document.getElementById('player');
         const albumPage = document.getElementById('albumPage');
+
+        // NOVO: Função para abrir e fechar a barra de gêneros
+        function toggleGenres() {
+            const nav = document.getElementById('catNav');
+            if (nav.style.display === 'flex') {
+                nav.style.display = 'none';
+            } else {
+                nav.style.display = 'flex';
+            }
+        }
 
         let lastScrollY = window.scrollY;
         window.addEventListener('scroll', () => {
@@ -138,7 +184,8 @@
 
         function voltarParaAlbumAtivo() { if (window.albumAtivoId) abrirAlbum(window.albumAtivoId, window.capaAtiva); }
 
-        const generos = ["Início", "Forró", "Vaquejada", "Piseiro", "Sertanejo", "Brega", "Arrocha"];
+        // LISTA DE GÊNEROS ITUNES
+        const generos = ["Início", "Forró", "Vaquejada", "Piseiro", "Sertanejo", "Brega", "Arrocha", "Axé", "Pagode", "Samba", "Gospel", "Rock", "Pop", "Hip-Hop"];
         document.getElementById('catNav').innerHTML = generos.map(g => `<button class="cat-btn" onclick="carregarPorGenero('${g}')">${g}</button>`).join('');
 
         async function carregarPorGenero(g) {
