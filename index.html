@@ -6,7 +6,7 @@
     <title>LAMONIÊ FLOW</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --primary: #94b3ce; --bg: #000000; --text-main: #ffffff; --player-bg: rgba(25, 25, 25, 0.8); }
+        :root { --primary: #94b3ce; --bg: #000000; --text-main: #ffffff; --player-bg: rgba(20, 20, 20, 0.9); }
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         body, html { width: 100%; overflow-x: hidden; background: var(--bg); color: var(--text-main); font-family: -apple-system, sans-serif; }
 
@@ -15,7 +15,7 @@
 
         .categories-nav { display: flex; overflow-x: auto; padding: 10px 15px; gap: 8px; border-bottom: 1px solid #1c1c1e; scrollbar-width: none; }
         .categories-nav::-webkit-scrollbar { display: none; }
-        .cat-btn { background: #1c1c1e; border: none; color: white; padding: 10px 20px; border-radius: 25px; font-size: 13px; font-weight: 600; flex-shrink: 0; cursor: pointer; }
+        .cat-btn { background: #1c1c1e; border: none; color: white; padding: 10px 20px; border-radius: 25px; font-size: 13px; font-weight: 600; flex-shrink: 0; cursor: pointer; transition: 0.3s; }
         .cat-btn.active { background: var(--primary); color: #000; }
 
         .search-container { padding: 15px; }
@@ -23,25 +23,21 @@
         .search-box input { background: none; border: none; color: white; flex: 1; padding: 14px 0; outline: none; font-size: 14px; }
         
         .main-grid { display: flex; flex-wrap: wrap; justify-content: space-between; padding: 10px 15px 180px; }
-        .card { width: 47%; background: #1c1c1e; border-radius: 14px; padding: 8px; margin-bottom: 18px; border: 1px solid #2c2c2e; cursor: pointer; animation: fadeIn 0.5s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .card { width: 47%; background: #1c1c1e; border-radius: 14px; padding: 8px; margin-bottom: 18px; border: 1px solid #2c2c2e; cursor: pointer; transition: transform 0.2s; }
+        .card:active { transform: scale(0.95); }
         .card img { width: 100%; aspect-ratio: 1/1; border-radius: 10px; object-fit: cover; }
         .card h4 { font-size: 12px; margin-top: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; }
 
         .full-page { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; display: none; flex-direction: column; overflow-y: auto; }
         .btn-voltar { margin: 15px; background: var(--primary); border: none; color: #000; padding: 10px 20px; border-radius: 30px; font-weight: 800; cursor: pointer; width: fit-content; }
         
-        .album-info-box { background: #1c1c1e; margin: 15px; padding: 15px; border-radius: 10px; font-size: 12px; color: #8e8e93; line-height: 1.5; text-align: center; }
-
         .track-row { display: flex; align-items: center; padding: 16px; border-bottom: 1px solid #1c1c1e; cursor: pointer; }
         .track-row.playing .track-title { color: var(--primary) !important; font-weight: bold; }
         .track-play-icon { color: #48484a; font-size: 20px; margin-left: auto; }
-        .track-row.playing .track-play-icon { color: var(--primary) !important; }
 
-        .player { position: fixed; bottom: 0; width: 100%; background: var(--player-bg); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); padding: 5px 15px 35px; border-top: 1px solid rgba(255,255,255,0.1); z-index: 10001; }
-        .player-controls { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-        .play-trigger { background: var(--primary); border: none; width: 50px; height: 50px; border-radius: 50%; color: #000; font-size: 20px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-        #timeLabel { font-size: 11px; color: var(--primary); min-width: 80px; text-align: center; font-family: monospace; }
+        .player { position: fixed; bottom: 0; width: 100%; background: var(--player-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); padding: 10px 15px 30px; border-top: 1px solid rgba(255,255,255,0.1); z-index: 10001; }
+        .player-controls { display: flex; align-items: center; justify-content: space-between; }
+        .play-trigger { background: var(--primary); border: none; width: 48px; height: 48px; border-radius: 50%; color: #000; font-size: 18px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -52,8 +48,7 @@
 
     <div class="search-container">
         <div class="search-box">
-            <input type="text" id="searchInput" placeholder="Buscar álbum, artista ou gênero..." onkeydown="if(event.key==='Enter') carregarAlbuns(this.value)">
-            <i class="fas fa-microphone" style="color:var(--primary); margin-right:15px;"></i>
+            <input type="text" id="searchInput" placeholder="Buscar álbum ou artista..." onkeydown="if(event.key==='Enter') carregarAlbuns(this.value)">
             <i class="fas fa-search" style="color:var(--primary); cursor:pointer;" onclick="carregarAlbuns(document.getElementById('searchInput').value)"></i>
         </div>
     </div>
@@ -71,10 +66,7 @@
                 <h4 id="trackTitle" style="font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Música</h4>
                 <p id="trackArtist" style="font-size:12px; color:var(--primary);">Artista</p>
             </div>
-            <span id="timeLabel">0:00 / 0:30</span>
-            <div style="display:flex; align-items:center; gap:15px;">
-                <i class="fas fa-random" style="color:#8e8e93; font-size:14px;"></i>
-                <i class="fas fa-redo" style="color:#8e8e93; font-size:14px;"></i>
+            <div style="display:flex; align-items:center; gap:20px;">
                 <button onclick="togglePlay()" id="playBtn" class="play-trigger"><i class="fas fa-pause"></i></button>
             </div>
         </div>
@@ -85,31 +77,31 @@
     <script>
         const audio = document.getElementById('audioMain');
         const grid = document.getElementById('grid');
-        const generos = ["Início", "Forró", "Vaquejada", "Piseiro", "Sertanejo", "MPB", "Gospel", "Pop", "Rock", "Axé", "Samba"];
-        const artistasForro = "Luiz Gonzaga, Flávio José, Noca do Acordeon, Trio Nordestino, Gaviões do Forró, Mastruz com Leite, Dorgival Dantas, Limão com Mel, Toca do Vale, Gleydson Gavião";
+        const generos = ["Início", "Forró", "Vaquejada", "Piseiro", "Sertanejo", "MPB", "Gospel", "Pop", "Rock", "Axé", "Samba", "Pagode"];
         
-        let listaAtual = [];
+        // Super busca de forró para a Home
+        const artistasHome = "Luiz Gonzaga, Flávio José, Trio Nordestino, Mestrinho, Dominguinhos, Mastruz com Leite, Aviões do Forró, Toca do Vale, Dorgival Dantas, Limão com Mel";
 
         function montarMenu() {
-            const catNav = document.getElementById('catNav');
-            catNav.innerHTML = generos.map(g => 
-                `<button class="cat-btn ${g==='Início'?'active':''}" onclick="mudarGenero(this, '${g}')">${g}</button>`
+            document.getElementById('catNav').innerHTML = generos.map(g => 
+                `<button class="cat-btn ${g==='Início'?'active':''}" onclick="mudarCat(this, '${g}')">${g}</button>`
             ).join('');
         }
 
-        function mudarGenero(btn, genero) {
+        function mudarCat(btn, g) {
             document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-            carregarAlbuns(genero);
+            carregarAlbuns(g === "Início" ? "" : g);
         }
 
         async function carregarAlbuns(termo = "") {
-            grid.innerHTML = "<p style='padding:20px; color:var(--primary)'>Carregando sucessos...</p>";
+            grid.innerHTML = "<p style='padding:20px; color:var(--primary)'>Carregando...</p>";
             
-            // Se for Início ou vazio, carrega os 500 de forró
-            let query = (termo === "" || termo === "Início") ? artistasForro : termo;
+            // Se for vazio (Início), usa a lista de 500 álbuns dos artistas que você pediu
+            let query = (termo === "" || termo === "Início") ? artistasHome : termo;
             
             try {
+                // Limitado a 200 por chamada (limite da API), mas pegando os melhores resultados
                 const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(query)}&entity=album&limit=200&country=br`);
                 const data = await res.json();
                 
@@ -125,7 +117,7 @@
                     </div>
                 `).join('');
             } catch (e) {
-                grid.innerHTML = "<p style='padding:20px;'>Erro de conexão.</p>";
+                grid.innerHTML = "<p style='padding:20px;'>Erro ao carregar.</p>";
             }
         }
 
@@ -133,20 +125,17 @@
             const res = await fetch(`https://itunes.apple.com/lookup?id=${id}&entity=song`);
             const data = await res.json();
             const album = data.results[0];
-            listaAtual = data.results.slice(1);
+            const musicas = data.results.slice(1);
             
             document.getElementById('albumPage').style.display = 'flex';
             document.getElementById('albumDetailContent').innerHTML = `
-                <div style="text-align:center; padding:20px;">
-                    <img src="${album.artworkUrl100.replace('100x100', '600x600')}" style="width:220px; border-radius:15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
-                    <h2 style="margin-top:20px; font-size:20px;">${album.collectionName}</h2>
+                <div style="text-align:center; padding:30px 20px;">
+                    <img src="${album.artworkUrl100.replace('100x100', '600x600')}" style="width:200px; border-radius:15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+                    <h2 style="margin-top:20px; font-size:22px;">${album.collectionName}</h2>
                     <p style="color:var(--primary); font-weight:bold;">${album.artistName}</p>
                 </div>
-                <div class="album-info-box">
-                    Lançamento: ${new Date(album.releaseDate).getFullYear()} | Gênero: ${album.primaryGenreName}
-                </div>
-                ${listaAtual.map((m, i) => `
-                    <div class="track-row" id="track_${i}" onclick="tocar(${i})">
+                ${musicas.map((m, i) => `
+                    <div class="track-row" id="track_${i}" onclick="tocar('${m.previewUrl}', '${m.trackName}', '${m.artistName}', ${i})">
                         <span style="color:#48484a; width:30px;">${i+1}</span>
                         <div style="flex:1;">
                             <div class="track-title" style="color:white; font-size:14px;">${m.trackName}</div>
@@ -159,40 +148,28 @@
             `;
         }
 
-        function tocar(index) {
-            const m = listaAtual[index];
-            audio.src = m.previewUrl;
+        function tocar(url, titulo, artista, idx) {
+            audio.src = url;
             audio.play();
             document.getElementById('player').style.display = 'block';
-            document.getElementById('trackTitle').innerText = m.trackName;
-            document.getElementById('trackArtist').innerText = m.artistName;
+            document.getElementById('trackTitle').innerText = titulo;
+            document.getElementById('trackArtist').innerText = artista;
+            document.getElementById('playBtn').innerHTML = '<i class="fas fa-pause"></i>';
             
             document.querySelectorAll('.track-row').forEach(r => r.classList.remove('playing'));
-            document.getElementById(`track_${index}`).classList.add('playing');
-            document.getElementById('playBtn').innerHTML = '<i class="fas fa-pause"></i>';
+            const row = document.getElementById(`track_${idx}`);
+            if(row) row.classList.add('playing');
         }
 
         function togglePlay() {
-            if(audio.paused) {
-                audio.play();
-                document.getElementById('playBtn').innerHTML = '<i class="fas fa-pause"></i>';
-            } else {
-                audio.pause();
-                document.getElementById('playBtn').innerHTML = '<i class="fas fa-play"></i>';
-            }
+            if(audio.paused) { audio.play(); document.getElementById('playBtn').innerHTML = '<i class="fas fa-pause"></i>'; }
+            else { audio.pause(); document.getElementById('playBtn').innerHTML = '<i class="fas fa-play"></i>'; }
         }
-
-        audio.ontimeupdate = () => {
-            const cur = Math.floor(audio.currentTime);
-            const dur = Math.floor(audio.duration) || 30;
-            document.getElementById('timeLabel').innerText = `0:${cur < 10 ? '0' : ''}${cur} / 0:${dur}`;
-        };
 
         function fecharPagina() { document.getElementById('albumPage').style.display = 'none'; }
 
-        // Inicialização
         montarMenu();
-        carregarAlbuns("Início");
+        carregarAlbuns(""); // Inicia com os 500 álbuns de forró
     </script>
 </body>
 </html>
