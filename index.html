@@ -6,7 +6,7 @@
     <title>LAMONIÊ FLOW</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --primary: #94b3ce; --bg: #000000; --text-main: #ffffff; --player-bg: rgba(25, 25, 25, 0.7); }
+        :root { --primary: #94b3ce; --bg: #000000; --text-main: #ffffff; --player-bg: rgba(25, 25, 25, 0.7); --playing-color: #ffff00; }
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         body, html { width: 100%; overflow-x: hidden; background: var(--bg); color: var(--text-main); font-family: -apple-system, sans-serif; }
         header { padding: 25px 15px 10px; }
@@ -31,8 +31,11 @@
         .full-page { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; display: none; flex-direction: column; overflow-y: auto; }
         .btn-voltar { margin: 15px; background: var(--primary); border: none; color: #000; padding: 10px 20px; border-radius: 30px; font-weight: 800; cursor: pointer; width: fit-content; }
         .album-meta-info { background: #1c1c1e; margin: 0 20px 20px; padding: 15px; border-radius: 12px; border: 1px solid #2c2c2e; font-size: 12px; line-height: 1.6; color: #8e8e93; text-align: center; }
+        .album-meta-info b { color: #ffffff; }
         .track-row { display: flex; align-items: center; padding: 16px; border-bottom: 1px solid #1c1c1e; cursor: pointer; }
         .track-row.playing .track-title { color: var(--primary) !important; font-weight: bold; }
+        /* Botão de play na lista fica amarelo quando tocando */
+        .track-row.playing .track-play-icon { color: var(--playing-color) !important; }
         .track-play-icon { color: #48484a; font-size: 20px; margin-left: auto; padding: 10px; }
         .download-btn { color: #8e8e93; font-size: 16px; padding: 10px; cursor: pointer; margin-left: 10px; }
         .player { position: fixed; bottom: 0; width: 100%; background: var(--player-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); padding: 5px 15px 30px; border-top: 1px solid rgba(255, 255, 255, 0.1); z-index: 10001; transition: transform 0.5s; }
@@ -42,7 +45,8 @@
         .player-controls { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
         .control-icon { color: #8e8e93; font-size: 22px; cursor: pointer; }
         .control-icon.active { color: var(--primary) !important; }
-        .play-trigger { background: var(--primary); border: none; width: 44px; height: 44px; border-radius: 50%; color: #000; font-size: 18px; display: flex; align-items: center; justify-content: center; }
+        /* Botão redondo do play na barra fica amarelo */
+        .play-trigger { background: var(--playing-color); border: none; width: 44px; height: 44px; border-radius: 50%; color: #000; font-size: 18px; display: flex; align-items: center; justify-content: center; }
         #timeLabel { font-size: 11px; color: var(--primary); min-width: 75px; text-align: center; }
     </style>
 </head>
@@ -94,7 +98,6 @@
         let albunsIniciaisFixos = [];
         const artistasIniciais = ["Gleidson Gavião", "Gaviões do Forró", "Luiz Gonzaga", "Flávio José", "Mastruz com Leite", "Zezé Di Camargo", "Toca do Vale", "Limão com Mel"];
 
-        // LISTA DE GÊNEROS AMPLIADA COMO SOLICITADO
         function carregarGeneros() {
             const generos = ["Início", "Forró", "Vaquejada", "Piseiro", "Sertanejo", "Brega", "Arrocha", "Pagode", "Axé", "Gospel", "MPB", "Forró das Antigas", "Banda de Baile", "Xote", "Baião", "Pop"];
             document.getElementById('catNav').innerHTML = generos.map(g => 
@@ -136,15 +139,18 @@
             try {
                 const response = await fetch(url);
                 const blob = await response.blob();
-                const blobUrl = URL.createObjectURL(blob);
+                const blobUrl = window.URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = blobUrl;
-                a.download = `${nome}.m4a`;
+                a.download = `${nome}_30s.m4a`;
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
-                URL.revokeObjectURL(blobUrl);
-            } catch (e) { window.open(url, '_blank'); }
+                window.URL.revokeObjectURL(blobUrl);
+            } catch (e) { 
+                const link = document.createElement('a');
+                link.href = url; link.target = '_blank'; link.download = nome; link.click();
+            }
         }
 
         async function abrirAlbum(id) {
@@ -157,15 +163,18 @@
                 <div style="text-align:center; padding:30px 20px 10px;">
                     <img src="${album.artworkUrl100.replace('100x100', '600x600')}" style="width:260px; border-radius:15px;">
                     <h2 style="margin-top:20px;">${album.collectionName}</h2>
-                    <p style="color:var(--primary); font-weight:bold;">${album.artistName}</p>
+                    <p style="color:var(--primary); font-weight:bold; margin-bottom:10px;">${album.artistName}</p>
                 </div>
-                <div class="album-meta-info"><b>Ano:</b> ${new Date(album.releaseDate).getFullYear()} | <b>Gênero:</b> ${album.primaryGenreName}</div>
+                <div class="album-meta-info">
+                    <b>Ano:</b> ${new Date(album.releaseDate).getFullYear()} | <b>Gênero:</b> ${album.primaryGenreName}<br>
+                    <b>Gravadora:</b> ${album.copyright || "Independente"}
+                </div>
                 ${listaAtual.map((m, i) => `
                     <div class="track-row" id="track_${i}" onclick="gerenciarPlay(${i})">
                         <span style="color:#48484a; width:30px; font-size:12px;">${i+1}</span>
                         <div style="flex:1;">
                             <div class="track-title" style="font-size:14px; color:white;">${m.trackName}</div>
-                            <div style="font-size:11px; color:#8e8e93;">${m.artistName}</div>
+                            <div style="font-size:11px; color:#8e8e93;">Compositor: ${m.artistName}</div>
                         </div>
                         <i class="fas fa-download download-btn" onclick="event.stopPropagation(); baixarMusica('${m.previewUrl}', '${m.trackName}')"></i>
                         <i class="fas fa-play-circle track-play-icon" id="icon_${i}"></i>
@@ -175,11 +184,11 @@
 
         function tocar(index) {
             musicaIndex = index; const m = listaAtual[musicaIndex];
+            if(!m) return;
             audio.src = m.previewUrl; audio.play();
             player.style.display = 'block';
             document.getElementById('trackTitle').innerText = m.trackName;
             document.getElementById('trackArtist').innerText = m.artistName;
-            document.getElementById('playBtn').innerHTML = '<i class="fas fa-pause"></i>';
             document.getElementById('mainDownloadBtn').onclick = () => baixarMusica(m.previewUrl, m.trackName);
             atualizarTrackPlaying();
         }
@@ -188,8 +197,7 @@
         
         audio.onended = function() {
             if (repeatBtn.classList.contains('active')) {
-                audio.currentTime = 0;
-                audio.play();
+                audio.currentTime = 0; audio.play();
             } else if (musicaIndex + 1 < listaAtual.length) {
                 tocar(musicaIndex + 1);
             }
@@ -199,6 +207,7 @@
         function gerenciarPlay(i) { if(musicaIndex===i && !audio.paused) { togglePlay(); } else { tocar(i); } }
         function fecharPagina() { document.getElementById('albumPage').style.display = 'none'; }
         function togglePlayer() { player.classList.toggle('minimized'); }
+
         function atualizarTrackPlaying() {
             document.querySelectorAll('.track-row').forEach(r => r.classList.remove('playing'));
             document.querySelectorAll('.track-play-icon').forEach(ic => { ic.className = 'fas fa-play-circle track-play-icon'; });
@@ -208,11 +217,13 @@
             if(ic) ic.className = audio.paused ? 'fas fa-play-circle track-play-icon' : 'fas fa-pause-circle track-play-icon';
             document.getElementById('playBtn').innerHTML = audio.paused ? '<i class="fas fa-play"></i>' : '<i class="fas fa-pause"></i>';
         }
+
         audio.ontimeupdate = () => {
             const m = Math.floor(audio.currentTime / 60);
             const s = Math.floor(audio.currentTime % 60);
             timeLabel.innerText = `${m}:${s<10?'0':''}${s} / 0:30`;
         };
+
         function comecarVoz() {
             const Speech = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (Speech) {
