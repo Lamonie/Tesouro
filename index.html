@@ -101,7 +101,7 @@
         </div>
     </div>
 
-    <footer class="player" id="player" style="display:none;" onclick="abrirNowPlaying()">
+    <footer class="player" id="player" style="display:none;" onclick="irParaOAlbumAtivo()">
         <div style="display:flex; align-items:center; gap:12px;">
             <img id="playerArt" src="" style="width:45px; height:45px; border-radius:8px;">
             <div style="flex:1; overflow:hidden;"><div id="trackTitleBar" style="font-weight:bold; font-size:14px; white-space:nowrap; text-overflow:ellipsis; overflow:hidden;">Música</div></div>
@@ -120,42 +120,26 @@
         const searchInput = document.getElementById('searchInput');
         const btnClear = document.getElementById('btnClear');
 
-        // FUNÇÃO DO MICROFONE CONSERTADA
         function iniciarVoz() {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!SpeechRecognition) {
-                alert("Seu navegador não suporta busca por voz.");
-                return;
-            }
+            if (!SpeechRecognition) return alert("Não suportado.");
             const recognition = new SpeechRecognition();
             recognition.lang = 'pt-BR';
-            
-            document.getElementById('micIconButton').style.color = "red"; // Indica que está ouvindo
-            
-            recognition.onresult = (event) => {
-                const texto = event.results[0][0].transcript;
-                searchInput.value = texto;
+            document.getElementById('micIconButton').style.color = "red";
+            recognition.onresult = (e) => {
+                searchInput.value = e.results[0][0].transcript;
                 btnClear.style.display = 'block';
-                carregarPorGenero(texto);
+                carregarPorGenero(searchInput.value);
             };
-            
-            recognition.onend = () => {
-                document.getElementById('micIconButton').style.color = "#888";
-            };
-            
+            recognition.onend = () => document.getElementById('micIconButton').style.color = "#888";
             recognition.start();
         }
 
-        function limparBusca() {
-            searchInput.value = '';
-            btnClear.style.display = 'none';
-            searchInput.focus();
-        }
+        function limparBusca() { searchInput.value = ''; btnClear.style.display = 'none'; searchInput.focus(); }
 
-        // ESCONDE-ESCONDE DA BARRA
         let lastScrollY = 0;
-        function handleScroll(element) {
-            const current = (element === window) ? window.scrollY : element.scrollTop;
+        function handleScroll(el) {
+            const current = (el === window) ? window.scrollY : el.scrollTop;
             if (current > lastScrollY && current > 50) playerBar.classList.add('player-hidden');
             else playerBar.classList.remove('player-hidden');
             lastScrollY = current;
@@ -183,10 +167,17 @@
             renderizarLista();
         }
 
+        // NOVO: Função para ir ao álbum que está tocando agora ao clicar na barra
+        function irParaOAlbumAtivo() {
+            if (window.albumAtivoId) {
+                abrirAlbum(window.albumAtivoId, window.capaAtiva);
+            }
+        }
+
         function renderizarLista() {
             const art = window.capaVisualizada;
             document.getElementById('albumDetailContent').innerHTML = `
-                <div style="text-align:center; padding:35px;"><img src="${art.replace('100x100', '600x600')}" style="width:200px; border-radius:15px; box-shadow: 0 15px 30px rgba(0,0,0,0.5);"></div>
+                <div style="text-align:center; padding:35px;"><img src="${art.replace('100x100', '600x600')}" style="width:200px; border-radius:15px;"></div>
                 ${window.listaVisualizada.map((m, i) => `
                     <div class="track-row ${window.musicaIndex === i && window.albumAtivoId === window.currentAlbumOpenId ? 'playing' : ''}">
                         <div class="track-info" onclick="tocar(${i}, true)">
@@ -194,7 +185,6 @@
                             <div style="font-size:12px; color:#777;">${m.artistName}</div>
                         </div>
                         <div class="track-actions">
-                            <i class="fas fa-download" style="color:#444;" onclick="baixar('${m.previewUrl}')"></i>
                             <i class="fas fa-play-circle list-play-btn ${window.musicaIndex === i && window.albumAtivoId === window.currentAlbumOpenId && !audio.paused ? 'active' : ''}" onclick="tocar(${i}, false)"></i>
                         </div>
                     </div>`).join('')}`;
@@ -227,7 +217,6 @@
         }
 
         function togglePlay() { audio.paused ? audio.play() : audio.pause(); atualizarUI(); }
-        
         function abrirNowPlaying() {
             const m = window.listaTocando[window.musicaIndex];
             document.getElementById('npArt').src = window.capaAtiva.replace('100x100', '600x600');
