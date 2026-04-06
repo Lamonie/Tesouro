@@ -6,61 +6,100 @@
     <title>LAMONIÊ FLOW</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --primary: #94b3ce; --bg: #000000; --text-main: #ffffff; --player-bg: rgba(40, 40, 40, 0.85); --playing-color: #ffff00; }
-        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-        body, html { width: 100%; height: 100%; background: var(--bg); color: var(--text-main); font-family: -apple-system, sans-serif; }
+        :root { --primary: #94b3ce; --bg: #000000; --text-main: #ffffff; --player-bg: rgba(45, 45, 45, 0.8); --playing-color: #ffff00; }
         
-        header { padding: 25px 15px 10px; }
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        
+        /* FUNDO ANIMADO SUAVE */
+        body { 
+            background: var(--bg); 
+            color: var(--text-main); 
+            font-family: -apple-system, sans-serif;
+            position: relative;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(45deg, #000, #1a1a2e, #000, #0a192f);
+            background-size: 400% 400%;
+            z-index: -1;
+            animation: gradientBG 15s ease infinite;
+            opacity: 0.6;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        header { padding: 25px 15px 10px; position: relative; z-index: 10; }
         header h1 { color: var(--primary); font-size: 26px; font-weight: 900; letter-spacing: -1px; }
 
-        /* BOTÕES DE GÊNERO ESTILO VIDRO IPHONE */
-        .categories-nav { display: flex; overflow-x: auto; padding: 10px 15px; gap: 10px; sticky: top; }
+        /* BOTÕES DE GÊNERO VIDRO */
+        .categories-nav { display: flex; overflow-x: auto; padding: 10px 15px; gap: 10px; position: relative; z-index: 10; }
         .categories-nav::-webkit-scrollbar { display: none; }
         .cat-btn { 
-            background: rgba(255, 255, 255, 0.1); 
-            backdrop-filter: blur(10px); 
-            -webkit-backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.08); 
+            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
             border: 1px solid rgba(255, 255, 255, 0.1);
             color: white; padding: 10px 22px; border-radius: 20px; 
             font-size: 13px; font-weight: 600; flex-shrink: 0; cursor: pointer;
-            transition: 0.3s;
         }
-        .cat-btn.active { background: var(--primary); color: #000; border-color: var(--primary); }
+        .cat-btn.active { background: var(--primary); color: #000; }
 
-        .search-container { padding: 15px; }
-        .search-box { display: flex; background: #1c1c1e; border-radius: 12px; border: 1px solid #333; align-items: center; }
-        .search-box input { background: none; border: none; color: white; flex: 1; padding: 14px; outline: none; font-size: 14px; }
+        /* BUSCA COM LUPA */
+        .search-container { padding: 15px; position: relative; z-index: 10; }
+        .search-box { 
+            display: flex; background: rgba(255, 255, 255, 0.05); 
+            border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); 
+            align-items: center; padding: 0 15px; backdrop-filter: blur(10px);
+        }
+        .search-box i { color: #8e8e93; font-size: 16px; }
+        .search-box input { 
+            background: none; border: none; color: white; flex: 1; 
+            padding: 14px 10px; outline: none; font-size: 14px; 
+        }
         
-        .main-grid { display: flex; flex-wrap: wrap; justify-content: space-between; padding: 10px 15px 160px; }
-        .card { width: 47%; background: #1c1c1e; border-radius: 14px; padding: 8px; margin-bottom: 18px; border: 1px solid #2c2c2e; cursor: pointer; }
+        .main-grid { display: flex; flex-wrap: wrap; justify-content: space-between; padding: 10px 15px 160px; position: relative; z-index: 5; }
+        .card { width: 47%; background: rgba(28, 28, 30, 0.6); border-radius: 14px; padding: 8px; margin-bottom: 18px; border: 1px solid rgba(255,255,255,0.05); backdrop-filter: blur(5px); }
         .card img { width: 100%; aspect-ratio: 1/1; border-radius: 10px; object-fit: cover; }
 
-        /* BARRA APPLE MUSIC - SUMIR AO ROLAR EM QUALQUER LUGAR */
+        /* BARRA PLAYER - BOTÕES AFASTADOS */
         .player { 
             position: fixed; bottom: 30px; left: 15px; right: 15px; 
             background: var(--player-bg); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); 
-            padding: 10px 15px; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.1); 
-            z-index: 10002; transition: opacity 0.3s ease, transform 0.3s ease; box-shadow: 0 8px 30px rgba(0,0,0,0.8);
-            cursor: pointer;
+            padding: 10px 18px; border-radius: 22px; border: 1px solid rgba(255, 255, 255, 0.15); 
+            z-index: 10002; transition: opacity 0.3s, transform 0.3s; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
-        .player.scrolling { opacity: 0; transform: translateY(30px); pointer-events: none; }
+        .player.scrolling { opacity: 0; transform: translateY(35px); pointer-events: none; }
 
-        .player-controls { display: flex; align-items: center; gap: 12px; }
-        .mini-art { width: 45px; height: 45px; border-radius: 8px; object-fit: cover; }
-        .time-display { font-size: 10px; color: #aaa; margin-top: 2px; font-family: monospace; }
-        .play-trigger { background: none; border: none; color: var(--playing-color); font-size: 26px; cursor: pointer; }
-
-        /* PÁGINA DO ÁLBUM */
-        .full-page { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 10001; display: none; flex-direction: column; overflow-y: auto; }
-        .btn-voltar { margin: 15px; background: var(--primary); border: none; color: #000; padding: 10px 20px; border-radius: 30px; font-weight: 800; cursor: pointer; width: fit-content; }
+        .player-controls { display: flex; align-items: center; gap: 15px; }
+        .mini-art { width: 48px; height: 48px; border-radius: 8px; object-fit: cover; }
+        .time-display { font-size: 10px; color: #bbb; margin-top: 2px; }
         
-        .track-row { display: flex; align-items: center; padding: 16px; border-bottom: 1px solid #1c1c1e; }
+        /* Espaçamento extra entre botões */
+        .player-actions { display: flex; align-items: center; gap: 25px; margin-left: 5px; }
+        .play-trigger { background: none; border: none; color: var(--playing-color); font-size: 28px; cursor: pointer; }
+
+        /* PÁGINA DO ÁLBUM COM FUNDO ANIMADO TAMBÉM */
+        .full-page { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.8); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            z-index: 10001; display: none; flex-direction: column; overflow-y: auto; 
+        }
+        .btn-voltar { margin: 15px; background: var(--primary); border: none; color: #000; padding: 10px 22px; border-radius: 30px; font-weight: 800; }
+        
+        .track-row { display: flex; align-items: center; padding: 16px; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .track-row.playing .track-title { color: #007bff !important; font-weight: bold; }
         .track-row.playing .track-play-icon { color: var(--playing-color) !important; }
-        .track-play-icon { font-size: 20px; color: #48484a; margin-left: auto; }
-        .download-btn { color: #8e8e93; font-size: 18px; padding: 10px; margin-left: 10px; cursor: pointer; }
-
-        .album-meta { background: #1c1c1e; margin: 10px 15px; padding: 15px; border-radius: 12px; font-size: 12px; color: #8e8e93; text-align: center; border: 1px solid #2c2c2e; line-height: 1.5; }
+        
+        .album-meta { background: rgba(255,255,255,0.05); margin: 10px 15px; padding: 18px; border-radius: 15px; font-size: 12px; color: #aaa; text-align: center; border: 1px solid rgba(255,255,255,0.1); }
         .album-meta b { color: #fff; }
     </style>
 </head>
@@ -68,7 +107,12 @@
 
     <header><h1>LAMONIÊ FLOW</h1></header>
     <div class="categories-nav" id="catNav"></div>
-    <div class="search-container"><div class="search-box"><input type="text" id="searchInput" placeholder="O que vamos ouvir hoje?"></div></div>
+    <div class="search-container">
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchInput" placeholder="O que vamos ouvir hoje?">
+        </div>
+    </div>
     
     <div id="grid" class="main-grid"></div>
 
@@ -79,8 +123,10 @@
                 <div style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-weight:bold; font-size:14px;" id="trackTitle">Música</div>
                 <div id="timeInfo" class="time-display">0:00 / 0:00</div>
             </div>
-            <button onclick="event.stopPropagation(); togglePlay();" id="playBtn" class="play-trigger"><i class="fas fa-pause"></i></button>
-            <i class="fas fa-step-forward" style="color:white; font-size:20px;" onclick="event.stopPropagation(); proxima();"></i>
+            <div class="player-actions">
+                <button onclick="event.stopPropagation(); togglePlay();" id="playBtn" class="play-trigger"><i class="fas fa-pause"></i></button>
+                <i class="fas fa-step-forward" style="color:white; font-size:22px;" onclick="event.stopPropagation(); proxima();"></i>
+            </div>
         </div>
     </footer>
 
@@ -97,7 +143,6 @@
         const albumPage = document.getElementById('albumPage');
         let scrollTimeout;
 
-        // SUMIR AO ROLAR (Em qualquer tela)
         function aplicarEfeitoScroll(elemento) {
             elemento.addEventListener('scroll', () => {
                 playerBar.classList.add('scrolling');
@@ -105,8 +150,8 @@
                 scrollTimeout = setTimeout(() => playerBar.classList.remove('scrolling'), 600);
             });
         }
-        aplicarEfeitoScroll(window); // Tela de início
-        aplicarEfeitoScroll(albumPage); // Tela do álbum
+        aplicarEfeitoScroll(window);
+        aplicarEfeitoScroll(albumPage);
 
         audio.ontimeupdate = () => {
             const current = formatTime(audio.currentTime);
@@ -123,8 +168,7 @@
 
         function voltarParaAlbumAtivo() { if (window.albumAtivoId) albumPage.style.display = 'flex'; }
 
-        // CARREGAR GÊNEROS E ÁLBUNS (400+)
-        const generos = ["Início", "Forró", "Vaquejada", "Piseiro", "Sertanejo", "Brega", "Arrocha", "Pagode", "Axé", "Gospel", "MPB"];
+        const generos = ["Início", "Forró", "Vaquejada", "Piseiro", "Sertanejo", "Brega", "Arrocha", "Pagode", "Gospel"];
         document.getElementById('catNav').innerHTML = generos.map(g => `<button class="cat-btn" onclick="carregarPorGenero('${g}')">${g}</button>`).join('');
 
         async function carregarPorGenero(g) {
@@ -132,11 +176,7 @@
             const termo = g === "Início" ? "Luiz Gonzaga" : g;
             const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(termo)}&entity=album&limit=100`);
             const data = await res.json();
-            renderizarGrid(data.results);
-        }
-
-        function renderizarGrid(albuns) {
-            document.getElementById('grid').innerHTML = albuns.map(t => `
+            document.getElementById('grid').innerHTML = data.results.map(t => `
                 <div class="card" onclick="abrirAlbum('${t.collectionId}', '${t.artworkUrl100}')">
                     <img src="${t.artworkUrl100.replace('100x100', '400x400')}">
                     <p style="margin-top:8px; font-weight:bold; font-size:12px; height:30px; overflow:hidden;">${t.collectionName}</p>
@@ -150,13 +190,12 @@
             const data = await res.json();
             const album = data.results[0];
             const songs = data.results.slice(1);
-            window.listaAtual = songs;
-            window.capaAtual = art;
+            window.listaAtual = songs; window.capaAtual = art;
 
             document.getElementById('albumDetailContent').innerHTML = `
-                <div style="text-align:center; padding:20px;">
-                    <img src="${art.replace('100x100', '600x600')}" style="width:220px; border-radius:15px; box-shadow: 0 10px 30px rgba(0,0,0,0.6);">
-                    <h2 style="margin-top:20px; font-size:22px;">${album.collectionName}</h2>
+                <div style="text-align:center; padding:25px;">
+                    <img src="${art.replace('100x100', '600x600')}" style="width:230px; border-radius:18px; box-shadow: 0 15px 35px rgba(0,0,0,0.7);">
+                    <h2 style="margin-top:20px; font-size:24px;">${album.collectionName}</h2>
                     <p style="color:var(--primary); font-weight:bold;">${album.artistName}</p>
                 </div>
                 <div class="album-meta">
@@ -166,12 +205,12 @@
                 </div>
                 ${songs.map((m, i) => `
                     <div class="track-row" id="track_${i}" onclick="tocar(${i})">
-                        <span style="color:#444; width:20px; font-size:12px;">${i+1}</span>
+                        <span style="color:#666; width:25px; font-size:12px;">${i+1}</span>
                         <div style="flex:1; margin-left:12px; overflow:hidden;">
-                            <div class="track-title" style="font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${m.trackName}</div>
-                            <div style="font-size:11px; color:#666">${m.artistName}</div>
+                            <div class="track-title" style="font-size:14px; color:white; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${m.trackName}</div>
+                            <div style="font-size:11px; color:#777">${m.artistName}</div>
                         </div>
-                        <i class="fas fa-download download-btn" onclick="event.stopPropagation(); baixarMusica('${m.previewUrl}', '${m.trackName}')"></i>
+                        <i class="fas fa-download" style="color:#8e8e93; font-size:18px; padding:10px;" onclick="event.stopPropagation(); baixarMusica('${m.previewUrl}', '${m.trackName}')"></i>
                         <i class="fas fa-play-circle track-play-icon" id="icon_${i}"></i>
                     </div>`).join('')}<div style="height:150px;"></div>`;
             atualizarUI();
@@ -180,8 +219,7 @@
         function tocar(index) {
             window.musicaIndex = index;
             const m = window.listaAtual[index];
-            audio.src = m.previewUrl;
-            audio.play();
+            audio.src = m.previewUrl; audio.play();
             playerBar.style.display = 'block';
             document.getElementById('playerArt').src = window.capaAtual;
             document.getElementById('trackTitle').innerText = m.trackName;
@@ -193,8 +231,7 @@
             const blob = await res.blob();
             const link = document.createElement('a');
             link.href = window.URL.createObjectURL(blob);
-            link.download = `${nome}.mp3`;
-            link.click();
+            link.download = `${nome}.mp3`; link.click();
         }
 
         function togglePlay() { audio.paused ? audio.play() : audio.pause(); atualizarUI(); }
