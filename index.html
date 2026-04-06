@@ -18,17 +18,9 @@
         .cat-btn.active { background: var(--primary); color: #000; }
 
         .search-container { padding: 15px; }
-        .search-box { display: flex; background: #1c1c1e; border-radius: 12px; border: 1px solid #333; align-items: center; position: relative; }
-        .search-box input { background: none; border: none; color: white; flex: 1; padding: 14px 85px 14px 14px; outline: none; font-size: 14px; }
+        .search-box { display: flex; background: #1c1c1e; border-radius: 12px; border: 1px solid #333; align-items: center; }
+        .search-box input { background: none; border: none; color: white; flex: 1; padding: 14px; outline: none; font-size: 14px; }
         
-        .search-controls { display: flex; align-items: center; gap: 10px; padding-right: 10px; }
-        .mic-btn { color: var(--primary); cursor: pointer; font-size: 18px; padding: 5px; }
-        .mic-btn.active { color: #ff3b30; animation: pulse 1.5s infinite; }
-        .clear-btn { color: #8e8e93; cursor: pointer; display: none; font-size: 18px; }
-        .search-btn { background: none; border: none; color: #8e8e93; cursor: pointer; font-size: 18px; }
-
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
-
         .main-grid { display: flex; flex-wrap: wrap; justify-content: space-between; padding: 10px 15px 160px; }
         .card { width: 47%; background: #1c1c1e; border-radius: 14px; padding: 8px; margin-bottom: 18px; border: 1px solid #2c2c2e; cursor: pointer; }
         .card img { width: 100%; aspect-ratio: 1/1; border-radius: 10px; object-fit: cover; }
@@ -37,32 +29,24 @@
         .full-page { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; display: none; flex-direction: column; overflow-y: auto; }
         .btn-voltar { margin: 15px; background: var(--primary); border: none; color: #000; padding: 10px 20px; border-radius: 30px; font-weight: 800; cursor: pointer; width: fit-content; }
         
+        .album-info-box { background: #1c1c1e; margin: 15px; padding: 15px; border-radius: 10px; font-size: 12px; color: #8e8e93; line-height: 1.5; text-align: center; }
+        .album-info-box b { color: #fff; }
+
         .track-row { display: flex; align-items: center; padding: 16px; border-bottom: 1px solid #1c1c1e; cursor: pointer; }
         .track-row.playing .track-title { color: var(--primary) !important; font-weight: bold; }
-        .track-play-icon { color: #48484a; font-size: 20px; margin-left: auto; padding: 10px; transition: 0.2s; }
+        .track-play-icon { color: #48484a; font-size: 20px; margin-left: auto; transition: 0.2s; }
         .track-row.playing .track-play-icon { color: var(--primary) !important; }
 
-        .player { 
-            position: fixed; 
-            bottom: 0; 
-            width: 100%; 
-            background: var(--player-bg); 
-            backdrop-filter: blur(20px); 
-            -webkit-backdrop-filter: blur(20px); 
-            padding: 5px 15px 30px; 
-            border-top: 1px solid rgba(255, 255, 255, 0.1); 
-            z-index: 10001; 
-            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); 
-        }
-        .player.minimized { transform: translateY(calc(100% - 45px)); } 
-        .handle-area { width: 100%; height: 30px; display: flex; justify-content: center; align-items: center; cursor: pointer; margin-bottom: 5px; }
-        .handle { width: 40px; height: 4px; background: rgba(255, 255, 255, 0.3); border-radius: 10px; }
+        .player { position: fixed; bottom: 0; width: 100%; background: var(--player-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); padding: 5px 15px 30px; border-top: 1px solid rgba(255,255,255,0.1); z-index: 10001; transition: 0.5s; }
+        .player.minimized { transform: translateY(calc(100% - 45px)); }
+        .handle-area { width: 100%; height: 30px; display: flex; justify-content: center; align-items: center; cursor: pointer; }
+        .handle { width: 40px; height: 4px; background: rgba(255,255,255,0.3); border-radius: 10px; }
         
         .player-controls { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-        .control-icon { color: #8e8e93; font-size: 22px; cursor: pointer; transition: 0.3s; }
-        .control-icon.active { color: var(--primary) !important; text-shadow: 0 0 10px var(--primary); }
+        .control-icon { color: #8e8e93; font-size: 22px; cursor: pointer; }
+        .control-icon.active { color: var(--primary) !important; }
         .play-trigger { background: var(--primary); border: none; width: 44px; height: 44px; border-radius: 50%; color: #000; font-size: 18px; display: flex; align-items: center; justify-content: center; }
-        #timeLabel { font-size: 11px; color: var(--primary); font-family: monospace; min-width: 75px; text-align: center; }
+        #timeLabel { font-size: 11px; color: var(--primary); min-width: 75px; text-align: center; font-family: monospace; }
     </style>
 </head>
 <body>
@@ -71,11 +55,7 @@
     <div class="search-container">
         <div class="search-box">
             <input type="text" id="searchInput" placeholder="O que você quer ouvir?" oninput="verificarInput()">
-            <div class="search-controls">
-                <i class="fas fa-microphone mic-btn" id="micBtn" onclick="comecarVoz()"></i>
-                <i class="fas fa-times-circle clear-btn" id="clearBtn" onclick="limparBusca()"></i>
-                <button class="search-btn" onclick="buscar()"><i class="fas fa-search"></i></button>
-            </div>
+            <i class="fas fa-microphone" id="micBtn" style="color:var(--primary); margin-right:15px; cursor:pointer;" onclick="comecarVoz()"></i>
         </div>
     </div>
     <div class="main-grid" id="grid"></div>
@@ -106,65 +86,35 @@
         const audio = document.getElementById('audioMain');
         const player = document.getElementById('player');
         const grid = document.getElementById('grid');
-        const searchInput = document.getElementById('searchInput');
-        const clearBtn = document.getElementById('clearBtn');
-        const micBtn = document.getElementById('micBtn');
         const repeatBtn = document.getElementById('repeatBtn');
         const timeLabel = document.getElementById('timeLabel');
-
+        
         let listaAtual = [];
         let musicaIndex = 0;
-        let albunsIniciaisFixos = []; // Aqui guardamos as 500 capas para sempre
+        let albunsIniciaisFixos = [];
 
-        const artistasIniciais = [
-            "Gleidson Gavião", "Gaviões do Forró", "Luiz Gonzaga", "Flávio José", 
-            "Dorgival Dantas", "Mastruz com Leite", "Zezé Di Camargo", "Reginaldo Rossi",
-            "Toca do Vale", "Limão com Mel", "Calcinha Preta", "Elba Ramalho"
-        ];
+        const artistasIniciais = ["Gleidson Gavião", "Gaviões do Forró", "Luiz Gonzaga", "Flávio José", "Mastruz com Leite", "Toca do Vale"];
 
         function carregarGeneros() {
-            // "Início" em vez de "Destaques"
-            document.getElementById('catNav').innerHTML = ["Início", "Forró", "Vaquejada", "Piseiro", "Sertanejo", "Arrocha", "Brega", "Pagode", "Axé", "MPB", "Gospel"].map(g => 
+            document.getElementById('catNav').innerHTML = ["Início", "Forró", "Vaquejada", "Piseiro", "Sertanejo", "Brega"].map(g => 
                 `<button class="cat-btn ${g==='Início'?'active':''}" onclick="gerenciarFiltro(this, '${g}')">${g}</button>`
             ).join('');
         }
 
         async function carregarAlbuns(termo = "") {
-            // Se for Início e já tivermos os álbuns, apenas mostra sem buscar de novo
             if ((termo === "" || termo === "Início") && albunsIniciaisFixos.length > 0) {
                 renderizarGrid(albunsIniciaisFixos);
                 return;
             }
-
-            grid.innerHTML = "<p style='padding:20px;'>Carregando sua coleção...</p>";
-
-            if (termo === "" || termo === "Início") {
-                const promessas = artistasIniciais.map(a => 
-                    fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(a)}&entity=album&limit=60`).then(r => r.json())
-                );
-                const resultados = await Promise.all(promessas);
-                let todosAlbuns = resultados.flatMap(data => data.results);
-                
-                // Filtra e embaralha só na primeira vez que abre o app
-                albunsIniciaisFixos = Array.from(new Set(todosAlbuns.map(a => a.collectionId)))
-                    .map(id => todosAlbuns.find(a => a.collectionId === id))
-                    .sort(() => Math.random() - 0.5);
-                
-                renderizarGrid(albunsIniciaisFixos);
-                return;
-            }
-
-            // Busca normal para gêneros e pesquisa
-            const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(termo)}&entity=album&limit=200`);
+            grid.innerHTML = "<p style='padding:20px;'>Carregando...</p>";
+            const busca = (termo === "" || termo === "Início") ? artistasIniciais.join(' ') : termo;
+            const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(busca)}&entity=album&limit=100`);
             const data = await res.json();
+            if (termo === "" || termo === "Início") albunsIniciaisFixos = data.results;
             renderizarGrid(data.results);
         }
 
         function renderizarGrid(albuns) {
-            if (!albuns || albuns.length === 0) {
-                grid.innerHTML = "<p style='padding:20px;'>Nenhum álbum encontrado.</p>";
-                return;
-            }
             grid.innerHTML = albuns.map(t => `
                 <div class="card" onclick="abrirAlbum('${t.collectionId}')">
                     <img src="${t.artworkUrl100.replace('100x100', '400x400')}">
@@ -173,60 +123,43 @@
             `).join('');
         }
 
-        function gerenciarFiltro(btn, g) {
-            document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            carregarAlbuns(g);
-        }
-
-        function comecarVoz() {
-            window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (window.SpeechRecognition) {
-                const recognition = new SpeechRecognition();
-                recognition.lang = 'pt-BR';
-                recognition.onstart = () => micBtn.classList.add('active');
-                recognition.onend = () => micBtn.classList.remove('active');
-                recognition.onresult = (e) => {
-                    searchInput.value = e.results[0][0].transcript;
-                    buscar();
-                };
-                recognition.start();
-            }
-        }
-
-        function verificarInput() { clearBtn.style.display = searchInput.value.length > 0 ? 'block' : 'none'; }
-        function limparBusca() { searchInput.value = ''; verificarInput(); searchInput.focus(); }
-        function buscar() { if (searchInput.value.trim() !== "") { carregarAlbuns(searchInput.value); document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active')); } }
-
         async function abrirAlbum(id) {
-            document.getElementById('albumPage').style.display = 'flex';
             const res = await fetch(`https://itunes.apple.com/lookup?id=${id}&entity=song`);
             const data = await res.json();
             const album = data.results[0];
             listaAtual = data.results.slice(1);
+            const ano = new Date(album.releaseDate).getFullYear();
+            
+            document.getElementById('albumPage').style.display = 'flex';
             document.getElementById('albumDetailContent').innerHTML = `
-                <div style="text-align:center; padding:30px 20px;">
-                    <img src="${album.artworkUrl100.replace('100x100', '600x600')}" style="width:260px; border-radius:15px;">
-                    <h2 style="margin-top:20px;">${album.collectionName}</h2>
+                <div style="text-align:center; padding:20px;">
+                    <img src="${album.artworkUrl100.replace('100x100', '600x600')}" style="width:250px; border-radius:15px;">
+                    <h2 style="margin-top:15px;">${album.collectionName}</h2>
                     <p style="color:var(--primary); font-weight:bold;">${album.artistName}</p>
+                </div>
+                <div class="album-info-box">
+                    <b>Lançamento:</b> ${ano} | <b>Gênero:</b> ${album.primaryGenreName}<br>
+                    <b>Gravadora:</b> ${album.copyright || 'Independente'}
                 </div>
                 ${listaAtual.map((m, i) => `
                     <div class="track-row" id="track_${i}" onclick="gerenciarPlay(${i})">
                         <span style="color:#48484a; width:30px; font-size:12px;">${i+1}</span>
                         <div style="flex:1;">
                             <div class="track-title" style="font-size:14px; color:white;">${m.trackName}</div>
-                            <div style="font-size:11px; color:#8e8e93;">${m.artistName}</div>
+                            <div style="font-size:11px; color:#8e8e93;">Compositor: ${m.artistName}</div>
                         </div>
                         <i class="fas fa-play-circle track-play-icon" id="icon_${i}"></i>
                     </div>
                 `).join('')}
-                <div style="height:180px;"></div>
+                <div style="height:150px;"></div>
             `;
             atualizarTrackPlaying();
         }
 
-        function gerenciarPlay(index) { if (musicaIndex === index && !audio.paused) { togglePlay(); } else { tocar(index); } }
-        
+        function gerenciarPlay(index) {
+            if (musicaIndex === index && !audio.paused) { togglePlay(); } else { tocar(index); }
+        }
+
         function tocar(index) {
             musicaIndex = index;
             const m = listaAtual[musicaIndex];
@@ -240,40 +173,44 @@
             atualizarTrackPlaying();
         }
 
-        function toggleRepeat() { repeatBtn.classList.toggle('active'); }
-
-        audio.onended = function() {
-            if (repeatBtn.classList.contains('active')) {
-                audio.currentTime = 0;
-                audio.play();
-            } else {
-                if (musicaIndex + 1 < listaAtual.length) {
-                    tocar(musicaIndex + 1);
-                }
-            }
-        };
-
         function atualizarTrackPlaying() {
             document.querySelectorAll('.track-row').forEach(row => row.classList.remove('playing'));
-            document.querySelectorAll('.track-play-icon').forEach(icon => { icon.classList.remove('fa-pause-circle'); icon.classList.add('fa-play-circle'); });
+            document.querySelectorAll('.track-play-icon').forEach(icon => {
+                icon.classList.remove('fa-pause-circle');
+                icon.classList.add('fa-play-circle');
+            });
             const currentTrackRow = document.getElementById(`track_${musicaIndex}`);
             const currentIcon = document.getElementById(`icon_${musicaIndex}`);
             if (currentTrackRow) currentTrackRow.classList.add('playing');
-            if (currentIcon && !audio.paused) { currentIcon.classList.remove('fa-play-circle'); currentIcon.classList.add('fa-pause-circle'); }
+            if (currentIcon && !audio.paused) {
+                currentIcon.classList.remove('fa-play-circle');
+                currentIcon.classList.add('fa-pause-circle');
+            }
         }
 
-        function togglePlay() { if(audio.paused) { audio.play(); document.getElementById('playBtn').innerHTML = '<i class="fas fa-pause"></i>'; } else { audio.pause(); document.getElementById('playBtn').innerHTML = '<i class="fas fa-play"></i>'; } atualizarTrackPlaying(); }
-        function fecharPagina() { document.getElementById('albumPage').style.display = 'none'; }
-        function togglePlayer() { player.classList.toggle('minimized'); }
-
-        audio.ontimeupdate = function() {
-            const curMins = Math.floor(audio.currentTime / 60);
-            const curSecs = Math.floor(audio.currentTime - curMins * 60);
-            timeLabel.innerText = `${curMins}:${curSecs < 10 ? '0' : ''}${curSecs} / 0:30`;
+        audio.onended = () => {
+            if (repeatBtn.classList.contains('active')) {
+                audio.currentTime = 0; audio.play();
+            } else if (musicaIndex + 1 < listaAtual.length) {
+                tocar(musicaIndex + 1);
+            }
         };
 
-        carregarGeneros();
-        carregarAlbuns(""); 
+        function toggleRepeat() { repeatBtn.classList.toggle('active'); }
+        function togglePlay() { audio.paused ? audio.play() : audio.pause(); atualizarTrackPlaying(); }
+        function fecharPagina() { document.getElementById('albumPage').style.display = 'none'; }
+        function togglePlayer() { player.classList.toggle('minimized'); }
+        function gerenciarFiltro(btn, g) { 
+            document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active'); carregarAlbuns(g); 
+        }
+
+        audio.ontimeupdate = () => {
+            const cur = Math.floor(audio.currentTime);
+            timeLabel.innerText = `0:${cur < 10 ? '0' : ''}${cur} / 0:30`;
+        };
+
+        carregarGeneros(); carregarAlbuns("");
     </script>
 </body>
 </html>
