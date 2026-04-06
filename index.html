@@ -12,6 +12,7 @@
         header { padding: 25px 15px 10px; }
         header h1 { color: var(--primary); font-size: 26px; font-weight: 900; letter-spacing: -1px; }
         .categories-nav { display: flex; overflow-x: auto; padding: 10px 15px; gap: 8px; border-bottom: 1px solid #1c1c1e; }
+        .categories-nav::-webkit-scrollbar { display: none; }
         .cat-btn { background: #1c1c1e; border: none; color: white; padding: 10px 20px; border-radius: 25px; font-size: 13px; font-weight: 600; flex-shrink: 0; cursor: pointer; }
         .cat-btn.active { background: var(--primary); color: #000; }
         .search-container { padding: 15px; }
@@ -93,8 +94,10 @@
         let albunsIniciaisFixos = [];
         const artistasIniciais = ["Gleidson Gavião", "Gaviões do Forró", "Luiz Gonzaga", "Flávio José", "Mastruz com Leite", "Zezé Di Camargo", "Toca do Vale", "Limão com Mel"];
 
+        // LISTA DE GÊNEROS AMPLIADA COMO SOLICITADO
         function carregarGeneros() {
-            document.getElementById('catNav').innerHTML = ["Início", "Forró", "Vaquejada", "Piseiro", "Sertanejo", "Brega", "Pagode"].map(g => 
+            const generos = ["Início", "Forró", "Vaquejada", "Piseiro", "Sertanejo", "Brega", "Arrocha", "Pagode", "Axé", "Gospel", "MPB", "Forró das Antigas", "Banda de Baile", "Xote", "Baião", "Pop"];
+            document.getElementById('catNav').innerHTML = generos.map(g => 
                 `<button class="cat-btn ${g==='Início'?'active':''}" onclick="gerenciarFiltro(this, '${g}')">${g}</button>`
             ).join('');
         }
