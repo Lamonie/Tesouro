@@ -10,21 +10,14 @@
         
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         
-        /* ALTERAÇÃO: Fundo da tela de início totalmente preto */
         body { background: #000000; color: var(--text-main); font-family: -apple-system, sans-serif; min-height: 100vh; overflow-x: hidden; }
-
-        /* Removido o efeito aurora para manter o preto sólido */
-        body::before {
-            content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #000000; z-index: -1;
-        }
+        body::before { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000000; z-index: -1; }
 
         header { padding: 30px 20px 15px; background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.1); }
         header h1 { color: var(--primary); font-size: 28px; font-weight: 900; }
 
         .categories-nav { display: flex; overflow-x: auto; padding: 15px; gap: 12px; }
-        .cat-btn { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); color: white; padding: 12px 25px; border-radius: 25px; font-size: 14px; font-weight: 600; flex-shrink: 0; transition: transform 0.1s; }
-        .cat-btn.active { background: var(--primary); color: #000; }
+        .cat-btn { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); color: white; padding: 12px 25px; border-radius: 25px; font-size: 14px; font-weight: 600; flex-shrink: 0; }
 
         .search-container { padding: 10px 15px; }
         .search-box { display: flex; background: rgba(255, 255, 255, 0.07); border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); align-items: center; padding: 0 15px; }
@@ -34,6 +27,7 @@
         .card { width: 47%; background: rgba(255,255,255,0.04); border-radius: 15px; padding: 8px; margin-bottom: 20px; }
         .card img { width: 100%; aspect-ratio: 1/1; border-radius: 12px; object-fit: cover; }
 
+        /* MINI PLAYER INFERIOR */
         .player { 
             position: fixed; bottom: 35px; left: 15px; right: 15px; 
             background: var(--player-bg); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); 
@@ -41,18 +35,33 @@
             z-index: 10002; transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s;
         }
         .player-hidden { transform: translateY(120px); opacity: 0; }
-        .player-controls { display: flex; align-items: center; gap: 15px; }
-        .mini-art { width: 50px; height: 50px; border-radius: 10px; object-fit: cover; }
 
-        .full-page { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); backdrop-filter: blur(35px); -webkit-backdrop-filter: blur(35px); z-index: 10001; display: none; flex-direction: column; overflow-y: auto; }
-        .btn-voltar { margin: 15px; background: var(--primary); border: none; color: #000; padding: 12px 25px; border-radius: 35px; font-weight: 800; width: fit-content; }
+        /* TELAS CHEIAS (ÁLBUM E REPRODUÇÃO) */
+        .full-page { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 10001; display: none; flex-direction: column; overflow-y: auto; }
+        .now-playing-page { z-index: 10003; background: linear-gradient(to bottom, #1a1a1a, #000); }
+
+        .btn-voltar { margin: 15px; background: rgba(255,255,255,0.1); border: none; color: #fff; padding: 10px 20px; border-radius: 20px; font-weight: bold; width: fit-content; z-index: 10; }
         
         .track-row { display: flex; align-items: center; padding: 18px; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; }
         .track-row.is-playing .track-title { color: var(--active-song) !important; font-weight: bold; }
-        .track-row.is-playing .track-play-icon { color: var(--playing-color) !important; }
 
-        .album-meta { background: rgba(255,255,255,0.06); margin: 15px; padding: 20px; border-radius: 18px; font-size: 13px; color: #bbb; text-align: center; line-height: 1.6; }
-        .composer-name { font-size: 11px; color: #777; margin-top: 2px; }
+        .album-meta { background: rgba(255,255,255,0.06); margin: 15px; padding: 20px; border-radius: 18px; font-size: 13px; color: #bbb; text-align: center; }
+
+        /* ESTILO DA TELA DE REPRODUÇÃO IGUAL APPLE MUSIC */
+        .np-container { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 20px; }
+        .np-art { width: 85%; aspect-ratio: 1/1; border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); object-fit: cover; }
+        .np-info { width: 100%; text-align: left; padding: 40px 20px 10px; }
+        .np-title { font-size: 22px; font-weight: bold; margin-bottom: 5px; }
+        .np-artist { font-size: 18px; color: var(--active-song); }
+
+        .np-progress-area { width: 100%; padding: 20px; }
+        .np-slider { width: 100%; height: 5px; border-radius: 5px; -webkit-appearance: none; background: #333; outline: none; }
+        .np-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; border-radius: 50%; background: #fff; }
+        .np-time { display: flex; justify-content: space-between; font-size: 12px; color: #666; margin-top: 10px; }
+
+        .np-controls { display: flex; align-items: center; gap: 50px; margin-top: 20px; }
+        .np-btn { background: none; border: none; color: white; font-size: 35px; cursor: pointer; }
+        .np-btn-main { font-size: 60px; color: #fff; }
     </style>
 </head>
 <body>
@@ -70,7 +79,35 @@
     </div>
     <div id="grid" class="main-grid"></div>
 
-    <footer class="player" id="player" style="display:none;" onclick="voltarParaAlbumAtivo()">
+    <div id="albumPage" class="full-page">
+        <button class="btn-voltar" onclick="fecharPagina()">← VOLTAR</button>
+        <div id="albumDetailContent"></div>
+    </div>
+
+    <div id="nowPlayingPage" class="full-page now-playing-page">
+        <button class="btn-voltar" onclick="fecharNowPlaying()">↓ VOLTAR</button>
+        <div class="np-container">
+            <img id="npArt" class="np-art" src="">
+            <div class="np-info">
+                <div id="npTitle" class="np-title">Música</div>
+                <div id="npArtist" class="np-artist">Artista</div>
+            </div>
+            <div class="np-progress-area">
+                <input type="range" class="np-slider" id="npSlider" value="0" min="0" step="1">
+                <div class="np-time">
+                    <span id="npCurrent">0:00</span>
+                    <span id="npDuration">0:00</span>
+                </div>
+            </div>
+            <div class="np-controls">
+                <button class="np-btn" onclick="anterior()"><i class="fas fa-backward"></i></button>
+                <button class="np-btn np-btn-main" onclick="togglePlay()" id="npPlayBtn"><i class="fas fa-pause"></i></button>
+                <button class="np-btn" onclick="proxima()"><i class="fas fa-forward"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="player" id="player" style="display:none;" onclick="abrirNowPlaying()">
         <div class="player-controls">
             <img id="playerArt" src="" class="mini-art">
             <div style="flex:1; overflow:hidden;">
@@ -84,29 +121,20 @@
         </div>
     </footer>
 
-    <div id="albumPage" class="full-page">
-        <button class="btn-voltar" onclick="fecharPagina()">← VOLTAR</button>
-        <div id="albumDetailContent"></div>
-    </div>
-
     <audio id="audioMain"></audio>
 
     <script>
         const audio = document.getElementById('audioMain');
         const playerBar = document.getElementById('player');
         const albumPage = document.getElementById('albumPage');
+        const nowPlayingPage = document.getElementById('nowPlayingPage');
+        const npSlider = document.getElementById('npSlider');
 
         let lastScrollY = window.scrollY;
         window.addEventListener('scroll', () => {
             if (window.scrollY > lastScrollY && window.scrollY > 50) { playerBar.classList.add('player-hidden'); }
             else { playerBar.classList.remove('player-hidden'); }
             lastScrollY = window.scrollY;
-        });
-
-        albumPage.addEventListener('scroll', () => {
-            if (albumPage.scrollTop > lastScrollY && albumPage.scrollTop > 50) { playerBar.classList.add('player-hidden'); }
-            else { playerBar.classList.remove('player-hidden'); }
-            lastScrollY = albumPage.scrollTop;
         });
 
         function ativarMicrofone() {
@@ -127,16 +155,22 @@
         }
 
         audio.ontimeupdate = () => {
-            document.getElementById('timeInfo').innerText = `${formatTime(audio.currentTime)} / ${formatTime(audio.duration || 0)}`;
+            const cur = audio.currentTime;
+            const dur = audio.duration || 0;
+            document.getElementById('timeInfo').innerText = `${formatTime(cur)} / ${formatTime(dur)}`;
+            document.getElementById('npCurrent').innerText = formatTime(cur);
+            document.getElementById('npDuration').innerText = formatTime(dur);
+            npSlider.max = Math.floor(dur);
+            npSlider.value = Math.floor(cur);
             atualizarUI();
         };
+
+        npSlider.oninput = () => { audio.currentTime = npSlider.value; };
 
         function formatTime(s) {
             const min = Math.floor(s / 60); const seg = Math.floor(s % 60);
             return `${min}:${seg < 10 ? '0' : ''}${seg}`;
         }
-
-        function voltarParaAlbumAtivo() { if (window.albumAtivoId) abrirAlbum(window.albumAtivoId, window.capaAtiva); }
 
         const generos = ["Início", "Forró", "Vaquejada", "Piseiro", "Sertanejo", "Brega", "Arrocha"];
         document.getElementById('catNav').innerHTML = generos.map(g => `<button class="cat-btn" onclick="carregarPorGenero('${g}')">${g}</button>`).join('');
@@ -159,25 +193,16 @@
             const data = await res.json();
             const album = data.results[0]; const songs = data.results.slice(1);
             
-            const dataLancamento = new Date(album.releaseDate).toLocaleDateString('pt-BR');
-            const gravadora = album.copyright || "Independente";
-
             document.getElementById('albumDetailContent').innerHTML = `
                 <div style="text-align:center; padding:30px;"><img src="${art.replace('100x100', '600x600')}" style="width:250px; border-radius:20px;">
                 <h2 style="margin-top:25px;">${album.collectionName}</h2><p style="color:var(--primary);">${album.artistName}</p></div>
-                
-                <div class="album-meta">
-                    <b>Gênero:</b> ${album.primaryGenreName}<br>
-                    <b>Lançamento:</b> ${dataLancamento}<br>
-                    <b>Gravadora:</b> ${gravadora}
-                </div>
-
+                <div class="album-meta"><b>Gênero:</b> ${album.primaryGenreName}<br><b>Lançamento:</b> ${new Date(album.releaseDate).toLocaleDateString('pt-BR')}<br><b>Gravadora:</b> ${album.copyright || "Independente"}</div>
                 ${songs.map((m, i) => `
                     <div class="track-row" id="row_${id}_${i}" onclick="tocar('${id}', ${i}, '${art}')">
                         <span style="color:#777; width:30px;">${i+1}</span>
                         <div style="flex:1; margin-left:12px; overflow:hidden;">
                             <div class="track-title" style="font-size:15px; color:white;">${m.trackName}</div>
-                            <div class="composer-name">${m.artistName}</div>
+                            <div style="font-size:11px; color:#777; margin-top:2px;">${m.artistName}</div>
                         </div>
                         <div class="track-actions">
                             <i class="fas fa-download" style="color:#8e8e93; font-size:18px;" onclick="event.stopPropagation(); baixarMusica('${m.previewUrl}', '${m.trackName}')"></i>
@@ -190,37 +215,46 @@
 
         function tocar(albumId, index, art) {
             if (window.albumAtivoId === albumId && window.musicaIndex === index) {
-                togglePlay(); return;
+                abrirNowPlaying(); return;
             }
             window.albumAtivoId = albumId; window.musicaIndex = index;
             window.listaTocando = window.listaVisualizada; window.capaAtiva = art;
             const m = window.listaTocando[index];
             audio.src = m.previewUrl; audio.play();
+            
             playerBar.style.display = 'block';
-            playerBar.classList.remove('player-hidden');
             document.getElementById('playerArt').src = art;
             document.getElementById('trackTitle').innerText = m.trackName;
+            
+            abrirNowPlaying();
             atualizarUI();
         }
 
+        function abrirNowPlaying() {
+            const m = window.listaTocando[window.musicaIndex];
+            document.getElementById('npArt').src = window.capaAtiva.replace('100x100', '600x600');
+            document.getElementById('npTitle').innerText = m.trackName;
+            document.getElementById('npArtist').innerText = m.artistName;
+            nowPlayingPage.style.display = 'flex';
+        }
+
+        function fecharNowPlaying() { nowPlayingPage.style.display = 'none'; }
+        function fecharPagina() { albumPage.style.display = 'none'; }
+
         function atualizarUI() {
             document.querySelectorAll('.track-row').forEach(r => r.classList.remove('is-playing'));
-            document.querySelectorAll('.track-play-icon').forEach(ic => {
-                ic.className = 'fas fa-play-circle track-play-icon';
-                ic.style.color = 'white';
-            });
-
             if (window.albumVisualizadoId === window.albumAtivoId) {
                 const row = document.getElementById(`row_${window.albumAtivoId}_${window.musicaIndex}`);
-                const icon = document.getElementById(`btn_list_${window.albumAtivoId}_${window.musicaIndex}`);
                 if(row) row.classList.add('is-playing');
-                if(icon) {
-                    icon.className = audio.paused ? 'fas fa-play-circle track-play-icon' : 'fas fa-pause-circle track-play-icon';
-                    icon.style.color = 'var(--playing-color)';
-                }
             }
-            document.getElementById('playBtn').innerHTML = audio.paused ? '<i class="fas fa-play"></i>' : '<i class="fas fa-pause"></i>';
+            const icon = audio.paused ? '<i class="fas fa-play"></i>' : '<i class="fas fa-pause"></i>';
+            document.getElementById('playBtn').innerHTML = icon;
+            document.getElementById('npPlayBtn').innerHTML = icon;
         }
+
+        function togglePlay() { audio.paused ? audio.play() : audio.pause(); atualizarUI(); }
+        function proxima() { if(window.musicaIndex + 1 < window.listaTocando.length) tocar(window.albumAtivoId, window.musicaIndex + 1, window.capaAtiva); }
+        function anterior() { if(window.musicaIndex - 1 >= 0) tocar(window.albumAtivoId, window.musicaIndex - 1, window.capaAtiva); }
 
         async function baixarMusica(url, nome) {
             const res = await fetch(url); const blob = await res.blob();
@@ -228,9 +262,6 @@
             link.download = `${nome}.mp3`; link.click();
         }
 
-        function togglePlay() { audio.paused ? audio.play() : audio.pause(); atualizarUI(); }
-        function proxima() { if(window.musicaIndex + 1 < window.listaTocando.length) tocar(window.albumAtivoId, window.musicaIndex + 1, window.capaAtiva); }
-        function fecharPagina() { albumPage.style.display = 'none'; }
         carregarPorGenero("Início");
     </script>
 </body>
