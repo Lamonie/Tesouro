@@ -114,7 +114,7 @@
 
         let listaAtual = [];
         let musicaIndex = 0;
-        let albunsDestaqueFixos = [];
+        let albunsIniciaisFixos = []; // Aqui guardamos as 500 capas para sempre
 
         const artistasIniciais = [
             "Gleidson Gavião", "Gaviões do Forró", "Luiz Gonzaga", "Flávio José", 
@@ -123,36 +123,48 @@
         ];
 
         function carregarGeneros() {
-            document.getElementById('catNav').innerHTML = ["Destaques", "Forró", "Vaquejada", "Piseiro", "Sertanejo", "Arrocha", "Brega", "Pagode", "Axé", "MPB", "Gospel"].map(g => 
-                `<button class="cat-btn ${g==='Destaques'?'active':''}" onclick="gerenciarFiltro(this, '${g}')">${g}</button>`
+            // "Início" em vez de "Destaques"
+            document.getElementById('catNav').innerHTML = ["Início", "Forró", "Vaquejada", "Piseiro", "Sertanejo", "Arrocha", "Brega", "Pagode", "Axé", "MPB", "Gospel"].map(g => 
+                `<button class="cat-btn ${g==='Início'?'active':''}" onclick="gerenciarFiltro(this, '${g}')">${g}</button>`
             ).join('');
         }
 
         async function carregarAlbuns(termo = "") {
-            if ((termo === "" || termo === "Destaques") && albunsDestaqueFixos.length > 0) {
-                renderizarGrid(albunsDestaqueFixos);
+            // Se for Início e já tivermos os álbuns, apenas mostra sem buscar de novo
+            if ((termo === "" || termo === "Início") && albunsIniciaisFixos.length > 0) {
+                renderizarGrid(albunsIniciaisFixos);
                 return;
             }
-            grid.innerHTML = "<p style='padding:20px;'>Preparando sucessos...</p>";
-            if (termo === "" || termo === "Destaques") {
+
+            grid.innerHTML = "<p style='padding:20px;'>Carregando sua coleção...</p>";
+
+            if (termo === "" || termo === "Início") {
                 const promessas = artistasIniciais.map(a => 
                     fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(a)}&entity=album&limit=60`).then(r => r.json())
                 );
                 const resultados = await Promise.all(promessas);
                 let todosAlbuns = resultados.flatMap(data => data.results);
-                const albunsUnicos = Array.from(new Set(todosAlbuns.map(a => a.collectionId)))
+                
+                // Filtra e embaralha só na primeira vez que abre o app
+                albunsIniciaisFixos = Array.from(new Set(todosAlbuns.map(a => a.collectionId)))
                     .map(id => todosAlbuns.find(a => a.collectionId === id))
                     .sort(() => Math.random() - 0.5);
-                albunsDestaqueFixos = albunsUnicos;
-                renderizarGrid(albunsDestaqueFixos);
+                
+                renderizarGrid(albunsIniciaisFixos);
                 return;
             }
+
+            // Busca normal para gêneros e pesquisa
             const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(termo)}&entity=album&limit=200`);
             const data = await res.json();
             renderizarGrid(data.results);
         }
 
         function renderizarGrid(albuns) {
+            if (!albuns || albuns.length === 0) {
+                grid.innerHTML = "<p style='padding:20px;'>Nenhum álbum encontrado.</p>";
+                return;
+            }
             grid.innerHTML = albuns.map(t => `
                 <div class="card" onclick="abrirAlbum('${t.collectionId}')">
                     <img src="${t.artworkUrl100.replace('100x100', '400x400')}">
@@ -228,11 +240,8 @@
             atualizarTrackPlaying();
         }
 
-        function toggleRepeat() {
-            repeatBtn.classList.toggle('active');
-        }
+        function toggleRepeat() { repeatBtn.classList.toggle('active'); }
 
-        // Lógica de Final de Música corrigida
         audio.onended = function() {
             if (repeatBtn.classList.contains('active')) {
                 audio.currentTime = 0;
@@ -260,7 +269,6 @@
         audio.ontimeupdate = function() {
             const curMins = Math.floor(audio.currentTime / 60);
             const curSecs = Math.floor(audio.currentTime - curMins * 60);
-            // Mostrar 30 segundos no total (limite da Apple API)
             timeLabel.innerText = `${curMins}:${curSecs < 10 ? '0' : ''}${curSecs} / 0:30`;
         };
 
