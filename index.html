@@ -37,15 +37,15 @@
         .track-play-icon { color: #48484a; font-size: 20px; margin-left: auto; transition: 0.2s; }
         .track-row.playing .track-play-icon { color: var(--primary) !important; }
 
-        .player { position: fixed; bottom: 0; width: 100%; background: var(--player-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); padding: 5px 15px 30px; border-top: 1px solid rgba(255,255,255,0.1); z-index: 10001; transition: 0.5s; }
-        .player.minimized { transform: translateY(calc(100% - 45px)); }
+        .player { position: fixed; bottom: 0; width: 100%; background: var(--player-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); padding: 5px 15px 30px; border-top: 1px solid rgba(255,255,255,0.1); z-index: 10001; transition: transform 0.4s ease; }
+        .player.minimized { transform: translateY(calc(100% - 50px)); }
         .handle-area { width: 100%; height: 30px; display: flex; justify-content: center; align-items: center; cursor: pointer; }
         .handle { width: 40px; height: 4px; background: rgba(255,255,255,0.3); border-radius: 10px; }
         
         .player-controls { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
         .control-icon { color: #8e8e93; font-size: 22px; cursor: pointer; }
         .control-icon.active { color: var(--primary) !important; }
-        .play-trigger { background: var(--primary); border: none; width: 44px; height: 44px; border-radius: 50%; color: #000; font-size: 18px; display: flex; align-items: center; justify-content: center; }
+        .play-trigger { background: var(--primary); border: none; width: 46px; height: 46px; border-radius: 50%; color: #000; font-size: 18px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
         #timeLabel { font-size: 11px; color: var(--primary); min-width: 75px; text-align: center; font-family: monospace; }
     </style>
 </head>
@@ -68,7 +68,7 @@
     <footer class="player" id="player" style="display:none;">
         <div class="handle-area" onclick="togglePlayer()"><div class="handle"></div></div>
         <div class="player-controls">
-            <div style="flex:1; overflow:hidden;">
+            <div style="flex:1; overflow:hidden;" onclick="togglePlayer()">
                 <h4 id="trackTitle" style="font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Música</h4>
                 <p id="trackArtist" style="font-size:12px; color:var(--primary);">Artista</p>
             </div>
@@ -93,7 +93,7 @@
         let musicaIndex = 0;
         let albunsIniciaisFixos = [];
 
-        const artistasIniciais = ["Gleidson Gavião", "Gaviões do Forró", "Luiz Gonzaga", "Flávio José", "Mastruz com Leite", "Toca do Vale"];
+        const artistasIniciais = ["Luiz Gonzaga", "Mastruz com Leite", "Gaviões do Forró", "Gleidson Gavião", "Toca do Vale", "Flávio José", "Limão com Mel", "Calcinha Preta"];
 
         function carregarGeneros() {
             document.getElementById('catNav').innerHTML = ["Início", "Forró", "Vaquejada", "Piseiro", "Sertanejo", "Brega"].map(g => 
@@ -106,15 +106,22 @@
                 renderizarGrid(albunsIniciaisFixos);
                 return;
             }
-            grid.innerHTML = "<p style='padding:20px;'>Carregando...</p>";
-            const busca = (termo === "" || termo === "Início") ? artistasIniciais.join(' ') : termo;
-            const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(busca)}&entity=album&limit=100`);
+            grid.innerHTML = "<p style='padding:20px;'>Carregando álbuns...</p>";
+            
+            // Busca expandida para preencher o início
+            const termoBusca = (termo === "" || termo === "Início") ? artistasIniciais.join(' OR ') : termo;
+            const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(termoBusca)}&entity=album&limit=200`);
             const data = await res.json();
+            
             if (termo === "" || termo === "Início") albunsIniciaisFixos = data.results;
             renderizarGrid(data.results);
         }
 
         function renderizarGrid(albuns) {
+            if(!albuns || albuns.length === 0) {
+                grid.innerHTML = "<p style='padding:20px;'>Nenhum álbum encontrado.</p>";
+                return;
+            }
             grid.innerHTML = albuns.map(t => `
                 <div class="card" onclick="abrirAlbum('${t.collectionId}')">
                     <img src="${t.artworkUrl100.replace('100x100', '400x400')}">
@@ -126,6 +133,8 @@
         async function abrirAlbum(id) {
             const res = await fetch(`https://itunes.apple.com/lookup?id=${id}&entity=song`);
             const data = await res.json();
+            if(!data.results || data.results.length === 0) return;
+
             const album = data.results[0];
             listaAtual = data.results.slice(1);
             const ano = new Date(album.releaseDate).getFullYear();
@@ -165,7 +174,7 @@
             const m = listaAtual[musicaIndex];
             if (!m) return;
             audio.src = m.previewUrl;
-            audio.play();
+            audio.play().catch(e => console.log("Erro ao tocar"));
             player.style.display = 'block';
             document.getElementById('trackTitle').innerText = m.trackName;
             document.getElementById('trackArtist').innerText = m.artistName;
@@ -197,7 +206,16 @@
         };
 
         function toggleRepeat() { repeatBtn.classList.toggle('active'); }
-        function togglePlay() { audio.paused ? audio.play() : audio.pause(); atualizarTrackPlaying(); }
+        function togglePlay() { 
+            if(audio.paused) {
+                audio.play();
+                document.getElementById('playBtn').innerHTML = '<i class="fas fa-pause"></i>';
+            } else {
+                audio.pause();
+                document.getElementById('playBtn').innerHTML = '<i class="fas fa-play"></i>';
+            }
+            atualizarTrackPlaying();
+        }
         function fecharPagina() { document.getElementById('albumPage').style.display = 'none'; }
         function togglePlayer() { player.classList.toggle('minimized'); }
         function gerenciarFiltro(btn, g) { 
