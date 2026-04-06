@@ -24,8 +24,7 @@
 
         .nav-wrapper { display: flex; align-items: center; padding: 10px 15px; gap: 10px; }
         .genres-main-btn { background: rgba(255, 255, 255, 0.1); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 10px 20px; border-radius: 12px; font-weight: bold; }
-        .genres-main-btn.active { background: var(--playing-color); color: black; }
-
+        
         .categories-nav { display: none; overflow-x: auto; gap: 10px; scrollbar-width: none; }
         .cat-btn { background: rgba(40, 40, 42, 0.8); border: 1px solid rgba(255, 255, 255, 0.05); color: #ccc; padding: 10px 18px; border-radius: 10px; font-size: 14px; flex-shrink: 0; }
         .cat-btn.selected { background: var(--playing-color); color: black; }
@@ -54,7 +53,7 @@
         .track-title { color: white; font-size: 15px; transition: color 0.3s; }
         .track-row.playing .track-title { color: var(--active-song) !important; font-weight: bold; }
         
-        .track-actions { display: flex; align-items: center; gap: 30px; margin-left: 10px; }
+        .track-actions { display: flex; align-items: center; gap: 25px; margin-left: 10px; }
         .list-play-btn { font-size: 24px; color: white; }
         .list-play-btn.active { color: var(--playing-color) !important; }
 
@@ -74,7 +73,7 @@
     <div class="search-container">
         <div class="search-box">
             <i class="fas fa-microphone" id="micIconButton" onclick="iniciarVoz()"></i>
-            <input type="text" id="searchInput" placeholder="Buscar música..." onkeyup="if(event.key==='Enter') carregarPorGenero(this.value)">
+            <input type="text" id="searchInput" placeholder="Buscar música..." oninput="controlarBotaoLimpar()" onkeyup="if(event.key==='Enter') carregarPorGenero(this.value)">
             <i class="fas fa-times-circle" id="btnClear" style="display:none;" onclick="limparBusca()"></i>
             <i class="fas fa-search" onclick="carregarPorGenero(document.getElementById('searchInput').value)"></i>
         </div>
@@ -120,6 +119,16 @@
         const searchInput = document.getElementById('searchInput');
         const btnClear = document.getElementById('btnClear');
 
+        function controlarBotaoLimpar() {
+            btnClear.style.display = searchInput.value.length > 0 ? 'block' : 'none';
+        }
+
+        function limparBusca() { 
+            searchInput.value = ''; 
+            controlarBotaoLimpar();
+            searchInput.focus(); 
+        }
+
         function iniciarVoz() {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (!SpeechRecognition) return alert("Não suportado.");
@@ -128,14 +137,12 @@
             document.getElementById('micIconButton').style.color = "red";
             recognition.onresult = (e) => {
                 searchInput.value = e.results[0][0].transcript;
-                btnClear.style.display = 'block';
+                controlarBotaoLimpar();
                 carregarPorGenero(searchInput.value);
             };
             recognition.onend = () => document.getElementById('micIconButton').style.color = "#888";
             recognition.start();
         }
-
-        function limparBusca() { searchInput.value = ''; btnClear.style.display = 'none'; searchInput.focus(); }
 
         let lastScrollY = 0;
         function handleScroll(el) {
@@ -167,11 +174,17 @@
             renderizarLista();
         }
 
-        // NOVO: Função para ir ao álbum que está tocando agora ao clicar na barra
         function irParaOAlbumAtivo() {
-            if (window.albumAtivoId) {
-                abrirAlbum(window.albumAtivoId, window.capaAtiva);
-            }
+            if (window.albumAtivoId) abrirAlbum(window.albumAtivoId, window.capaAtiva);
+        }
+
+        function baixar(url) {
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = "musica.m4a";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
         }
 
         function renderizarLista() {
@@ -185,6 +198,7 @@
                             <div style="font-size:12px; color:#777;">${m.artistName}</div>
                         </div>
                         <div class="track-actions">
+                            <i class="fas fa-download" style="color:#666; font-size:20px;" onclick="baixar('${m.previewUrl}')"></i>
                             <i class="fas fa-play-circle list-play-btn ${window.musicaIndex === i && window.albumAtivoId === window.currentAlbumOpenId && !audio.paused ? 'active' : ''}" onclick="tocar(${i}, false)"></i>
                         </div>
                     </div>`).join('')}`;
