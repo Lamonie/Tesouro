@@ -1,184 +1,100 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Spotify Clone Pro</title>
+<title>LAMONIÊ FLOW PRO+</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
 <style>
-body{
-    margin:0;
-    font-family:Arial;
-    background:#0f0f0f;
-    color:#fff;
-}
-
-/* BOTÃO COPIAR */
-.copy-btn{
-    position:fixed;
-    top:10px;
-    right:10px;
-    background:#1db954;
-    border:none;
-    padding:10px 15px;
-    border-radius:20px;
-    color:#fff;
-    font-weight:bold;
-    cursor:pointer;
-}
-
-/* HEADER */
-header{
-    padding:20px;
-    font-size:22px;
-    font-weight:bold;
-}
-
-/* SEARCH */
-.search{
-    padding:15px;
-}
-.search input{
-    width:100%;
-    padding:12px;
-    border-radius:25px;
-    border:none;
-    background:#222;
-    color:#fff;
-}
-
-/* CARDS */
-.grid{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:15px;
-    padding:15px;
-}
-
-.card{
-    background:#181818;
-    border-radius:10px;
-    overflow:hidden;
-    transition:0.3s;
-}
-.card:hover{
-    transform:scale(1.05);
-}
-
-.card img{
-    width:100%;
-    height:140px;
-    object-fit:cover;
-}
-
-.card p{
-    padding:10px;
-    font-size:14px;
-}
-
-/* TEXTO */
-.content{
-    padding:20px;
-    line-height:1.6;
-    font-size:14px;
-}
-
-/* PLAYER */
-.player{
-    position:fixed;
-    bottom:0;
-    width:100%;
-    background:#111;
-    padding:10px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-}
-
-.play{
-    background:#1db954;
-    border:none;
-    border-radius:50%;
-    width:50px;
-    height:50px;
-    color:#000;
-    font-size:20px;
-}
+body{background:#000;color:#fff;font-family:Arial}
+.card{width:47%;margin:10px;display:inline-block}
+.card img{width:100%;border-radius:12px}
+.player{position:fixed;bottom:10px;left:10px;right:10px;background:#111;padding:10px;border-radius:15px}
 </style>
 </head>
 
 <body>
 
-<button class="copy-btn" onclick="copiar()">COPIAR TUDO</button>
+<h2 style="padding:20px">LAMONIÊ FLOW PRO+</h2>
 
-<header>Spotify PRO</header>
+<input id="searchInput" placeholder="Buscar artista..." style="width:90%;margin:10px;padding:10px;border-radius:10px;border:none">
+<button onclick="buscar()" style="padding:10px;border-radius:10px">Buscar</button>
 
-<div class="search">
-<input placeholder="O que você quer ouvir?">
+<div id="grid"></div>
+
+<div class="player" id="player" style="display:none">
+<img id="playerArt" width="50">
+<span id="trackTitle"></span>
+<button onclick="togglePlay()">▶</button>
 </div>
 
-<div class="grid">
-
-<div class="card">
-<img src="https://i.scdn.co/image/ab67616d0000b2731c0c5d2c4f2d64e0fbb3c0b0">
-<p>Cultura Brasileira - Alcymar Monteiro</p>
-</div>
-
-<div class="card">
-<img src="https://i.scdn.co/image/ab67616d0000b2730a2d3f1c5cfa4b2c4d5e6f7a">
-<p>Rainha da Borborema</p>
-</div>
-
-<div class="card">
-<img src="https://images.unsplash.com/photo-1506157786151-b8491531f063">
-<p>Quadrilha Nordeste</p>
-</div>
-
-<div class="card">
-<img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4">
-<p>Forró Pé de Serra</p>
-</div>
-
-</div>
-
-<div class="content">
-
-<p><b>Versão 9.1.32</b></p>
-
-<p>Com o app Spotify, você tem uma biblioteca de músicas e podcasts de graça. Crie as melhores playlists e ouça milhões de músicas, álbuns e podcasts originais grátis no celular ou tablet.</p>
-
-<p>Assine o Spotify Premium para baixar e escutar offline e descubra nosso catálogo de audiolivros.</p>
-
-<p><b>Por que usar?</b></p>
-
-<ul>
-<li>100 milhões de músicas</li>
-<li>6 milhões de podcasts</li>
-<li>Playlists exclusivas</li>
-<li>Recomendações personalizadas</li>
-<li>Descobertas da Semana</li>
-<li>Radar de Novidades</li>
-</ul>
-
-<p><b>Spotify Premium:</b></p>
-<ul>
-<li>Sem anúncios</li>
-<li>Modo offline</li>
-<li>Qualidade máxima</li>
-</ul>
-
-</div>
-
-<div class="player">
-<span>Tocando agora 🎵</span>
-<button class="play">▶</button>
-</div>
+<audio id="audio"></audio>
 
 <script>
-function copiar(){
-    const texto = document.documentElement.outerHTML;
-    navigator.clipboard.writeText(texto);
-    alert("Código copiado!");
+const audio = document.getElementById("audio");
+
+async function buscar(){
+    const termo = document.getElementById("searchInput").value;
+
+    // ITUNES
+    const itunes = fetch(`https://itunes.apple.com/search?term=${termo}&entity=song&limit=20`)
+    .then(r=>r.json());
+
+    // DEEZER
+    const deezer = fetch(`https://corsproxy.io/?https://api.deezer.com/search?q=${termo}`)
+    .then(r=>r.json());
+
+    const [itunesData, deezerData] = await Promise.all([itunes, deezer]);
+
+    let resultados = [];
+
+    // ITUNES
+    itunesData.results.forEach(m=>{
+        resultados.push({
+            titulo: m.trackName,
+            artista: m.artistName,
+            capa: m.artworkUrl100,
+            audio: m.previewUrl
+        });
+    });
+
+    // DEEZER
+    deezerData.data.forEach(m=>{
+        resultados.push({
+            titulo: m.title,
+            artista: m.artist.name,
+            capa: m.album.cover_medium,
+            audio: m.preview
+        });
+    });
+
+    mostrar(resultados);
+}
+
+function mostrar(lista){
+    document.getElementById("grid").innerHTML = lista.map((m,i)=>`
+        <div class="card" onclick="tocar('${m.audio}','${m.capa}','${m.titulo}')">
+            <img src="${m.capa}">
+            <p>${m.titulo}</p>
+            <small>${m.artista}</small>
+        </div>
+    `).join("");
+}
+
+function tocar(src, capa, titulo){
+    audio.src = src;
+    audio.play();
+
+    document.getElementById("player").style.display="block";
+    document.getElementById("playerArt").src = capa;
+    document.getElementById("trackTitle").innerText = titulo;
+}
+
+function togglePlay(){
+    if(audio.paused) audio.play();
+    else audio.pause();
 }
 </script>
 
