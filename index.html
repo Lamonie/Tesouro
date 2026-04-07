@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>LAMONIÊ FLOW</title>
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --primary: #94b3ce; --bg: #000000; --text-main: #ffffff; --player-bg: rgba(255, 255, 255, 0.1); --playing-color: #ffff00; --active-song: #007bff; }
@@ -17,24 +18,27 @@
             background: #000000; z-index: -1;
         }
 
-        /* Ajuste no Header para centralizar a imagem */
         header { 
-            padding: 20px 20px 10px; 
+            padding: 20px; 
             background: rgba(255, 255, 255, 0.03); 
             backdrop-filter: blur(20px); 
             -webkit-backdrop-filter: blur(20px); 
-            border-bottom: 1px solid rgba(255,255,255,0.1); 
-            display: flex;
-            justify-content: center; /* Centraliza horizontalmente */
-            align-items: center;    /* Centraliza verticalmente */
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            text-align: center;
         }
 
-        /* Estilo para a imagem do Logo de Diamante */
-        .logo-diamante {
-            max-width: 80%;       /* Garante que não estoure a tela em celulares pequenos */
-            height: auto;          /* Mantém a proporção */
-            max-height: 60px;     /* Define uma altura máxima elegante */
-            object-fit: contain;  /* Garante que a imagem caiba sem cortes */
+        /* Estilo da Fonte Rubrica Cor Inox */
+        .logo-inox {
+            font-family: 'Great Vibes', cursive;
+            font-size: 42px;
+            font-weight: normal;
+            /* Efeito Metálico Inox */
+            background: linear-gradient(to bottom, #cfd8dc 0%, #ffffff 50%, #90a4ae 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            letter-spacing: 1px;
+            display: inline-block;
         }
 
         .nav-container { 
@@ -121,7 +125,7 @@
 <body>
 
     <header>
-        <img src="image_17.png" alt="Lamonie Flow" class="logo-diamante">
+        <div class="logo-inox">LamonieFlow</div>
     </header>
 
     <div class="nav-container">
