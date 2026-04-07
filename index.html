@@ -3,347 +3,206 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>LAMONIÊ FLOW</title>
+    <title>LAMONIÊ FLOW v9.1.32</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --primary: #94b3ce; --bg: #000000; --text-main: #ffffff; --player-bg: rgba(255, 255, 255, 0.1); --playing-color: #ffff00; --active-song: #007bff; }
+        :root { --primary: #94b3ce; --sp-green: #1DB954; --bg: #000000; --card: #181818; --text: #ffffff; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--bg); color: var(--text); padding-bottom: 120px; overflow-x: hidden; }
         
-        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        header { padding: 40px 20px 10px; background: linear-gradient(to bottom, #222, #000); }
+        header h1 { color: var(--primary); font-size: 26px; font-weight: 900; }
+
+        .nav-container { display: flex; align-items: center; padding: 15px; gap: 10px; overflow: hidden; }
+        .genres-toggle-btn { background: #333; color: white; border: none; padding: 8px 15px; border-radius: 10px; font-weight: bold; font-size: 14px; }
         
-        body { background: #000000; color: var(--text-main); font-family: -apple-system, sans-serif; min-height: 100vh; overflow-x: hidden; }
-        body::before {
-            content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #000000; z-index: -1;
-        }
-        header { padding: 30px 20px 15px; background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.1); }
-        header h1 { color: var(--primary); font-size: 28px; font-weight: 900; }
-        .nav-container { 
-            display: flex; 
-            align-items: center; 
-            padding: 10px 15px; 
-            gap: 10px; 
-            overflow: hidden;
-        }
-        .genres-toggle-btn {
-            background: #000;
-            color: white;
-            border: 1px solid #333; 
-            box-shadow: 0 0 4px rgba(50, 50, 50, 0.4);
-            padding: 8px 15px;
-            border-radius: 10px;
-            font-weight: bold;
-            cursor: pointer;
-            flex-shrink: 0;
-            font-size: 14px;
-        }
-        .categories-nav { 
-            display: none; 
-            overflow-x: auto; 
-            gap: 8px; 
-            white-space: nowrap;
-            scrollbar-width: none;
-            flex: 1;
-        }
+        .categories-nav { display: flex; overflow-x: auto; gap: 8px; scrollbar-width: none; }
         .categories-nav::-webkit-scrollbar { display: none; }
-        
-        .cat-btn { 
-            background: #000; 
-            border: 1px solid #333; 
-            box-shadow: 0 0 3px rgba(50, 50, 50, 0.3);
-            color: white; 
-            padding: 8px 16px; 
-            border-radius: 18px; 
-            font-size: 13px; 
-            font-weight: 600; 
-            flex-shrink: 0; 
-        }
-        .cat-btn.active { background: var(--primary); color: #000; border-color: var(--primary); box-shadow: 0 0 5px var(--primary); }
+        .cat-btn { background: #282828; border: none; color: white; padding: 8px 16px; border-radius: 20px; font-size: 13px; white-space: nowrap; }
+        .cat-btn.active { background: var(--primary); color: #000; font-weight: bold; }
+
         .search-container { padding: 10px 15px; }
-        .search-box { display: flex; background: rgba(255, 255, 255, 0.07); border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); align-items: center; padding: 0 15px; }
-        .search-box input { background: none; border: none; color: white; flex: 1; padding: 15px 10px; outline: none; }
-        .main-grid { display: flex; flex-wrap: wrap; justify-content: space-between; padding: 10px 15px 180px; }
-        .card { width: 47%; background: rgba(255,255,255,0.04); border-radius: 15px; padding: 8px; margin-bottom: 20px; }
-        .card img { width: 100%; aspect-ratio: 1/1; border-radius: 12px; object-fit: cover; }
-        .player { 
-            position: fixed; 
-            bottom: 10px;
-            left: 10px; 
-            right: 10px; 
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px); 
-            padding: 12px 20px; 
-            border-radius: 20px; 
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            z-index: 10002; 
-            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s;
-        }
-        .player-hidden { transform: translateY(100px); opacity: 0; }
-        .player-controls { display: flex; align-items: center; gap: 15px; }
-        .mini-art { width: 50px; height: 50px; border-radius: 10px; object-fit: cover; }
-        .full-page { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); backdrop-filter: blur(35px); -webkit-backdrop-filter: blur(35px); z-index: 10001; display: none; flex-direction: column; overflow-y: auto; }
-        .btn-voltar { margin: 15px; background: var(--primary); border: none; color: #000; padding: 12px 25px; border-radius: 35px; font-weight: 800; width: fit-content; }
+        .search-box { display: flex; background: #282828; border-radius: 12px; padding: 12px; border: 1px solid #333; align-items: center; }
+        .search-box input { background: none; border: none; color: white; flex: 1; outline: none; font-size: 16px; }
+
+        .main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 15px; }
+        .card { background: var(--card); border-radius: 10px; padding: 12px; position: relative; transition: 0.3s; }
+        .card img { width: 100%; aspect-ratio: 1/1; border-radius: 6px; object-fit: cover; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        .card p { margin-top: 8px; font-size: 13px; font-weight: bold; height: 35px; overflow: hidden; }
+        .api-tag { position: absolute; top: 15px; right: 15px; background: rgba(0,0,0,0.7); font-size: 8px; padding: 2px 5px; border-radius: 4px; color: var(--primary); }
+
+        .player { position: fixed; bottom: 15px; left: 10px; right: 10px; background: rgba(30,30,30,0.95); backdrop-filter: blur(15px); padding: 12px; border-radius: 12px; border: 1px solid #444; z-index: 1000; }
+        .player-controls { display: flex; align-items: center; gap: 12px; }
+        .mini-art { width: 45px; height: 45px; border-radius: 5px; }
+
+        .full-page { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 2000; display: none; flex-direction: column; overflow-y: auto; }
+        .btn-voltar { margin: 20px; background: var(--primary); border: none; color: #000; padding: 12px 25px; border-radius: 30px; font-weight: bold; width: fit-content; }
         
-        .track-row { display: flex; align-items: center; padding: 18px; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; }
-        .track-row.is-playing .track-title { color: var(--active-song) !important; font-weight: bold; }
-        .track-row.is-playing .track-play-icon { color: var(--playing-color) !important; }
-        .album-meta { background: rgba(255,255,255,0.06); margin: 15px; padding: 20px; border-radius: 18px; font-size: 13px; color: #bbb; text-align: center; line-height: 1.6; }
-        .composer-name { font-size: 11px; color: #777; margin-top: 2px; }
-        .error-message { text-align: center; color: #ff4d4d; padding: 20px; background: rgba(255,0,0,0.1); border-radius: 15px; margin: 15px;}
+        .track-row { display: flex; align-items: center; padding: 15px; border-bottom: 1px solid #111; gap: 15px; }
+        .track-info { flex: 1; }
+        .track-title { font-weight: bold; font-size: 15px; }
+        .track-artist { color: #888; font-size: 12px; }
+        .is-playing .track-title { color: var(--sp-green); }
     </style>
 </head>
 <body>
+
     <header><h1>LAMONIÊ FLOW</h1></header>
+
     <div class="nav-container">
-        <div class="genres-toggle-btn" onclick="toggleGenres()">Gêneros</div>
+        <div class="genres-toggle-btn">Gêneros</div>
         <div class="categories-nav" id="catNav"></div>
     </div>
+
     <div class="search-container">
         <div class="search-box">
-            <input type="text" id="searchInput" placeholder="Buscar...">
-            <div style="display:flex; gap:25px; color:#8e8e93; align-items: center;">
-                <i class="fas fa-microphone" id="micBtn" onclick="ativarMicrofone()" style="cursor:pointer; padding: 5px;"></i>
-                <i class="fas fa-search" onclick="realizarBuscaManual()" style="cursor:pointer;"></i>
-            </div>
+            <input type="text" id="searchInput" placeholder="O que vamos ouvir hoje?">
+            <i class="fas fa-search" style="color:var(--primary)" onclick="realizarBuscaManual()"></i>
         </div>
     </div>
+
     <div id="grid" class="main-grid"></div>
-    <footer class="player" id="player" style="display:none;" onclick="voltarParaAlbumAtivo()">
+
+    <footer class="player" id="player" style="display:none;" onclick="abrirAlbum(window.albumAtivoId, window.capaAtiva, window.apiAtiva)">
         <div class="player-controls">
             <img id="playerArt" src="" class="mini-art">
             <div style="flex:1; overflow:hidden;">
-                <div style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-weight:bold; font-size:15px; color:white;" id="trackTitle">Música</div>
-                <div id="timeInfo" style="font-size:11px; color:rgba(255,255,255,0.7);">0:00 / 0:00</div>
+                <div id="trackTitle" style="font-weight:bold; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Música</div>
+                <div id="timeInfo" style="font-size:11px; color:#aaa;">0:00 / 0:00</div>
             </div>
-            <div style="display:flex; align-items:center; gap:30px;">
-                <button onclick="event.stopPropagation(); togglePlay();" id="playBtn" style="background:none; border:none; color:var(--playing-color); font-size:30px;"><i class="fas fa-pause"></i></button>
-                <i class="fas fa-step-forward" style="color:white; font-size:24px;" onclick="event.stopPropagation(); proxima();"></i>
-            </div>
+            <button onclick="event.stopPropagation(); togglePlay();" id="playBtn" style="background:none; border:none; color:var(--primary); font-size:25px;"><i class="fas fa-play"></i></button>
+            <i class="fas fa-step-forward" style="color:white; font-size:20px;" onclick="event.stopPropagation(); proxima();"></i>
         </div>
     </footer>
+
     <div id="albumPage" class="full-page">
         <button class="btn-voltar" onclick="fecharPagina()">← VOLTAR</button>
         <div id="albumDetailContent"></div>
     </div>
+
     <audio id="audioMain"></audio>
+
     <script>
         const audio = document.getElementById('audioMain');
+        const grid = document.getElementById('grid');
         const playerBar = document.getElementById('player');
         const albumPage = document.getElementById('albumPage');
-        const grid = document.getElementById('grid');
         const albumDetailContent = document.getElementById('albumDetailContent');
+        const searchInput = document.getElementById('searchInput');
 
-        function showError(element, message) {
-            element.innerHTML = `<div class="error-message"><h3>Ocorreu um erro</h3><p>${message}</p></div>`;
-        }
-        
-        // **NOVA FUNÇÃO DE API**
-        async function fetchDeezer(endpoint) {
-            // Trocando para um proxy mais confiável
-            const proxy = 'https://thingproxy.freeboard.io/fetch/';
-            const apiUrl = `https://api.deezer.com/${endpoint}`;
-            try {
-                const response = await fetch(proxy + apiUrl);
-                if (!response.ok) {
-                    throw new Error(`A requisição falhou: ${response.statusText} (status: ${response.status})`);
-                }
-                const data = await response.json();
-                if (data.error) {
-                    throw new Error(`Erro da API do Deezer: ${data.error.message}`);
-                }
-                return data;
-            } catch (error) {
-                console.error('Erro ao buscar dados do Deezer:', error);
-                return { error: true, message: error.message };
+        const generos = ["Início", "Forró", "Vaquejada", "Piseiro", "Sertanejo", "Brega", "Gospel", "Pop"];
+        document.getElementById('catNav').innerHTML = generos.map(g => `<button class="cat-btn" onclick="carregarPorGenero('${g}', this)">${g}</button>`).join('');
+
+        function realizarBuscaManual() { carregarPorGenero(searchInput.value); }
+        searchInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') realizarBuscaManual(); });
+
+        async function carregarPorGenero(g, btn) {
+            if(btn) {
+                document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
             }
-        }
+            grid.innerHTML = "<p style='padding:20px;'>Sincronizando...</p>";
+            const termo = (g === "Início" || !g) ? "Luiz Gonzaga" : g;
+            let html = "";
 
-
-        function toggleGenres() {
-            const nav = document.getElementById('catNav');
-            nav.style.display = (nav.style.display === 'flex') ? 'none' : 'flex';
-        }
-        let lastScrollY = window.scrollY;
-        window.addEventListener('scroll', () => {
-            if (window.scrollY > lastScrollY && window.scrollY > 50) { playerBar.classList.add('player-hidden'); }
-            else { playerBar.classList.remove('player-hidden'); }
-            lastScrollY = window.scrollY;
-        });
-        albumPage.addEventListener('scroll', () => {
-            if (albumPage.scrollTop > lastScrollY && albumPage.scrollTop > 50) { playerBar.classList.add('player-hidden'); }
-            else { playerBar.classList.remove('player-hidden'); }
-            lastScrollY = albumPage.scrollTop;
-        });
-        function ativarMicrofone() {
             try {
-                const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-                recognition.lang = 'pt-BR'; recognition.start();
-                document.getElementById('micBtn').style.color = '#ff3b30';
-                recognition.onresult = (event) => {
-                    const texto = event.results[0][0].transcript;
-                    document.getElementById('searchInput').value = texto;
-                    carregarPorGenero(texto);
-                };
-                recognition.onend = () => { document.getElementById('micBtn').style.color = '#8e8e93'; };
-            } catch (e) {
-                alert('O reconhecimento de voz não é suportado neste navegador.');
-            }
+                // Busca iTunes
+                const resI = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(termo)}&entity=album&limit=20`).then(r => r.json()).catch(() => ({results:[]}));
+                resI.results.forEach(a => {
+                    html += `<div class="card" onclick="abrirAlbum('${a.collectionId}', '${a.artworkUrl100.replace('100x100','600x600')}', 'itunes')">
+                        <span class="api-tag">iTunes</span><img src="${a.artworkUrl100.replace('100x100','600x600')}"><p>${a.collectionName}</p></div>`;
+                });
+
+                // Busca Jamendo
+                const resJ = await fetch(`https://api.jamendo.com/v3.0/albums/?client_id=56d30cce&format=json&name=${encodeURIComponent(termo)}&limit=10`).then(r => r.json()).catch(() => ({results:[]}));
+                resJ.results.forEach(a => {
+                    html += `<div class="card" onclick="abrirAlbum('${a.id}', '${a.image}', 'jamendo')">
+                        <span class="api-tag">FULL</span><img src="${a.image}"><p>${a.name}</p></div>`;
+                });
+
+                grid.innerHTML = html || "<p style='padding:20px;'>Nenhum resultado encontrado.</p>";
+            } catch (e) { grid.innerHTML = "<p>Erro na conexão.</p>"; }
         }
-        function realizarBuscaManual() {
-            const valor = document.getElementById('searchInput').value;
-            if(valor) carregarPorGenero(valor);
+
+        async function abrirAlbum(id, capa, api) {
+            window.albumVisualizadoId = id;
+            window.capaAtivaVisualizada = capa;
+            window.apiAtivaVisualizada = api;
+            albumPage.style.display = 'flex';
+            albumDetailContent.innerHTML = "<p style='padding:50px; text-align:center;'>Abrindo álbum...</p>";
+
+            try {
+                let faixas = [];
+                if(api === 'itunes') {
+                    const d = await fetch(`https://itunes.apple.com/lookup?id=${id}&entity=song`).then(r => r.json());
+                    faixas = d.results.slice(1).map(m => ({ n: m.trackName, u: m.previewUrl, a: m.artistName }));
+                } else {
+                    const d = await fetch(`https://api.jamendo.com/v3.0/tracks/?client_id=56d30cce&album_id=${id}`).then(r => r.json());
+                    faixas = d.results.map(m => ({ n: m.name, u: m.audio, a: m.artist_name }));
+                }
+
+                window.listaVisualizada = faixas;
+                albumDetailContent.innerHTML = `
+                    <div style="text-align:center; padding:30px; background:linear-gradient(to bottom, #444, #000);">
+                        <img src="${capa}" style="width:220px; border-radius:10px; box-shadow:0 10px 30px rgba(0,0,0,0.8);">
+                        <h2 style="margin-top:20px;">Álbum</h2>
+                    </div>
+                    ${faixas.map((f, i) => `
+                        <div class="track-row ${window.musicaIndex === i && window.albumAtivoId === id ? 'is-playing' : ''}" onclick="tocar(${i})">
+                            <div class="track-info">
+                                <div class="track-title">${f.n}</div>
+                                <div class="track-artist">${f.a}</div>
+                            </div>
+                            <i class="fas fa-play-circle" style="color:var(--primary); font-size:20px;"></i>
+                        </div>
+                    `).join('')}
+                `;
+            } catch(e) { albumDetailContent.innerHTML = "<p>Erro ao carregar faixas.</p>"; }
         }
+
+        function tocar(index) {
+            window.albumAtivoId = window.albumVisualizadoId;
+            window.capaAtiva = window.capaAtivaVisualizada;
+            window.apiAtiva = window.apiAtivaVisualizada;
+            window.listaTocando = window.listaVisualizada;
+            window.musicaIndex = index;
+
+            const musica = window.listaTocando[index];
+            audio.src = musica.u;
+            audio.play();
+
+            playerBar.style.display = 'block';
+            document.getElementById('playerArt').src = window.capaAtiva;
+            document.getElementById('trackTitle').innerText = musica.n;
+            atualizarBotaoPlay();
+        }
+
+        function togglePlay() {
+            if(audio.paused) audio.play(); else audio.pause();
+            atualizarBotaoPlay();
+        }
+
+        function atualizarBotaoPlay() {
+            document.getElementById('playBtn').innerHTML = audio.paused ? '<i class="fas fa-play"></i>' : '<i class="fas fa-pause"></i>';
+        }
+
+        function proxima() {
+            if(window.musicaIndex + 1 < window.listaTocando.length) tocar(window.musicaIndex + 1);
+        }
+
         audio.ontimeupdate = () => {
             const duration = audio.duration || 0;
             document.getElementById('timeInfo').innerText = `${formatTime(audio.currentTime)} / ${formatTime(duration)}`;
-            atualizarUI();
         };
-        audio.onended = () => {
-            proxima();
-        };
+
         function formatTime(s) {
             const min = Math.floor(s / 60); const seg = Math.floor(s % 60);
             return `${min}:${seg < 10 ? '0' : ''}${seg}`;
         }
-        function voltarParaAlbumAtivo() { if (window.albumAtivoId) abrirAlbum(window.albumAtivoId); }
-        const generos = ["Início", "Forró", "Vaquejada", "Piseiro", "Sertanejo", "Brega", "Arrocha", "Axé", "Pagode", "Samba", "Gospel", "Rock", "Pop", "Hip-Hop"];
-        document.getElementById('catNav').innerHTML = generos.map(g => `<button class="cat-btn" onclick="carregarPorGenero('${g}')">${g}</button>`).join('');
 
-        async function carregarPorGenero(g) {
-            grid.innerHTML = `<p style="text-align:center; padding: 20px;">Carregando...</p>`;
-            const termo = g === "Início" ? "Luiz Gonzaga" : g;
-            const data = await fetchDeezer(`search/album?q=${encodeURIComponent(termo)}&limit=100`);
-            
-            if (data.error) {
-                showError(grid, "Não foi possível buscar os álbuns. O serviço pode estar temporariamente indisponível. Tente novamente mais tarde.");
-                return;
-            }
-
-            if (data.data && data.data.length > 0) {
-                grid.innerHTML = data.data.map(album => `
-                    <div class="card" onclick="abrirAlbum('${album.id}')">
-                        <img src="${album.cover_big}" alt="${album.title}">
-                        <p style="margin-top:10px; font-weight:bold; font-size:13px;">${album.title}</p>
-                    </div>`).join('');
-            } else {
-                grid.innerHTML = `<p style="text-align:center; padding: 20px;">Nenhum álbum encontrado para "${g}".</p>`;
-            }
-        }
-        
-        async function abrirAlbum(id) {
-            window.albumVisualizadoId = id;
-            albumPage.style.display = 'flex';
-            albumDetailContent.innerHTML = `<p style="text-align:center; padding: 20px;">Carregando detalhes do álbum...</p>`;
-
-            const data = await fetchDeezer(`album/${id}`);
-
-            if (data.error) {
-                showError(albumDetailContent, "Não foi possível carregar os detalhes do álbum.");
-                return;
-            }
-            
-            const album = data;
-            const songs = data.tracks.data;
-            window.capaAtiva = album.cover_big;
-            
-            const dataLancamento = new Date(album.release_date).toLocaleDateString('pt-BR');
-            const gravadora = album.label || "Independente";
-            
-            albumDetailContent.innerHTML = `
-                <div style="text-align:center; padding:30px;"><img src="${album.cover_big}" style="width:250px; border-radius:20px;">
-                <h2 style="margin-top:25px;">${album.title}</h2><p style="color:var(--primary);">${album.artist.name}</p></div>
-                <div class="album-meta">
-                    <b>Gênero:</b> ${album.genres.data.map(g => g.name).join(', ') || 'Não especificado'}<br>
-                    <b>Lançamento:</b> ${dataLancamento}<br>
-                    <b>Gravadora:</b> ${gravadora}
-                </div>
-                ${songs.map((song, i) => `
-                    <div class="track-row" id="row_${id}_${i}" onclick="tocar('${id}', ${i})">
-                        <span style="color:#777; width:30px;">${i+1}</span>
-                        <div style="flex:1; margin-left:12px; overflow:hidden;">
-                            <div class="track-title" style="font-size:15px; color:white;">${song.title}</div>
-                            <div class="composer-name">${song.artist.name}</div>
-                        </div>
-                        <div class="track-actions" style="display:flex; align-items:center; gap: 15px;">
-                            <i class="fas fa-download" style="color:#8e8e93; font-size:18px;" onclick="event.stopPropagation(); baixarMusica('${song.preview}', '${song.title}')"></i>
-                            <i class="fas fa-play-circle track-play-icon" id="btn_list_${id}_${i}" style="font-size:24px; color:white;"></i>
-                        </div>
-                    </div>`).join('')}<div style="height:180px;"></div>`;
-            window.listaVisualizada = songs; 
-            atualizarUI();
-        }
-
-        function tocar(albumId, index) {
-            if (window.albumAtivoId === albumId && window.musicaIndex === index) {
-                togglePlay(); return;
-            }
-            window.albumAtivoId = albumId; window.musicaIndex = index;
-            window.listaTocando = window.listaVisualizada;
-            const song = window.listaTocando[index];
-
-            audio.src = song.preview; 
-            audio.play().catch(e => console.error("Erro ao tocar áudio:", e));
-
-            playerBar.style.display = 'block';
-            playerBar.classList.remove('player-hidden');
-            document.getElementById('playerArt').src = window.capaAtiva;
-            document.getElementById('trackTitle').innerText = song.title;
-            atualizarUI();
-        }
-
-        function atualizarUI() {
-            document.querySelectorAll('.track-row').forEach(r => r.classList.remove('is-playing'));
-            document.querySelectorAll('.track-play-icon').forEach(ic => {
-                ic.className = 'fas fa-play-circle track-play-icon';
-                ic.style.color = 'white';
-            });
-            if (window.albumVisualizadoId === window.albumAtivoId && window.musicaIndex !== undefined) {
-                const row = document.getElementById(`row_${window.albumAtivoId}_${window.musicaIndex}`);
-                const icon = document.getElementById(`btn_list_${window.albumAtivoId}_${window.musicaIndex}`);
-                if(row) row.classList.add('is-playing');
-                if(icon) {
-                    icon.className = audio.paused ? 'fas fa-play-circle track-play-icon' : 'fas fa-pause-circle track-play-icon';
-                    icon.style.color = 'var(--playing-color)';
-                }
-            }
-            document.getElementById('playBtn').innerHTML = audio.paused ? '<i class="fas fa-play"></i>' : '<i class="fas fa-pause"></i>';
-        }
-        
-        async function baixarMusica(url, nome) {
-            try {
-                // Para o download funcionar, não podemos usar o proxy.
-                // Isso pode falhar em alguns navegadores/redes dependendo da segurança.
-                const res = await fetch(url); 
-                const blob = await res.blob();
-                const link = document.createElement('a'); 
-                link.href = window.URL.createObjectURL(blob);
-                link.download = `${nome}.mp3`; 
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            } catch(e) {
-                console.error("Erro ao baixar:", e);
-                alert("Não foi possível iniciar o download. O áudio pode estar protegido ou o navegador bloqueou a ação.");
-            }
-        }
-
-        function togglePlay() { 
-            if (audio.src) {
-                audio.paused ? audio.play() : audio.pause(); 
-            }
-        }
-
-        function proxima() { 
-            if(window.listaTocando && (window.musicaIndex + 1) < window.listaTocando.length) {
-                tocar(window.albumAtivoId, window.musicaIndex + 1); 
-            }
-        }
-        
         function fecharPagina() { albumPage.style.display = 'none'; }
-        
-        // Carregamento inicial
-        carregarPorGenero("Início");
 
+        carregarPorGenero("Início");
     </script>
 </body>
 </html>
