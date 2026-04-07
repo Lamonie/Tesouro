@@ -21,11 +21,11 @@
         .card { width: 47%; margin-bottom: 20px; background: #121212; padding: 10px; border-radius: 15px; }
         .card img { width: 100%; aspect-ratio: 1/1; border-radius: 10px; object-fit: cover; }
 
-        /* BARRA FLUTUANTE - CORREÇÃO DE TEXTO VAZANDO */
+        /* BARRA FLUTUANTE */
         .dock-container {
             position: fixed; bottom: 30px; left: 0; right: 0;
             display: flex; justify-content: center; align-items: center; gap: 10px;
-            z-index: 20000; /* Garante que fica no topo */
+            z-index: 20000;
         }
         
         .dock-item {
@@ -40,10 +40,9 @@
         .btn-home { width: 60px; height: 60px; border-radius: 30px; font-size: 24px; color: #fff; }
         .btn-search { width: 60px; height: 60px; border-radius: 30px; font-size: 24px; color: #ff0000; }
         
-        /* Ajuste na Cápsula do Player */
         .player-capsule {
             width: 220px; height: 60px; border-radius: 30px;
-            padding: 0 12px; gap: 10px; overflow: hidden; /* Corta o que sobrar */
+            padding: 0 12px; gap: 10px; overflow: hidden;
         }
         
         .mini-art { width: 40px; height: 40px; border-radius: 8px; flex-shrink: 0; object-fit: cover; }
@@ -59,12 +58,15 @@
         .track-info-mini b { font-size: 12px; color: #fff; text-overflow: ellipsis; overflow: hidden; }
         .track-info-mini span { font-size: 10px; color: rgba(255,255,255,0.6); text-overflow: ellipsis; overflow: hidden; }
 
-        /* Telas Full */
+        /* TELAS FULL */
         .full-page { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 10001; display: none; flex-direction: column; overflow-y: auto; }
         .track-row { display: flex; align-items: center; padding: 15px; border-bottom: 1px solid #1c1c1e; }
-        .track-row.is-playing .track-title { color: var(--active-song) !important; font-weight: bold; }
         
-        /* Overlay de Busca */
+        /* Destaque para a música tocando */
+        .track-row.is-playing .track-title { color: var(--playing-color) !important; font-weight: bold; }
+        .track-row.is-playing .track-number { color: var(--playing-color) !important; }
+
+        /* BUSCA */
         #searchOverlay { 
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: rgba(0,0,0,0.98); z-index: 21000; padding: 20px; overflow-y: auto;
@@ -81,7 +83,6 @@
     <div class="nav-container" id="catNav"></div>
     <div id="grid" class="main-grid"></div>
 
-    <!-- BARRA FLUTUANTE -->
     <div class="dock-container" id="dock">
         <div class="dock-item btn-home" onclick="irParaInicio()"><i class="fas fa-home"></i></div>
         
@@ -99,7 +100,6 @@
         <div class="dock-item btn-search" onclick="abrirBusca()"><i class="fas fa-search"></i></div>
     </div>
 
-    <!-- BUSCA -->
     <div id="searchOverlay">
         <div class="search-header">
             <div class="search-input-wrapper">
@@ -111,7 +111,6 @@
         <div id="suggestionsList"></div>
     </div>
 
-    <!-- PAGINA DO ALBUM -->
     <div id="albumPage" class="full-page">
         <div id="albumContent"></div>
     </div>
@@ -122,7 +121,6 @@
         const audio = document.getElementById('audioMain');
         let searchTimeout;
 
-        // CORREÇÃO: Função Home agora limpa tudo
         function irParaInicio() {
             fecharPagina();
             fecharBusca();
@@ -185,17 +183,17 @@
 
             document.getElementById('albumContent').innerHTML = `
                 <div style="text-align:center; padding:50px 30px 30px 30px;">
-                    <img src="${art.replace('100x100', '600x600')}" style="width:250px; border-radius:20px;">
-                    <h2 style="margin-top:20px;">${album.collectionName}</h2>
+                    <img src="${art.replace('100x100', '600x600')}" style="width:220px; border-radius:15px; box-shadow: 0 10px 30px rgba(0,0,0,0.8);">
+                    <h2 style="margin-top:20px; font-size:22px;">${album.collectionName}</h2>
+                    <p style="color:#777; margin-top:5px;">${album.artistName}</p>
                 </div>
                 ${songs.map((m, i) => `
                     <div class="track-row" id="row_${id}_${i}" onclick="tocar('${id}', ${i}, '${art}')">
-                        <span style="color:#555; width:30px;">${i+1}</span>
+                        <span class="track-number" style="color:#555; width:40px; text-align:center; font-size:14px;">${i+1}</span>
                         <div style="flex:1; overflow:hidden;">
-                            <div class="track-title" style="color:#fff;">${m.trackName}</div>
-                            <div style="font-size:11px; color:#777;">${m.artistName}</div>
+                            <div class="track-title" style="color:#fff; font-size:16px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${m.trackName}</div>
+                            <div style="font-size:12px; color:#555;">${m.artistName}</div>
                         </div>
-                        <i class="fas fa-play-circle track-play-icon" id="btn_list_${id}_${i}" style="font-size:24px;"></i>
                     </div>
                 `).join('')}<div style="height:150px;"></div>`;
             window.listaVisualizada = songs;
@@ -215,8 +213,8 @@
         }
 
         function atualizarUI() {
+            document.querySelectorAll('.track-row').forEach(r => r.classList.remove('is-playing'));
             if (window.albumVisualizadoId === window.albumAtivoId) {
-                document.querySelectorAll('.track-row').forEach(r => r.classList.remove('is-playing'));
                 const row = document.getElementById(`row_${window.albumAtivoId}_${window.musicaIndex}`);
                 if(row) row.classList.add('is-playing');
             }
