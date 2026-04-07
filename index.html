@@ -69,7 +69,7 @@
     <div id="grid" class="main-grid"></div>
 
     <div class="dock-container">
-        <div class="dock-item btn-home" onclick="irParaInicio()"><i class="fas fa-home"></i></div>
+        <div class="dock-item btn-home" onclick="logicaBotaoHome()"><i class="fas fa-home"></i></div>
         
         <div class="dock-item player-capsule" onclick="abrirAlbumAtivo()">
             <img id="playerArt" src="https://via.placeholder.com/40" class="mini-art">
@@ -107,14 +107,25 @@
     <script>
         const audio = document.getElementById('audioMain');
         let searchTimeout;
+        let buscaAtiva = false; // Controla se estamos vendo um resultado de busca
 
-        // SOLUÇÃO DEFINITIVA PARA VOLTAR AO INÍCIO REAL
-        function irParaInicio() {
-            fecharPagina(); 
-            fecharBusca();
-            // Recarrega o gênero inicial (Forró) para limpar a pesquisa do grid
-            carregarPorGenero("Forró"); 
-            window.scrollTo({top: 0, behavior: 'smooth'});
+        // NOVA LÓGICA DO BOTÃO HOME (CASINHA)
+        function logicaBotaoHome() {
+            const albumAberto = document.getElementById('albumPage').style.display === 'flex';
+            
+            if (albumAberto) {
+                // 1º Toque: Fecha o álbum e volta para a lista (que pode ser a da pesquisa)
+                fecharPagina();
+            } else if (buscaAtiva) {
+                // 2º Toque: Se estava numa busca, limpa a busca e volta para o início real (Forró)
+                carregarPorGenero("Forró");
+                buscaAtiva = false;
+                window.scrollTo({top: 0, behavior: 'smooth'});
+            } else {
+                // 3º Toque: Já está no início, apenas sobe para o topo
+                window.scrollTo({top: 0, behavior: 'smooth'});
+            }
+            fecharBusca(); // Garante que a tela de digitar busca feche também
         }
 
         function abrirBusca() {
@@ -148,11 +159,14 @@
         function selecionarSugestao(termo) {
             fecharPagina(); 
             fecharBusca(); 
+            buscaAtiva = true; // Marcamos que o grid agora é um resultado de busca
             carregarPorGenero(termo);
         }
 
         const generos = ["Forró", "Vaquejada", "Piseiro", "Sertanejo", "Arrocha", "Pagode"];
-        document.getElementById('catNav').innerHTML = generos.map(g => `<button class="cat-btn" onclick="carregarPorGenero('${g}')">${g}</button>`).join('');
+        document.getElementById('catNav').innerHTML = generos.map(g => `
+            <button class="cat-btn" onclick="buscaAtiva=false; carregarPorGenero('${g}')">${g}</button>
+        `).join('');
 
         async function carregarPorGenero(g) {
             const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(g)}&entity=album&limit=50`);
@@ -216,7 +230,7 @@
         function abrirAlbumAtivo() { if(window.albumAtivoId) abrirAlbum(window.albumAtivoId, window.capaAtiva); }
 
         audio.onplay = atualizarUI; audio.onpause = atualizarUI;
-        carregarPorGenero("Forró"); // Inicializa com Forró
+        carregarPorGenero("Forró");
     </script>
 </body>
 </html>
