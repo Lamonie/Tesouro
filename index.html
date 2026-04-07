@@ -7,29 +7,53 @@
     <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --primary: #94b3ce; --bg: #000000; --text-main: #ffffff; --player-bg: rgba(255, 255, 255, 0.1); --playing-color: #ffff00; --active-song: #007bff; }
+        :root { 
+            --primary: #94b3ce; 
+            --bg: #000000; 
+            --text-main: #ffffff; 
+            --player-bg: rgba(255, 255, 255, 0.1); 
+            --playing-color: #ffff00; 
+            --active-song: #007bff; 
+        }
         
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         
-        body { background: #000000; color: var(--text-main); font-family: -apple-system, sans-serif; min-height: 100vh; overflow-x: hidden; }
+        body { 
+            background: #000000; 
+            color: var(--text-main); 
+            font-family: -apple-system, sans-serif; 
+            min-height: 100vh; 
+            overflow-x: hidden; 
+        }
 
         header { 
-            padding: 20px 15px; 
+            padding: 25px 15px 20px; 
             background: rgba(255, 255, 255, 0.03); 
             backdrop-filter: blur(20px); 
-            -webkit-backdrop-filter: blur(20px); 
             border-bottom: 1px solid rgba(255,255,255,0.1);
             text-align: center;
         }
 
-        .logo-container {
-            width: 100%;
-            max-width: 420px;
-            height: 110px;
-            margin: 0 auto;
-            background: url('https://files.catbox.moe/0v4p8k.png') no-repeat center;
-            background-size: contain;
-            filter: drop-shadow(0 8px 15px rgba(0, 0, 0, 0.6));
+        .logo-inox {
+            font-family: 'Great Vibes', cursive;
+            font-size: 48px;
+            font-weight: 400;
+            letter-spacing: 2px;
+            display: inline-block;
+            padding: 10px 30px;
+            
+            /* Efeito Metálico 3D Preto com borda LED cinza brilhante */
+            background: linear-gradient(145deg, #1a1a1a, #0f0f0f, #1a1a1a);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 
+                0 0 10px rgba(200, 200, 200, 0.9),
+                0 0 20px rgba(180, 180, 180, 0.7),
+                3px 3px 8px rgba(0, 0, 0, 0.9),
+                -2px -2px 6px rgba(255, 255, 255, 0.15),
+                0 0 30px rgba(150, 150, 150, 0.6);
+            filter: drop-shadow(0 8px 15px rgba(0, 0, 0, 0.8));
+            -webkit-text-stroke: 1.5px #c0c0c0;
         }
 
         .nav-container { 
@@ -91,7 +115,6 @@
             right: 10px; 
             background: rgba(255, 255, 255, 0.1); 
             backdrop-filter: blur(25px); 
-            -webkit-backdrop-filter: blur(25px); 
             padding: 12px 20px; 
             border-radius: 20px; 
             border: 1px solid rgba(255, 255, 255, 0.2); 
@@ -102,7 +125,7 @@
         .player-controls { display: flex; align-items: center; gap: 15px; }
         .mini-art { width: 50px; height: 50px; border-radius: 10px; object-fit: cover; }
 
-        .full-page { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); backdrop-filter: blur(35px); -webkit-backdrop-filter: blur(35px); z-index: 10001; display: none; flex-direction: column; overflow-y: auto; }
+        .full-page { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); backdrop-filter: blur(35px); z-index: 10001; display: none; flex-direction: column; overflow-y: auto; }
         .btn-voltar { margin: 15px; background: var(--primary); border: none; color: #000; padding: 12px 25px; border-radius: 35px; font-weight: 800; width: fit-content; }
         
         .track-row { display: flex; align-items: center; padding: 18px; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; }
@@ -116,7 +139,7 @@
 <body>
 
     <header>
-        <div class="logo-container"></div>
+        <div class="logo-inox">LamonieFlow</div>
     </header>
 
     <div class="nav-container">
