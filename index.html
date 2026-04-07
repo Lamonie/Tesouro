@@ -109,16 +109,33 @@
         .player-controls { display: flex; align-items: center; gap: 15px; }
         .mini-art { width: 50px; height: 50px; border-radius: 10px; object-fit: cover; }
 
-        .full-page { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(0,0,0,0.92); 
-            backdrop-filter: blur(35px); 
-            -webkit-backdrop-filter: blur(35px); 
-            z-index: 10001; 
-            display: none; 
-            flex-direction: column; 
-            overflow-y: auto; 
+        /* Contador de tempo no estilo da imagem */
+        .time-bar-container {
+            width: 100%;
+            margin: 8px 0 12px 0;
         }
+        .time-bar {
+            height: 4px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 2px;
+            position: relative;
+            overflow: hidden;
+        }
+        .time-progress {
+            height: 100%;
+            background: rgba(255,255,255,0.7);
+            width: 0%;
+            transition: width 0.3s linear;
+        }
+        .time-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: rgba(255,255,255,0.7);
+            margin-top: 4px;
+        }
+
+        .full-page { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); backdrop-filter: blur(35px); -webkit-backdrop-filter: blur(35px); z-index: 10001; display: none; flex-direction: column; overflow-y: auto; }
         
         .btn-voltar { 
             margin: 15px; 
@@ -134,7 +151,6 @@
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
         }
 
-        /* Novo botão de compartilhar - posição ao lado da imagem do álbum */
         .share-album-btn {
             position: absolute;
             top: 35px;
@@ -152,11 +168,6 @@
             cursor: pointer;
             z-index: 10;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
-            transition: all 0.2s;
-        }
-        .share-album-btn:hover {
-            background: rgba(0, 0, 0, 0.9);
-            border-color: white;
         }
 
         .track-row { display: flex; align-items: center; padding: 18px; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; }
@@ -194,12 +205,24 @@
             <img id="playerArt" src="" class="mini-art">
             <div style="flex:1; overflow:hidden;">
                 <div style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-weight:bold; font-size:15px; color:white;" id="trackTitle">Música</div>
-                <div id="timeInfo" style="font-size:11px; color:rgba(255,255,255,0.7);">0:00 / 0:00</div>
+                <div id="trackArtist" style="font-size:13px; opacity:0.8;"></div>
             </div>
-            <div style="display:flex; align-items:center; gap:30px;">
-                <button onclick="event.stopPropagation(); togglePlay();" id="playBtn" style="background:none; border:none; color:var(--playing-color); font-size:30px;"><i class="fas fa-pause"></i></button>
-                <i class="fas fa-step-forward" style="color:white; font-size:24px;" onclick="event.stopPropagation(); proxima();"></i>
+        </div>
+
+        <!-- Contador de tempo no estilo da imagem -->
+        <div class="time-bar-container">
+            <div class="time-bar">
+                <div class="time-progress" id="timeProgress"></div>
             </div>
+            <div class="time-labels">
+                <span id="currentTime">0:00</span>
+                <span id="remainingTime">-0:00</span>
+            </div>
+        </div>
+
+        <div style="display:flex; align-items:center; gap:30px; justify-content:center; margin-top:8px;">
+            <button onclick="event.stopPropagation(); togglePlay();" id="playBtn" style="background:none; border:none; color:var(--playing-color); font-size:30px;"><i class="fas fa-pause"></i></button>
+            <i class="fas fa-step-forward" style="color:white; font-size:24px;" onclick="event.stopPropagation(); proxima();"></i>
         </div>
     </footer>
 
@@ -215,6 +238,31 @@
         const audio = document.getElementById('audioMain');
         const playerBar = document.getElementById('player');
         const albumPage = document.getElementById('albumPage');
+
+        // Atualiza o contador de tempo
+        audio.ontimeupdate = () => {
+            const current = audio.currentTime || 0;
+            const duration = audio.duration || 0;
+            
+            const currentFormatted = formatTime(current);
+            const remaining = duration - current;
+            const remainingFormatted = remaining > 0 ? '-' + formatTime(remaining) : '-0:00';
+
+            document.getElementById('currentTime').textContent = currentFormatted;
+            document.getElementById('remainingTime').textContent = remainingFormatted;
+
+            // Barra de progresso
+            const progressPercent = duration ? (current / duration) * 100 : 0;
+            document.getElementById('timeProgress').style.width = `${progressPercent}%`;
+
+            atualizarUI();
+        };
+
+        function formatTime(s) {
+            const min = Math.floor(s / 60);
+            const seg = Math.floor(s % 60);
+            return `${min}:${seg < 10 ? '0' : ''}${seg}`;
+        }
 
         function toggleGenres() {
             const nav = document.getElementById('catNav');
@@ -251,17 +299,6 @@
             if(valor) carregarPorGenero(valor);
         }
 
-        audio.ontimeupdate = () => {
-            const duration = audio.duration || 0;
-            document.getElementById('timeInfo').innerText = `${formatTime(audio.currentTime)} / ${formatTime(duration)}`;
-            atualizarUI();
-        };
-
-        function formatTime(s) {
-            const min = Math.floor(s / 60); const seg = Math.floor(s % 60);
-            return `${min}:${seg < 10 ? '0' : ''}${seg}`;
-        }
-
         function voltarParaAlbumAtivo() { if (window.albumAtivoId) abrirAlbum(window.albumAtivoId, window.capaAtiva); }
 
         const generos = ["Início", "Forró", "Vaquejada", "Piseiro", "Sertanejo", "Brega", "Arrocha", "Axé", "Pagode", "Samba", "Gospel", "Rock", "Pop", "Hip-Hop"];
@@ -294,11 +331,7 @@
             document.getElementById('albumDetailContent').innerHTML = `
                 <div style="text-align:center; padding:30px; position:relative;">
                     <img src="${art.replace('100x100', '600x600')}" style="width:250px; border-radius:20px;">
-                    
-                    <!-- Novo botão de compartilhar ao lado da imagem -->
-                    <div class="share-album-btn" onclick="compartilharAlbum()" title="Compartilhar álbum">
-                        ↑
-                    </div>
+                    <div class="share-album-btn" onclick="compartilharAlbum()" title="Compartilhar álbum">↑</div>
                 </div>
                 
                 <div style="text-align:center; margin-top:-20px;">
@@ -331,21 +364,14 @@
 
         function compartilharAlbum() {
             const link = window.currentAlbumLink || "https://music.apple.com";
-            
             if (navigator.share) {
-                navigator.share({
-                    title: "Confira este álbum",
-                    text: "Ouça agora no LamoniêFlow!",
-                    url: link
-                });
+                navigator.share({ title: "Confira este álbum", text: "Ouça agora!", url: link });
             } else {
                 const whatsappUrl = `https://wa.me/?text=${encodeURIComponent("Ouça este álbum: " + link)}`;
-                if (confirm("Abrir no WhatsApp para compartilhar?\n\nOu clique em OK para copiar o link.")) {
+                if (confirm("Abrir no WhatsApp?\n\nOu OK para copiar link.")) {
                     window.open(whatsappUrl, '_blank');
                 } else {
-                    navigator.clipboard.writeText(link).then(() => {
-                        alert("✅ Link copiado para a área de transferência!");
-                    });
+                    navigator.clipboard.writeText(link).then(() => alert("Link copiado!"));
                 }
             }
         }
@@ -357,11 +383,13 @@
             window.albumAtivoId = albumId; window.musicaIndex = index;
             window.listaTocando = window.listaVisualizada; window.capaAtiva = art;
             const m = window.listaTocando[index];
-            audio.src = m.previewUrl; audio.play();
+            audio.src = m.previewUrl; 
+            audio.play();
             playerBar.style.display = 'block';
             playerBar.classList.remove('player-hidden');
             document.getElementById('playerArt').src = art;
             document.getElementById('trackTitle').innerText = m.trackName;
+            document.getElementById('trackArtist').innerText = m.artistName || '';
             atualizarUI();
         }
 
@@ -385,13 +413,19 @@
         }
 
         async function baixarMusica(url, nome) {
-            const res = await fetch(url); const blob = await res.blob();
-            const link = document.createElement('a'); link.href = window.URL.createObjectURL(blob);
-            link.download = `${nome}.mp3`; link.click();
+            const res = await fetch(url); 
+            const blob = await res.blob();
+            const link = document.createElement('a'); 
+            link.href = window.URL.createObjectURL(blob);
+            link.download = `${nome}.mp3`; 
+            link.click();
         }
 
         function togglePlay() { audio.paused ? audio.play() : audio.pause(); atualizarUI(); }
-        function proxima() { if(window.musicaIndex + 1 < window.listaTocando.length) tocar(window.albumAtivoId, window.musicaIndex + 1, window.capaAtiva); }
+        function proxima() { 
+            if(window.musicaIndex + 1 < window.listaTocando.length) 
+                tocar(window.albumAtivoId, window.musicaIndex + 1, window.capaAtiva); 
+        }
         function fecharPagina() { albumPage.style.display = 'none'; }
         carregarPorGenero("Início");
     </script>
