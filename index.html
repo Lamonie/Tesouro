@@ -5,175 +5,143 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>LAMONIÊ FLOW</title>
     <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
-        :root { 
-            --primary: #94b3ce; 
-            --bg: #000000; 
-            --text-main: #ffffff; 
-            --playing-color: #ffff00; 
-        }
+        :root { --primary: #94b3ce; }
         
-        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-        
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         body { 
-            background: #000000; 
-            color: var(--text-main); 
-            font-family: -apple-system, sans-serif; 
-            min-height: 100vh; 
-            overflow-x: hidden; 
+            background: #000; 
+            color: #fff; 
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif; 
+            min-height: 100vh;
         }
 
         header { 
-            padding: 25px 15px 15px; 
-            background: rgba(255, 255, 255, 0.03); 
-            backdrop-filter: blur(20px); 
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding: 30px 15px 15px; 
             text-align: center;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.05), transparent);
         }
 
         .logo-inox {
             font-family: 'Great Vibes', cursive;
-            font-size: 48px;
+            font-size: 52px;
             font-weight: 400;
-            letter-spacing: 2px;
-            display: inline-block;
-            padding: 10px 30px;
-            background: linear-gradient(145deg, #1a1a1a, #0f0f0f, #1a1a1a);
+            letter-spacing: 3px;
+            background: linear-gradient(white, #ddd);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            text-shadow: 
-                0 0 10px rgba(200,200,200,0.9),
-                0 0 20px rgba(180,180,180,0.7),
-                3px 3px 8px rgba(0,0,0,0.9),
-                -2px -2px 6px rgba(255,255,255,0.15);
-            filter: drop-shadow(0 8px 15px rgba(0,0,0,0.8));
-            -webkit-text-stroke: 1.5px #c0c0c0;
+            text-shadow: 0 0 30px rgba(255,255,255,0.8);
+            filter: drop-shadow(0 0 20px rgba(255,255,255,0.6));
         }
 
         .api-tabs {
             display: flex;
             justify-content: center;
-            gap: 10px;
-            padding: 10px 15px;
+            gap: 8px;
+            padding: 15px;
             flex-wrap: wrap;
         }
         .api-tab {
-            padding: 8px 20px;
-            background: #111;
+            padding: 10px 22px;
+            background: #1a1a1a;
             border: 1px solid #333;
-            border-radius: 20px;
-            font-size: 14px;
+            border-radius: 25px;
+            font-size: 15px;
             cursor: pointer;
             transition: all 0.3s;
         }
         .api-tab.active {
-            background: var(--primary);
+            background: #94b3ce;
             color: #000;
-            border-color: var(--primary);
-        }
-
-        .nav-container { 
-            display: flex; 
-            align-items: center; 
-            padding: 10px 15px; 
-            gap: 10px; 
-            overflow: hidden;
-        }
-
-        .genres-toggle-btn {
-            background: #000;
-            color: white;
-            border: 1px solid #333; 
-            padding: 8px 15px;
-            border-radius: 10px;
             font-weight: bold;
+        }
+
+        .nav-container {
+            padding: 0 15px 10px;
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        .nav-container::-webkit-scrollbar { display: none; }
+
+        .genres-btn, .cat-btn {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            color: white;
+            padding: 9px 18px;
+            border-radius: 20px;
+            white-space: nowrap;
+            font-size: 14px;
             cursor: pointer;
         }
+        .genres-btn { font-weight: bold; }
 
-        .categories-nav { 
-            display: none; 
-            overflow-x: auto; 
-            gap: 8px; 
-            white-space: nowrap;
-            scrollbar-width: none;
+        .search-container {
+            padding: 10px 15px;
+        }
+        .search-box {
+            display: flex;
+            background: #1f1f1f;
+            border-radius: 25px;
+            padding: 0 18px;
+            align-items: center;
+        }
+        .search-box input {
             flex: 1;
-        }
-        .categories-nav::-webkit-scrollbar { display: none; }
-        
-        .cat-btn { 
-            background: #000; 
-            border: 1px solid #333; 
-            color: white; 
-            padding: 8px 16px; 
-            border-radius: 18px; 
-            font-size: 13px; 
-            font-weight: 600; 
-            flex-shrink: 0; 
+            background: none;
+            border: none;
+            color: white;
+            padding: 14px 10px;
+            font-size: 16px;
+            outline: none;
         }
 
-        .search-container { padding: 10px 15px; }
-        .search-box { 
-            display: flex; 
-            background: rgba(255, 255, 255, 0.07); 
-            border-radius: 15px; 
-            border: 1px solid rgba(255,255,255,0.1); 
-            align-items: center; 
-            padding: 0 15px; 
-        }
-        .search-box input { 
-            background: none; 
-            border: none; 
-            color: white; 
-            flex: 1; 
-            padding: 15px 10px; 
-            outline: none; 
-        }
-
-        .main-grid { 
-            display: flex; 
-            flex-wrap: wrap; 
-            justify-content: space-between; 
-            padding: 10px 15px 180px; 
+        .main-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
             gap: 15px;
+            padding: 15px;
         }
-        .card { 
-            width: 47%; 
-            background: rgba(255,255,255,0.04); 
-            border-radius: 15px; 
-            padding: 8px; 
+        .card {
+            background: #111;
+            border-radius: 16px;
             overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.2s;
         }
-        .card img { 
-            width: 100%; 
-            aspect-ratio: 1/1; 
-            border-radius: 12px; 
-            object-fit: cover; 
+        .card:hover { transform: scale(1.04); }
+        .card img {
+            width: 100%;
+            aspect-ratio: 1/1;
+            object-fit: cover;
         }
-        .source-tag {
-            position: absolute;
-            top: 10px;
-            right: 10px;
+        .card-info {
+            padding: 12px;
+        }
+        .source {
             font-size: 10px;
             padding: 2px 8px;
+            background: rgba(255,255,255,0.1);
             border-radius: 10px;
-            background: rgba(0,0,0,0.7);
+            display: inline-block;
+            margin-bottom: 6px;
         }
 
-        .player { 
-            position: fixed; 
-            bottom: 10px; 
-            left: 10px; 
-            right: 10px; 
-            background: rgba(255, 255, 255, 0.1); 
-            backdrop-filter: blur(25px); 
-            padding: 12px 20px; 
-            border-radius: 20px; 
-            border: 1px solid rgba(255, 255, 255, 0.2); 
-            z-index: 10002; 
+        .player {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(20,20,20,0.95);
+            backdrop-filter: blur(20px);
+            padding: 12px 15px;
+            display: none;
+            align-items: center;
+            gap: 12px;
+            z-index: 1000;
         }
-        .player-hidden { transform: translateY(100px); opacity: 0; }
-        .mini-art { width: 50px; height: 50px; border-radius: 10px; object-fit: cover; }
     </style>
 </head>
 <body>
@@ -182,44 +150,43 @@
         <div class="logo-inox">LamonieFlow</div>
     </header>
 
-    <div class="api-tabs">
+    <div class="api-tabs" id="apiTabs">
         <div class="api-tab active" data-source="all">Todas</div>
         <div class="api-tab" data-source="itunes">iTunes</div>
-        <div class="api-tab" data-source="spotify">Spotify</div>
         <div class="api-tab" data-source="deezer">Deezer</div>
     </div>
 
     <div class="nav-container">
-        <div class="genres-toggle-btn" onclick="toggleGenres()">Gêneros</div>
-        <div class="categories-nav" id="catNav"></div>
+        <div class="genres-btn" onclick="toggleGenres()">Gêneros</div>
+        <div id="catNav"></div>
     </div>
 
     <div class="search-container">
         <div class="search-box">
-            <input type="text" id="searchInput" placeholder="Buscar música, artista ou álbum...">
-            <div style="display:flex; gap:20px; color:#8e8e93;">
-                <i class="fas fa-search" onclick="realizarBusca()" style="cursor:pointer;"></i>
-            </div>
+            <input type="text" id="searchInput" placeholder="Buscar música, artista ou álbum..." onkeypress="if(event.key==='Enter') buscar()">
+            <i class="fas fa-search" onclick="buscar()" style="color:#888; font-size:20px; cursor:pointer;"></i>
         </div>
     </div>
 
     <div id="grid" class="main-grid"></div>
 
-    <footer class="player" id="player" style="display:none;">
-        <div style="display:flex; align-items:center; gap:15px;">
-            <img id="playerArt" src="" class="mini-art">
-            <div style="flex:1; overflow:hidden;">
-                <div id="trackTitle" style="font-weight:bold; font-size:15px;">Música</div>
-                <div id="trackArtist" style="font-size:13px; opacity:0.8;"></div>
-            </div>
-            <audio id="audioMain" controls style="width:140px;"></audio>
+    <div id="player" class="player">
+        <img id="playerArt" src="" style="width:55px; height:55px; border-radius:8px; object-fit:cover;">
+        <div style="flex:1; overflow:hidden;">
+            <div id="playerTitle" style="font-weight:600; font-size:15px;">Título</div>
+            <div id="playerArtist" style="font-size:13px; opacity:0.8;">Artista</div>
         </div>
-    </footer>
+        <audio id="audioPlayer" controls style="width:130px;"></audio>
+    </div>
 
     <script>
+        const generos = ["Forró", "Vaquejada", "Piseiro", "Sertanejo", "Brega", "Arrocha", "Axé", "Pagode", "Samba", "Início"];
+        document.getElementById('catNav').innerHTML = generos.map(g => 
+            `<div class="cat-btn" onclick="buscarGeral('${g}')">${g}</div>`
+        ).join('');
+
         let currentSource = 'all';
 
-        // Tabs
         document.querySelectorAll('.api-tab').forEach(tab => {
             tab.addEventListener('click', () => {
                 document.querySelectorAll('.api-tab').forEach(t => t.classList.remove('active'));
@@ -228,54 +195,38 @@
             });
         });
 
-        const generos = ["Início", "Forró", "Vaquejada", "Piseiro", "Sertanejo", "Brega", "Arrocha", "Axé", "Pagode", "Samba"];
-        document.getElementById('catNav').innerHTML = generos.map(g => 
-            `<button class="cat-btn" onclick="buscarGeral('${g}')">${g}</button>`
-        ).join('');
-
         function toggleGenres() {
             const nav = document.getElementById('catNav');
-            nav.style.display = (nav.style.display === 'flex') ? 'none' : 'flex';
+            nav.style.display = nav.style.display === 'flex' ? 'none' : 'flex';
         }
 
-        async function buscarGeral(termo) {
-            document.getElementById('grid').innerHTML = '<p style="text-align:center; width:100%; padding:40px;">Buscando em iTunes, Spotify e Deezer...</p>';
-            
-            const promises = [];
-            
+        async function buscarGeral(termo = "Forró") {
+            document.getElementById('grid').innerHTML = `<p style="grid-column:1/-1; text-align:center; padding:50px;">Buscando em iTunes e Deezer...</p>`;
+
+            let allResults = [];
+
             // iTunes
-            promises.push(fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(termo)}&entity=album&limit=20&country=BR`)
-                .then(r => r.json()).then(data => data.results.map(item => ({...item, source: 'itunes'}))));
-
-            // Spotify (público via proxy não oficial, mas funciona em muitos casos)
-            promises.push(fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(termo)}&type=album&limit=12`, {
-                headers: { 'Authorization': 'Bearer BQD...'} // em produção você precisaria de token real
-            }).catch(() => ({tracks: {items: []}})).then(d => {
-                if (!d.albums) return [];
-                return d.albums.items.map(item => ({...item, source: 'spotify'}));
-            }));
-
-            // Deezer (funciona sem autenticação)
-            promises.push(fetch(`https://api.deezer.com/search/album?q=${encodeURIComponent(termo)}&limit=15`)
-                .then(r => r.json()).then(data => (data.data || []).map(item => ({...item, source: 'deezer'}))));
-
-            try {
-                const resultsArray = await Promise.allSettled(promises);
-                let allItems = [];
-
-                resultsArray.forEach(result => {
-                    if (result.status === 'fulfilled' && Array.isArray(result.value)) {
-                        allItems = allItems.concat(result.value);
-                    }
-                });
-
-                mostrarResultados(allItems);
-            } catch (e) {
-                document.getElementById('grid').innerHTML = '<p style="text-align:center; color:red;">Erro na busca.</p>';
+            if (currentSource === 'all' || currentSource === 'itunes') {
+                try {
+                    const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(termo)}&entity=album&limit=30&country=BR`);
+                    const data = await res.json();
+                    allResults.push(...data.results.map(item => ({...item, source: 'iTunes'})));
+                } catch(e) {}
             }
+
+            // Deezer
+            if (currentSource === 'all' || currentSource === 'deezer') {
+                try {
+                    const res = await fetch(`https://api.deezer.com/search/album?q=${encodeURIComponent(termo)}&limit=20`);
+                    const data = await res.json();
+                    allResults.push(...(data.data || []).map(item => ({...item, source: 'Deezer'})));
+                } catch(e) {}
+            }
+
+            mostrarResultados(allResults);
         }
 
-        function realizarBusca() {
+        function buscar() {
             const termo = document.getElementById('searchInput').value.trim();
             if (termo) buscarGeral(termo);
         }
@@ -285,44 +236,50 @@
             grid.innerHTML = '';
 
             if (items.length === 0) {
-                grid.innerHTML = '<p style="text-align:center; width:100%;">Nenhum resultado encontrado.</p>';
+                grid.innerHTML = '<p style="grid-column:1/-1; text-align:center; padding:50px;">Nenhum resultado encontrado.</p>';
                 return;
             }
 
             items.forEach(item => {
-                let img = '';
-                let title = '';
-                let artist = '';
-                let source = item.source || 'itunes';
-
-                if (source === 'itunes') {
-                    img = item.artworkUrl100 ? item.artworkUrl100.replace('100x100', '400x400') : '';
-                    title = item.collectionName || item.trackName;
-                    artist = item.artistName;
-                } else if (source === 'spotify') {
-                    img = item.images ? item.images[0].url : '';
-                    title = item.name;
-                    artist = item.artists ? item.artists[0].name : '';
-                } else if (source === 'deezer') {
-                    img = item.cover_big || item.cover_medium || '';
-                    title = item.title;
+                let img = '', title = '', artist = '';
+                
+                if (item.source === 'iTunes') {
+                    img = (item.artworkUrl100 || '').replace('100x100', '400x400');
+                    title = item.collectionName || item.trackName || 'Sem título';
+                    artist = item.artistName || '';
+                } else {
+                    img = item.cover_big || item.cover_medium || 'https://via.placeholder.com/300';
+                    title = item.title || 'Sem título';
                     artist = item.artist ? item.artist.name : '';
                 }
 
-                const card = document.createElement('div');
-                card.className = 'card';
-                card.style.position = 'relative';
-                card.innerHTML = `
-                    <img src="${img}" onerror="this.src='https://via.placeholder.com/300x300/222/fff?text=Sem+Imagem'">
-                    <div class="source-tag">${source.toUpperCase()}</div>
-                    <p style="margin-top:10px; font-weight:bold; font-size:13px;">${title || 'Sem título'}</p>
-                    <p style="font-size:12px; opacity:0.8;">${artist || ''}</p>
+                const cardHTML = `
+                    <div class="card" onclick="tocarMusica('${img}', '${title.replace(/'/g, "\\'")}', '${artist.replace(/'/g, "\\'")}')">
+                        <img src="${img}" onerror="this.src='https://via.placeholder.com/300x300/222/fff?text=Sem+Imagem'">
+                        <div class="card-info">
+                            <div class="source">${item.source}</div>
+                            <div style="font-weight:600; font-size:14px; margin-bottom:4px;">${title}</div>
+                            <div style="font-size:13px; opacity:0.8;">${artist}</div>
+                        </div>
+                    </div>
                 `;
-                grid.appendChild(card);
+                grid.innerHTML += cardHTML;
             });
         }
 
-        // Inicia com Forró / Luiz Gonzaga
+        function tocarMusica(art, title, artist) {
+            const player = document.getElementById('player');
+            document.getElementById('playerArt').src = art;
+            document.getElementById('playerTitle').textContent = title;
+            document.getElementById('playerArtist').textContent = artist;
+            player.style.display = 'flex';
+            
+            // Toca preview se disponível (iTunes tem previewUrl, Deezer não direto aqui)
+            const audio = document.getElementById('audioPlayer');
+            audio.src = ''; // por enquanto só mostra o player
+        }
+
+        // Inicia automaticamente
         window.onload = () => buscarGeral("Forró");
     </script>
 </body>
