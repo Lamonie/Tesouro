@@ -84,21 +84,23 @@
         .card { width: 47%; background: rgba(255,255,255,0.04); border-radius: 15px; padding: 8px; margin-bottom: 20px; }
         .card img { width: 100%; aspect-ratio: 1/1; border-radius: 12px; object-fit: cover; }
 
-        /* ==================== BARRA INFERIOR NO ESTILO DESEJADO ==================== */
+        /* ==================== BARRA INFERIOR COM EFEITO DE VIDRO TRANSPARENTE ==================== */
         .player { 
             position: fixed; 
             bottom: 12px; 
             left: 12px; 
             right: 12px; 
-            background: rgba(30, 30, 30, 0.95); 
-            backdrop-filter: blur(25px); 
+            background: rgba(255, 255, 255, 0.08);   /* Fundo quase transparente */
+            backdrop-filter: blur(30px);             /* Efeito vidro forte */
+            -webkit-backdrop-filter: blur(30px);
             border-radius: 50px; 
             padding: 8px 12px; 
             display: flex; 
             align-items: center; 
             gap: 12px; 
             z-index: 10002; 
-            box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.5);
         }
 
         .nav-bottom-btn {
@@ -193,7 +195,7 @@
     </div>
     <div id="grid" class="main-grid"></div>
 
-    <!-- Barra inferior no novo formato -->
+    <!-- Barra inferior com efeito vidro transparente -->
     <footer class="player" id="player">
         <!-- Botão Home -->
         <div class="nav-bottom-btn" onclick="voltarParaInicio()">
@@ -241,11 +243,6 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // Atualiza contador de tempo (mantido simples)
-        audio.ontimeupdate = () => {
-            atualizarUI();
-        };
-
         function toggleGenres() {
             const nav = document.getElementById('catNav');
             nav.style.display = (nav.style.display === 'flex') ? 'none' : 'flex';
@@ -267,11 +264,6 @@
             const valor = document.getElementById('searchInput').value;
             if(valor) carregarPorGenero(valor);
         }
-
-        function voltarParaAlbumAtivo() { if (window.albumAtivoId) abrirAlbum(window.albumAtivoId, window.capaAtiva); }
-
-        const generos = ["Início", "Forró", "Vaquejada", "Piseiro", "Sertanejo", "Brega", "Arrocha", "Axé", "Pagode", "Samba", "Gospel", "Rock", "Pop", "Hip-Hop"];
-        document.getElementById('catNav').innerHTML = generos.map(g => `<button class="cat-btn" onclick="carregarPorGenero('${g}')">${g}</button>`).join('');
 
         async function carregarPorGenero(g) {
             const termo = g === "Início" ? "Luiz Gonzaga" : g;
@@ -334,7 +326,6 @@
             document.getElementById('playerArt').src = art;
             document.getElementById('trackTitle').innerText = m.trackName;
             document.getElementById('trackArtist').innerText = m.artistName || '';
-            player.style.display = 'flex';
         }
 
         function togglePlay() {
