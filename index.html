@@ -196,7 +196,7 @@
     <div id="grid" class="main-grid"></div>
 
     <!-- Barra inferior -->
-    <footer class="player" id="player" onclick="abrirAlbumAtual()">
+    <footer class="player" id="player" onclick="abrirAlbumDaBarra()">
         <div class="nav-bottom-btn" onclick="event.stopImmediatePropagation(); voltarParaInicio()">
             <i class="fas fa-home"></i>
         </div>
@@ -229,7 +229,7 @@
         const audio = document.getElementById('audioMain');
         const player = document.getElementById('player');
 
-        // Variáveis globais para controlar o álbum atual
+        // Variáveis para controlar o álbum atual da barra
         window.albumAtualId = null;
         window.capaAtual = null;
 
@@ -243,7 +243,8 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        function abrirAlbumAtual() {
+        // Clique na barra → abre o álbum que está tocando
+        function abrirAlbumDaBarra() {
             if (window.albumAtualId && window.capaAtual) {
                 abrirAlbum(window.albumAtualId, window.capaAtual);
             }
@@ -283,11 +284,12 @@
         }
 
         async function abrirAlbum(id, art) {
-            window.albumAtualId = id;        // ← Salva o álbum atual
-            window.capaAtual = art;          // ← Salva a capa atual
+            window.albumAtualId = id;      // Salva o álbum atual
+            window.capaAtual = art;        // Salva a capa atual
 
             window.albumVisualizadoId = id;
             albumPage.style.display = 'flex';
+
             const res = await fetch(`https://itunes.apple.com/lookup?id=${id}&entity=song`);
             const data = await res.json();
             const album = data.results[0]; 
@@ -335,6 +337,10 @@
             document.getElementById('playerArt').src = art;
             document.getElementById('trackTitle').innerText = m.trackName;
             document.getElementById('trackArtist').innerText = m.artistName || '';
+
+            // Atualiza o álbum atual da barra
+            window.albumAtualId = albumId;
+            window.capaAtual = art;
         }
 
         function togglePlay() {
