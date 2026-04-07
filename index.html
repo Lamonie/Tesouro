@@ -89,6 +89,7 @@
         .track-row.is-playing .track-play-icon { color: var(--playing-color) !important; }
         .album-meta { background: rgba(255,255,255,0.06); margin: 15px; padding: 20px; border-radius: 18px; font-size: 13px; color: #bbb; text-align: center; line-height: 1.6; }
         .composer-name { font-size: 11px; color: #777; margin-top: 2px; }
+        .error-message { text-align: center; color: #ff4d4d; padding: 20px; }
     </style>
 </head>
 <body>
@@ -129,8 +130,39 @@
         const audio = document.getElementById('audioMain');
         const playerBar = document.getElementById('player');
         const albumPage = document.getElementById('albumPage');
-        // Adicionado proxy para contornar o problema de CORS
-        const proxyUrl = 'https://api.allorigins.win/raw?url=';
+        const grid = document.getElementById('grid');
+        const albumDetailContent = document.getElementById('albumDetailContent');
+
+        // Função para exibir erros na tela
+        function showError(element, message) {
+            element.innerHTML = `<div class="error-message"><h3>Ocorreu um erro</h3><p>${message}</p></div>`;
+        }
+
+        // Função para fazer a chamada à API do Deezer usando um proxy confiável
+        async function fetchDeezer(endpoint) {
+            // Este proxy é mais estável para a API do Deezer.
+            const proxy = 'https://cors-anywhere.herokuapp.com/';
+            const apiUrl = `https://api.deezer.com/${endpoint}`;
+            
+            try {
+                const response = await fetch(proxy + apiUrl, {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                });
+                if (!response.ok) {
+                    throw new Error(`A requisição falhou: ${response.statusText} (status: ${response.status})`);
+                }
+                const data = await response.json();
+                if (data.error) {
+                    throw new Error(`Erro da API do Deezer: ${data.error.message}`);
+                }
+                return data;
+            } catch (error) {
+                console.error('Erro ao buscar dados do Deezer:', error);
+                // Retorna o erro para que a função que chamou possa tratá-lo
+                return { error: true, message: error.message };
+            }
+        }
+
 
         function toggleGenres() {
             const nav = document.getElementById('catNav');
@@ -171,88 +203,89 @@
             const min = Math.floor(s / 60); const seg = Math.floor(s % 60);
             return `${min}:${seg < 10 ? '0' : ''}${seg}`;
         }
-        function voltarParaAlbumAtivo() { if (window.albumAtivoId) abrirAlbum(window.albumAtivoId, window.capaAtiva); }
+        function voltarParaAlbumAtivo() { if (window.albumAtivoId) abrirAlbum(window.albumAtivoId); }
         const generos = ["Início", "Forró", "Vaquejada", "Piseiro", "Sertanejo", "Brega", "Arrocha", "Axé", "Pagode", "Samba", "Gospel", "Rock", "Pop", "Hip-Hop"];
         document.getElementById('catNav').innerHTML = generos.map(g => `<button class="cat-btn" onclick="carregarPorGenero('${g}')">${g}</button>`).join('');
 
         async function carregarPorGenero(g) {
+            grid.innerHTML = `<p style="text-align:center; padding: 20px;">Carregando...</p>`;
             const termo = g === "Início" ? "Luiz Gonzaga" : g;
-            // Usando o proxy na URL da API
-            const apiUrl = `https://api.deezer.com/search/album?q=${encodeURIComponent(termo)}&limit=100`;
-            const res = await fetch(`${proxyUrl}${encodeURIComponent(apiUrl)}`);
-            const data = await res.json();
+            const data = await fetchDeezer(`search/album?q=${encodeURIComponent(termo)}&limit=100`);
+            
+            if (data.error) {
+                showError(grid, "Não foi possível buscar os álbuns. Verifique sua conexão ou tente mais tarde.");
+                return;
+            }
 
-            // Verificando se 'data.data' existe antes de mapear
-            if (data && data.data) {
-                document.getElementById('grid').innerHTML = data.data.map(t => `
-                    <div class="card" onclick="abrirAlbum('${t.id}', '${t.cover_big}')">
-                        <img src="${t.cover_big}">
-                        <p style="margin-top:10px; font-weight:bold; font-size:13px;">${t.title}</p>
+            if (data.data && data.data.length > 0) {
+                grid.innerHTML = data.data.map(album => `
+                    <div class="card" onclick="abrirAlbum('${album.id}')">
+                        <img src="${album.cover_big}" alt="${album.title}">
+                        <p style="margin-top:10px; font-weight:bold; font-size:13px;">${album.title}</p>
                     </div>`).join('');
             } else {
-                console.error("A resposta da API do Deezer não tem o formato esperado.", data);
-                document.getElementById('grid').innerHTML = "<p>Não foi possível carregar os álbuns.</p>";
+                grid.innerHTML = `<p style="text-align:center; padding: 20px;">Nenhum álbum encontrado para "${g}".</p>`;
             }
         }
         
-        async function abrirAlbum(id, art) {
+        async function abrirAlbum(id) {
             window.albumVisualizadoId = id;
             albumPage.style.display = 'flex';
-            document.getElementById('albumDetailContent').innerHTML = "<p>Carregando álbum...</p>"; // Feedback para o usuário
+            albumDetailContent.innerHTML = `<p style="text-align:center; padding: 20px;">Carregando detalhes do álbum...</p>`;
 
-            // Usando o proxy na URL da API
-            const apiUrl = `https://api.deezer.com/album/${id}`;
-            const res = await fetch(`${proxyUrl}${encodeURIComponent(apiUrl)}`);
-            const data = await res.json();
+            const data = await fetchDeezer(`album/${id}`);
 
-            // Verificando se os dados do álbum e das faixas existem
-            if (data && data.tracks && data.tracks.data) {
-                const album = data;
-                const songs = data.tracks.data;
-                const dataLancamento = new Date(album.release_date).toLocaleDateString('pt-BR');
-                const gravadora = album.label || "Independente";
-                
-                document.getElementById('albumDetailContent').innerHTML = `
-                    <div style="text-align:center; padding:30px;"><img src="${album.cover_big}" style="width:250px; border-radius:20px;">
-                    <h2 style="margin-top:25px;">${album.title}</h2><p style="color:var(--primary);">${album.artist.name}</p></div>
-                    
-                    <div class="album-meta">
-                        <b>Gênero:</b> ${album.genres.data.map(g => g.name).join(', ')}<br>
-                        <b>Lançamento:</b> ${dataLancamento}<br>
-                        <b>Gravadora:</b> ${gravadora}
-                    </div>
-                    ${songs.map((m, i) => `
-                        <div class="track-row" id="row_${id}_${i}" onclick="tocar('${id}', ${i}, '${art}')">
-                            <span style="color:#777; width:30px;">${i+1}</span>
-                            <div style="flex:1; margin-left:12px; overflow:hidden;">
-                                <div class="track-title" style="font-size:15px; color:white;">${m.title}</div>
-                                <div class="composer-name">${m.artist.name}</div>
-                            </div>
-                            <div class="track-actions">
-                                <i class="fas fa-download" style="color:#8e8e93; font-size:18px;" onclick="event.stopPropagation(); baixarMusica('${m.preview}', '${m.title}')"></i>
-                                <i class="fas fa-play-circle track-play-icon" id="btn_list_${id}_${i}" style="font-size:24px; color:white;"></i>
-                            </div>
-                        </div>`).join('')}<div style="height:180px;"></div>`;
-                window.listaVisualizada = songs; 
-                atualizarUI();
-            } else {
-                console.error("A resposta da API do Deezer não tem o formato esperado.", data);
-                document.getElementById('albumDetailContent').innerHTML = "<p>Erro ao carregar os detalhes do álbum.</p>";
+            if (data.error) {
+                showError(albumDetailContent, "Não foi possível carregar os detalhes do álbum.");
+                return;
             }
+            
+            const album = data;
+            const songs = data.tracks.data;
+            window.capaAtiva = album.cover_big; // Salva a capa para usar no player
+            
+            const dataLancamento = new Date(album.release_date).toLocaleDateString('pt-BR');
+            const gravadora = album.label || "Independente";
+            
+            albumDetailContent.innerHTML = `
+                <div style="text-align:center; padding:30px;"><img src="${album.cover_big}" style="width:250px; border-radius:20px;">
+                <h2 style="margin-top:25px;">${album.title}</h2><p style="color:var(--primary);">${album.artist.name}</p></div>
+                <div class="album-meta">
+                    <b>Gênero:</b> ${album.genres.data.map(g => g.name).join(', ') || 'Não especificado'}<br>
+                    <b>Lançamento:</b> ${dataLancamento}<br>
+                    <b>Gravadora:</b> ${gravadora}
+                </div>
+                ${songs.map((song, i) => `
+                    <div class="track-row" id="row_${id}_${i}" onclick="tocar('${id}', ${i})">
+                        <span style="color:#777; width:30px;">${i+1}</span>
+                        <div style="flex:1; margin-left:12px; overflow:hidden;">
+                            <div class="track-title" style="font-size:15px; color:white;">${song.title}</div>
+                            <div class="composer-name">${song.artist.name}</div>
+                        </div>
+                        <div class="track-actions" style="display:flex; align-items:center; gap: 15px;">
+                            <i class="fas fa-download" style="color:#8e8e93; font-size:18px;" onclick="event.stopPropagation(); baixarMusica('${song.preview}', '${song.title}')"></i>
+                            <i class="fas fa-play-circle track-play-icon" id="btn_list_${id}_${i}" style="font-size:24px; color:white;"></i>
+                        </div>
+                    </div>`).join('')}<div style="height:180px;"></div>`;
+            window.listaVisualizada = songs; 
+            atualizarUI();
         }
 
-        function tocar(albumId, index, art) {
+        function tocar(albumId, index) {
             if (window.albumAtivoId === albumId && window.musicaIndex === index) {
                 togglePlay(); return;
             }
             window.albumAtivoId = albumId; window.musicaIndex = index;
-            window.listaTocando = window.listaVisualizada; window.capaAtiva = art;
-            const m = window.listaTocando[index];
-            audio.src = m.preview; audio.play();
+            window.listaTocando = window.listaVisualizada;
+            const song = window.listaTocando[index];
+
+            audio.src = song.preview; 
+            audio.play().catch(e => console.error("Erro ao tocar áudio:", e));
+
             playerBar.style.display = 'block';
             playerBar.classList.remove('player-hidden');
-            document.getElementById('playerArt').src = art; // Usar a arte grande no player
-            document.getElementById('trackTitle').innerText = m.title;
+            document.getElementById('playerArt').src = window.capaAtiva;
+            document.getElementById('trackTitle').innerText = song.title;
             atualizarUI();
         }
 
@@ -262,7 +295,7 @@
                 ic.className = 'fas fa-play-circle track-play-icon';
                 ic.style.color = 'white';
             });
-            if (window.albumVisualizadoId === window.albumAtivoId) {
+            if (window.albumVisualizadoId === window.albumAtivoId && window.musicaIndex !== undefined) {
                 const row = document.getElementById(`row_${window.albumAtivoId}_${window.musicaIndex}`);
                 const icon = document.getElementById(`btn_list_${window.albumAtivoId}_${window.musicaIndex}`);
                 if(row) row.classList.add('is-playing');
@@ -273,16 +306,39 @@
             }
             document.getElementById('playBtn').innerHTML = audio.paused ? '<i class="fas fa-play"></i>' : '<i class="fas fa-pause"></i>';
         }
+        
         async function baixarMusica(url, nome) {
-            const res = await fetch(url); const blob = await res.blob();
-            const link = document.createElement('a'); link.href = window.URL.createObjectURL(blob);
-            link.download = `${nome}.mp3`; link.click();
+            // O download de arquivos via proxy pode ser instável ou bloqueado.
+            // Esta função pode não funcionar de forma consistente.
+            try {
+                const res = await fetch(url); 
+                const blob = await res.blob();
+                const link = document.createElement('a'); 
+                link.href = window.URL.createObjectURL(blob);
+                link.download = `${nome}.mp3`; 
+                link.click();
+            } catch(e) {
+                alert("Não foi possível iniciar o download. O áudio pode estar protegido.");
+            }
         }
-        function togglePlay() { audio.paused ? audio.play() : audio.pause(); atualizarUI(); }
-        function proxima() { if(window.musicaIndex + 1 < window.listaTocando.length) tocar(window.albumAtivoId, window.musicaIndex + 1, window.capaAtiva); }
+
+        function togglePlay() { 
+            if (audio.src) {
+                audio.paused ? audio.play() : audio.pause(); 
+            }
+        }
+
+        function proxima() { 
+            if(window.listaTocando && window.musicaIndex + 1 < window.listaTocando.length) {
+                tocar(window.albumAtivoId, window.musicaIndex + 1); 
+            }
+        }
+        
         function fecharPagina() { albumPage.style.display = 'none'; }
         
+        // Carregamento inicial
         carregarPorGenero("Início");
+
     </script>
 </body>
 </html>
