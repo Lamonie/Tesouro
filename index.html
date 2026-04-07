@@ -7,7 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --playing-color: #ffff00; --active-song: #007bff; }
+        :root { --playing-color: #ffff00; }
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         body { background: #000; color: #fff; font-family: -apple-system, sans-serif; min-height: 100vh; overflow-x: hidden; }
 
@@ -25,37 +25,36 @@
         .dock-container {
             position: fixed; bottom: 30px; left: 0; right: 0;
             display: flex; justify-content: center; align-items: center; gap: 10px;
-            z-index: 20000;
+            z-index: 30000;
         }
         
         .dock-item {
             background: rgba(255, 255, 255, 0.15); 
-            backdrop-filter: blur(20px) saturate(180%) brightness(120%);
-            -webkit-backdrop-filter: blur(20px) saturate(180%) brightness(120%);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
             border: 1px solid rgba(255, 255, 255, 0.3);
             display: flex; align-items: center; justify-content: center;
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
         }
 
-        .btn-home { width: 60px; height: 60px; border-radius: 30px; font-size: 24px; color: #fff; cursor: pointer; }
-        .btn-search { width: 60px; height: 60px; border-radius: 30px; font-size: 24px; color: #ff0000; cursor: pointer; }
+        .btn-home { width: 60px; height: 60px; border-radius: 30px; font-size: 24px; color: #fff; }
+        .btn-search { width: 60px; height: 60px; border-radius: 30px; font-size: 24px; color: #ff0000; }
         
-        .player-capsule { width: 220px; height: 60px; border-radius: 30px; padding: 0 12px; gap: 10px; overflow: hidden; cursor: pointer; }
+        .player-capsule { width: 220px; height: 60px; border-radius: 30px; padding: 0 12px; gap: 10px; overflow: hidden; }
         .mini-art { width: 40px; height: 40px; border-radius: 8px; flex-shrink: 0; object-fit: cover; }
-        
         .track-info-mini { flex: 1; display: flex; flex-direction: column; justify-content: center; overflow: hidden; white-space: nowrap; }
         .track-info-mini b { font-size: 12px; color: #fff; text-overflow: ellipsis; overflow: hidden; }
         .track-info-mini span { font-size: 10px; color: rgba(255,255,255,0.6); text-overflow: ellipsis; overflow: hidden; }
 
         /* TELAS FULL */
-        .full-page { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 10001; display: none; flex-direction: column; overflow-y: auto; }
+        .full-page { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 15000; display: none; flex-direction: column; overflow-y: auto; }
         .track-row { display: flex; align-items: center; padding: 15px; border-bottom: 1px solid #1c1c1e; }
         .track-row.is-playing .track-title { color: var(--playing-color) !important; font-weight: bold; }
 
         /* BUSCA */
         #searchOverlay { 
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(0,0,0,0.98); z-index: 21000; padding: 20px; overflow-y: auto;
+            background: rgba(0,0,0,0.98); z-index: 40000; padding: 20px; overflow-y: auto;
         }
         .search-header { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
         .search-input-wrapper { flex: 1; background: #1c1c1e; border-radius: 12px; display: flex; align-items: center; padding: 0 15px; }
@@ -69,7 +68,7 @@
     <div class="nav-container" id="catNav"></div>
     <div id="grid" class="main-grid"></div>
 
-    <div class="dock-container" id="dock">
+    <div class="dock-container">
         <div class="dock-item btn-home" onclick="irParaInicio()"><i class="fas fa-home"></i></div>
         
         <div class="dock-item player-capsule" onclick="abrirAlbumAtivo()">
@@ -86,7 +85,6 @@
         <div class="dock-item btn-search" onclick="abrirBusca()"><i class="fas fa-search"></i></div>
     </div>
 
-    <!-- BUSCA -->
     <div id="searchOverlay">
         <div class="search-header">
             <div class="search-input-wrapper">
@@ -110,9 +108,11 @@
         const audio = document.getElementById('audioMain');
         let searchTimeout;
 
+        // AJUSTADO: Função Início limpa tudo e reseta para o padrão
         function irParaInicio() {
-            fecharPagina();
+            fecharPagina(); 
             fecharBusca();
+            carregarPorGenero("Forró"); // Volta para a lista inicial
             window.scrollTo({top: 0, behavior: 'smooth'});
         }
 
@@ -139,16 +139,15 @@
                         <div style="color:#fff">${item.collectionName}</div>
                     </div>
                 `).join('');
-                if(data.results.length > 0) html += `<div style="color:#ff0000; padding:20px 0; font-weight:bold;" onclick="selecionarSugestao('${termo}')">Mostrar todos os resultados</div>`;
+                if(data.results.length > 0) html += `<div style="color:#ff0000; padding:20px 0; font-weight:bold;" onclick="selecionarSugestao('${termo}')">Ver resultados para "${termo}"</div>`;
                 document.getElementById('suggestionsList').innerHTML = html;
             }, 300);
         }
 
-        // CORREÇÃO: Fecha o álbum atual antes de carregar a busca no grid principal
         function selecionarSugestao(termo) {
-            fecharPagina(); // Fecha a tela do álbum se estiver aberta
-            fecharBusca();  // Fecha a tela de busca
-            carregarPorGenero(termo); // Carrega os novos álbuns no fundo
+            fecharPagina(); // Garante que se tiver um álbum aberto, ele feche
+            fecharBusca(); 
+            carregarPorGenero(termo);
         }
 
         const generos = ["Forró", "Vaquejada", "Piseiro", "Sertanejo", "Arrocha", "Pagode"];
@@ -160,9 +159,8 @@
             document.getElementById('grid').innerHTML = data.results.map(t => `
                 <div class="card" onclick="abrirAlbum('${t.collectionId}', '${t.artworkUrl100}')">
                     <img src="${t.artworkUrl100.replace('100x100', '400x400')}">
-                    <p style="margin-top:10px; font-weight:bold; font-size:13px;">${t.collectionName}</p>
+                    <p style="margin-top:10px; font-weight:bold; font-size:13px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${t.collectionName}</p>
                 </div>`).join('');
-            window.scrollTo(0, 0);
         }
 
         async function abrirAlbum(id, art) {
@@ -174,16 +172,16 @@
             const album = data.results[0];
 
             document.getElementById('albumContent').innerHTML = `
-                <div style="text-align:center; padding:50px 30px 30px 30px;">
-                    <img src="${art.replace('100x100', '600x600')}" style="width:220px; border-radius:15px; box-shadow: 0 10px 30px rgba(0,0,0,0.8);">
-                    <h2 style="margin-top:20px;">${album.collectionName}</h2>
+                <div style="text-align:center; padding:50px 30px 20px 30px;">
+                    <img src="${art.replace('100x100', '600x600')}" style="width:200px; border-radius:15px;">
+                    <h2 style="margin-top:15px; font-size:20px;">${album.collectionName}</h2>
+                    <p style="color:#666;">${album.artistName}</p>
                 </div>
                 ${songs.map((m, i) => `
                     <div class="track-row" id="row_${id}_${i}" onclick="tocar('${id}', ${i}, '${art}')">
-                        <span style="color:#555; width:40px; text-align:center;">${i+1}</span>
+                        <span style="color:#555; width:35px; text-align:center;">${i+1}</span>
                         <div style="flex:1; overflow:hidden;">
-                            <div class="track-title" style="color:#fff;">${m.trackName}</div>
-                            <div style="font-size:12px; color:#555;">${m.artistName}</div>
+                            <div class="track-title" style="color:#fff; font-size:15px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${m.trackName}</div>
                         </div>
                     </div>
                 `).join('')}<div style="height:150px;"></div>`;
