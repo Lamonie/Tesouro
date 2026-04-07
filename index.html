@@ -1,77 +1,152 @@
-<script>
-    const audio = document.getElementById('audioMain');
-    const grid = document.getElementById('grid');
-    
-    // Lista de gêneros organizada
-    const generos = ["Início", "Forró", "Vaquejada", "Piseiro", "Sertanejo", "Brega", "Arrocha", "Pagode", "Gospel", "Rock"];
-    
-    // Renderiza os botões de categoria
-    const catNav = document.getElementById('catNav');
-    if(catNav) {
-        catNav.innerHTML = generos.map(g => `<button class="cat-btn" onclick="buscarSuperApi('${g}', this)">${g}</button>`).join('');
-    }
-
-    async function buscarSuperApi(termo, btn) {
-        // Estilo do botão ativo
-        if(btn) {
-            document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-        }
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>LAMONIÊ FLOW</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { --primary: #94b3ce; --bg: #000; --text: #fff; --active: #ffff00; }
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--bg); color: var(--text); font-family: sans-serif; }
         
-        grid.innerHTML = "<p style='padding:20px; color:#94b3ce;'>Sincronizando bibliotecas...</p>";
-        const busca = termo === "Início" ? "Luiz Gonzaga" : termo;
+        header { padding: 25px 20px; border-bottom: 1px solid #222; }
+        header h1 { color: var(--primary); font-size: 24px; font-weight: 900; }
 
-        try {
-            // Executa as buscas de forma independente para não travar
-            const piTunes = fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(busca)}&entity=album&limit=15`)
-                .then(r => r.json()).catch(() => ({results: []}));
-                
-            const pDeezer = fetch(`https://api.allorigins.win/get?url=${encodeURIComponent('https://api.deezer.com/search/album?q=' + busca)}`)
-                .then(r => r.json()).then(d => JSON.parse(d.contents)).catch(() => ({data: []}));
-                
-            const pJamendo = fetch(`https://api.jamendo.com/v3.0/albums/?client_id=56d30cce&format=json&name=${encodeURIComponent(busca)}&limit=10`)
-                .then(r => r.json()).catch(() => ({results: []}));
+        .nav-container { display: flex; padding: 10px 15px; gap: 10px; align-items: center; }
+        .genres-btn { background: #111; color: #fff; border: 1px solid #333; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        
+        .cat-nav { display: none; overflow-x: auto; gap: 8px; flex: 1; scrollbar-width: none; }
+        .cat-btn { background: #1a1a1a; border: 1px solid #333; color: #777; padding: 8px 16px; border-radius: 20px; font-size: 13px; flex-shrink: 0; transition: 0.2s; }
+        
+        /* Efeito de toque e cor que você pediu */
+        .cat-btn:active { transform: scale(0.9); }
+        .cat-btn.active { background: var(--primary); color: #000; border-color: var(--primary); font-weight: bold; }
 
-            const [dataiTunes, dataDeezer, dataJamendo] = await Promise.all([piTunes, pDeezer, pJamendo]);
+        .main-grid { display: flex; flex-wrap: wrap; justify-content: space-between; padding: 15px 15px 150px; }
+        .card { width: 47%; background: #111; border-radius: 12px; padding: 8px; margin-bottom: 15px; border: 1px solid #222; }
+        .card img { width: 100%; aspect-ratio: 1/1; border-radius: 8px; object-fit: cover; }
+        .card p { font-size: 12px; margin-top: 8px; font-weight: bold; height: 32px; overflow: hidden; }
+        
+        .player { position: fixed; bottom: 15px; left: 10px; right: 10px; background: rgba(30,30,30,0.9); backdrop-filter: blur(15px); padding: 12px; border-radius: 15px; border: 1px solid #444; display: none; z-index: 999; }
+        
+        .full-page { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 1000; display: none; flex-direction: column; overflow-y: auto; }
+        .btn-voltar { margin: 15px; background: var(--primary); border: none; padding: 12px 20px; border-radius: 30px; font-weight: bold; width: fit-content; }
+        .track-row { display: flex; align-items: center; padding: 15px; border-bottom: 1px solid #111; }
+    </style>
+</head>
+<body>
 
-            let cards = "";
+    <header><h1>LAMONIÊ FLOW</h1></header>
 
-            // Montagem dos cards com verificação de segurança
-            if(dataiTunes && dataiTunes.results) {
-                dataiTunes.results.forEach(t => {
-                    cards += criarCard(t.collectionName, t.artworkUrl100.replace('100x100', '400x400'), t.collectionId, 'itunes');
-                });
+    <div class="nav-container">
+        <div class="genres-btn" onclick="document.getElementById('catNav').style.display = 'flex'">Gêneros</div>
+        <div class="cat-nav" id="catNav"></div>
+    </div>
+
+    <div id="grid" class="main-grid"></div>
+
+    <footer class="player" id="player">
+        <div style="display:flex; align-items:center; gap:12px;">
+            <img id="pArt" src="" style="width:45px; height:45px; border-radius:5px;">
+            <div style="flex:1; overflow:hidden;"><div id="pTitle" style="font-weight:bold; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Música</div></div>
+            <button onclick="togglePlay()" id="playBtn" style="background:none; border:none; color:var(--active); font-size:24px;"><i class="fas fa-play"></i></button>
+        </div>
+    </footer>
+
+    <div id="albumPage" class="full-page">
+        <button class="btn-voltar" onclick="document.getElementById('albumPage').style.display='none'">← VOLTAR</button>
+        <div id="albumContent"></div>
+    </div>
+
+    <audio id="audio"></audio>
+
+    <script>
+        const audio = document.getElementById('audio');
+        const grid = document.getElementById('grid');
+        
+        // Gêneros atualizados para o seu gosto
+        const generos = ["Início", "Forró", "Vaquejada", "Piseiro", "Sertanejo", "Brega", "Arrocha", "Pagode", "Gospel"];
+        
+        document.getElementById('catNav').innerHTML = generos.map(g => 
+            `<button class="cat-btn" onclick="superBusca('${g}', this)">${g}</button>`
+        ).join('');
+
+        async function superBusca(termo, btn) {
+            if(btn) {
+                document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
             }
+            grid.innerHTML = "<p style='padding:20px; color:#555;'>Carregando...</p>";
+            
+            const busca = termo === "Início" ? "Luiz Gonzaga" : termo;
+            let cardsHtml = "";
 
-            if(dataDeezer && dataDeezer.data) {
-                dataDeezer.data.forEach(t => {
-                    cards += criarCard(t.title, t.cover_medium, t.id, 'deezer');
+            // Buscamos as APIs uma por uma para não dar erro geral
+            // 1. iTunes (Muito estável)
+            try {
+                const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(busca)}&entity=album&limit=15`);
+                const data = await res.json();
+                data.results.forEach(t => {
+                    cardsHtml += `<div class="card" onclick="abrirAlbum('${t.collectionId}', '${t.artworkUrl100.replace('100x100','400x400')}', 'itunes')">
+                        <img src="${t.artworkUrl100.replace('100x100','400x400')}"><p>${t.collectionName}</p></div>`;
                 });
-            }
+            } catch(e) { console.log("iTunes falhou"); }
 
-            if(dataJamendo && dataJamendo.results) {
-                dataJamendo.results.forEach(t => {
-                    cards += criarCard(t.name, t.image || 'https://via.placeholder.com/400', t.id, 'jamendo');
+            // 2. Jamendo (Seguro)
+            try {
+                const res = await fetch(`https://api.jamendo.com/v3.0/albums/?client_id=56d30cce&format=json&name=${encodeURIComponent(busca)}&limit=10`);
+                const data = await res.json();
+                data.results.forEach(t => {
+                    cardsHtml += `<div class="card" onclick="abrirAlbum('${t.id}', '${t.image}', 'jamendo')">
+                        <img src="${t.image}"><p>${t.name}</p></div>`;
                 });
-            }
+            } catch(e) { console.log("Jamendo falhou"); }
 
-            grid.innerHTML = cards || "<p style='padding:20px;'>Nenhum álbum encontrado.</p>";
-
-        } catch (error) {
-            console.error("Erro na busca:", error);
-            grid.innerHTML = "<p style='padding:20px;'>Erro ao carregar músicas. Tente novamente.</p>";
+            grid.innerHTML = cardsHtml || "<p style='padding:20px;'>Nenhum resultado. Tente outro gênero.</p>";
         }
-    }
 
-    function criarCard(titulo, capa, id, api) {
-        return `
-            <div class="card" onclick="abrirAlbum('${id}', '${capa}', '${api}')">
-                <span class="api-tag" style="position:absolute; top:5px; right:5px; background:rgba(0,0,0,0.6); font-size:9px; padding:2px 5px; border-radius:4px;">${api}</span>
-                <img src="${capa}" loading="lazy">
-                <p style="margin-top:10px; font-weight:bold; font-size:12px; height:30px; overflow:hidden;">${titulo}</p>
-            </div>`;
-    }
+        async function abrirAlbum(id, capa, api) {
+            const page = document.getElementById('albumPage');
+            const content = document.getElementById('albumContent');
+            page.style.display = 'flex';
+            content.innerHTML = "<p style='padding:40px;'>Buscando músicas...</p>";
 
-    // Inicia a página
-    buscarSuperApi("Início");
-</script>
+            try {
+                let faixas = [];
+                if(api === 'itunes') {
+                    const res = await fetch(`https://itunes.apple.com/lookup?id=${id}&entity=song`);
+                    const data = await res.json();
+                    faixas = data.results.slice(1).map(m => ({ n: m.trackName, u: m.previewUrl }));
+                } else {
+                    const res = await fetch(`https://api.jamendo.com/v3.0/tracks/?client_id=56d30cce&album_id=${id}`);
+                    const data = await res.json();
+                    faixas = data.results.map(m => ({ n: m.name, u: m.audio }));
+                }
+
+                content.innerHTML = `<div style="text-align:center; padding:20px;"><img src="${capa}" style="width:200px; border-radius:10px;"></div>` + 
+                    faixas.map(f => `<div class="track-row" onclick="tocar('${f.u}', '${f.n}', '${capa}')">
+                        <div style="flex:1; color:#fff; font-weight:bold;">${f.n}</div>
+                        <i class="fas fa-play-circle" style="color:var(--primary); font-size:20px;"></i>
+                    </div>`).join('');
+            } catch(e) { content.innerHTML = "<p style='padding:40px;'>Erro ao carregar faixas.</p>"; }
+        }
+
+        function tocar(url, nome, capa) {
+            audio.src = url; audio.play();
+            document.getElementById('player').style.display = 'block';
+            document.getElementById('pArt').src = capa;
+            document.getElementById('pTitle').innerText = nome;
+            document.getElementById('playBtn').innerHTML = '<i class="fas fa-pause"></i>';
+        }
+
+        function togglePlay() {
+            if(audio.paused) { audio.play(); document.getElementById('playBtn').innerHTML = '<i class="fas fa-pause"></i>'; }
+            else { audio.pause(); document.getElementById('playBtn').innerHTML = '<i class="fas fa-play"></i>'; }
+        }
+
+        // Inicia com Luiz Gonzaga
+        superBusca("Início");
+    </script>
+</body>
+</html>
