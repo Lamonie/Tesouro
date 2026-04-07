@@ -7,22 +7,16 @@
     <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --primary: #94b3ce; --bg: #000000; --text-main: #ffffff; --player-bg: rgba(255, 255, 255, 0.1); --playing-color: #ffff00; --active-song: #007bff; }
-        
+        :root { --primary: #94b3ce; --bg: #000000; --text-main: #ffffff; --playing-color: #ffff00; }
+
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         
         body { background: #000000; color: var(--text-main); font-family: -apple-system, sans-serif; min-height: 100vh; overflow-x: hidden; }
-
-        body::before {
-            content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #000000; z-index: -1;
-        }
 
         header { 
             padding: 20px; 
             background: rgba(255, 255, 255, 0.03); 
             backdrop-filter: blur(20px); 
-            -webkit-backdrop-filter: blur(20px); 
             border-bottom: 1px solid rgba(255,255,255,0.1);
             text-align: center;
         }
@@ -81,7 +75,6 @@
             font-weight: 600; 
             flex-shrink: 0; 
         }
-        .cat-btn.active { background: var(--primary); color: #000; border-color: var(--primary); box-shadow: 0 0 5px var(--primary); }
 
         .search-container { padding: 10px 15px; }
         .search-box { display: flex; background: rgba(255, 255, 255, 0.07); border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); align-items: center; padding: 0 15px; }
@@ -91,77 +84,91 @@
         .card { width: 47%; background: rgba(255,255,255,0.04); border-radius: 15px; padding: 8px; margin-bottom: 20px; }
         .card img { width: 100%; aspect-ratio: 1/1; border-radius: 12px; object-fit: cover; }
 
+        /* ==================== BARRA INFERIOR NO ESTILO DESEJADO ==================== */
         .player { 
             position: fixed; 
-            bottom: 10px; 
-            left: 10px; 
-            right: 10px; 
-            background: rgba(255, 255, 255, 0.1); 
+            bottom: 12px; 
+            left: 12px; 
+            right: 12px; 
+            background: rgba(30, 30, 30, 0.95); 
             backdrop-filter: blur(25px); 
-            -webkit-backdrop-filter: blur(25px); 
-            padding: 12px 20px; 
-            border-radius: 20px; 
-            border: 1px solid rgba(255, 255, 255, 0.2); 
+            border-radius: 50px; 
+            padding: 8px 12px; 
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
             z-index: 10002; 
-            transition: opacity 0.4s ease;
-            opacity: 1;
-        }
-        .player-hidden { 
-            opacity: 0; 
-            pointer-events: none;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.6);
         }
 
-        .player-controls { display: flex; align-items: center; gap: 15px; }
-        .mini-art { width: 50px; height: 50px; border-radius: 10px; object-fit: cover; }
-
-        /* Contador de tempo */
-        .time-bar-container {
-            width: 100%;
-            margin: 8px 0 12px 0;
+        .nav-bottom-btn {
+            width: 48px;
+            height: 48px;
+            background: rgba(255,255,255,0.12);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            flex-shrink: 0;
         }
-        .time-bar {
-            height: 4px;
-            background: rgba(255,255,255,0.2);
-            border-radius: 2px;
-            position: relative;
+
+        .player-center {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 0;
+        }
+
+        .mini-art {
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .track-info {
+            flex: 1;
             overflow: hidden;
         }
-        .time-progress {
-            height: 100%;
-            background: rgba(255,255,255,0.7);
-            width: 0%;
-            transition: width 0.3s linear;
-        }
-        .time-labels {
-            display: flex;
-            justify-content: space-between;
-            font-size: 12px;
-            color: rgba(255,255,255,0.7);
-            margin-top: 4px;
+
+        .track-info div:first-child {
+            font-weight: 600;
+            font-size: 15px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
-        .full-page { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); backdrop-filter: blur(35px); -webkit-backdrop-filter: blur(35px); z-index: 10001; display: none; flex-direction: column; overflow-y: auto; }
+        .track-info div:last-child {
+            font-size: 13px;
+            opacity: 0.75;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .full-page { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); backdrop-filter: blur(35px); z-index: 10001; display: none; flex-direction: column; overflow-y: auto; }
         
         .btn-voltar { 
             margin: 15px; 
             background: rgba(255, 255, 255, 0.08); 
             backdrop-filter: blur(25px); 
-            -webkit-backdrop-filter: blur(25px); 
             border: 1px solid rgba(255, 255, 255, 0.15); 
             color: #ffffff; 
             padding: 12px 25px; 
             border-radius: 35px; 
             font-weight: 600; 
             width: fit-content;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
         }
 
         .track-row { display: flex; align-items: center; padding: 18px; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; }
-        .track-row.is-playing .track-title { color: var(--active-song) !important; font-weight: bold; }
-        .track-row.is-playing .track-play-icon { color: var(--playing-color) !important; }
 
         .album-meta { background: rgba(255,255,255,0.06); margin: 15px; padding: 20px; border-radius: 18px; font-size: 13px; color: #bbb; text-align: center; line-height: 1.6; }
-        .composer-name { font-size: 11px; color: #777; margin-top: 2px; }
     </style>
 </head>
 <body>
@@ -186,34 +193,36 @@
     </div>
     <div id="grid" class="main-grid"></div>
 
+    <!-- Barra inferior no novo formato -->
     <footer class="player" id="player">
-        <div class="player-controls">
+        <!-- Botão Home -->
+        <div class="nav-bottom-btn" onclick="voltarParaInicio()">
+            <i class="fas fa-home"></i>
+        </div>
+
+        <!-- Centro: Capa + Informações -->
+        <div class="player-center">
             <img id="playerArt" src="" class="mini-art">
-            <div style="flex:1; overflow:hidden;">
-                <div style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-weight:bold; font-size:15px; color:white;" id="trackTitle">Música</div>
-                <div id="trackArtist" style="font-size:13px; opacity:0.8;"></div>
+            <div class="track-info">
+                <div id="trackTitle">Música</div>
+                <div id="trackArtist">Artista</div>
             </div>
         </div>
 
-        <div class="time-bar-container">
-            <div class="time-bar">
-                <div class="time-progress" id="timeProgress"></div>
-            </div>
-            <div class="time-labels">
-                <span id="currentTime">0:00</span>
-                <span id="remainingTime">-0:00</span>
-            </div>
-        </div>
+        <!-- Botão Play/Pause -->
+        <button onclick="togglePlay()" id="playBtn" style="background:none; border:none; color:var(--playing-color); font-size:28px; padding:8px;">
+            <i class="fas fa-pause"></i>
+        </button>
 
-        <div style="display:flex; align-items:center; gap:30px; justify-content:center; margin-top:8px;">
-            <button onclick="event.stopPropagation(); togglePlay();" id="playBtn" style="background:none; border:none; color:var(--playing-color); font-size:30px;"><i class="fas fa-pause"></i></button>
-            <i class="fas fa-step-forward" style="color:white; font-size:24px;" onclick="event.stopPropagation(); proxima();"></i>
+        <!-- Botão Busca -->
+        <div class="nav-bottom-btn" onclick="focarBusca()">
+            <i class="fas fa-search"></i>
         </div>
     </footer>
 
     <div id="albumPage" class="full-page">
         <button class="btn-voltar" onclick="fecharPagina()">← VOLTAR</button>
-        <div id="albumDetailContent" style="position:relative;"></div>
+        <div id="albumDetailContent"></div>
     </div>
 
     <audio id="audioMain"></audio>
@@ -222,48 +231,20 @@
         const audio = document.getElementById('audioMain');
         const player = document.getElementById('player');
 
-        let hideTimeout;
-        let lastScrollY = window.scrollY;
-
-        function hidePlayer() {
-            player.classList.add('player-hidden');
+        function voltarParaInicio() {
+            document.getElementById('albumPage').style.display = 'none';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        function showPlayer() {
-            player.classList.remove('player-hidden');
-            clearTimeout(hideTimeout);
-            hideTimeout = setTimeout(hidePlayer, 3000); // some após 3 segundos sem rolar
+        function focarBusca() {
+            document.getElementById('searchInput').focus();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // Detecta movimento de rolagem
-        window.addEventListener('scroll', () => {
-            if (Math.abs(window.scrollY - lastScrollY) > 5) {
-                showPlayer();
-            }
-            lastScrollY = window.scrollY;
-        });
-
-        // Atualiza o contador de tempo
+        // Atualiza contador de tempo (mantido simples)
         audio.ontimeupdate = () => {
-            const current = audio.currentTime || 0;
-            const duration = audio.duration || 0;
-            
-            const currentFormatted = formatTime(current);
-            const remaining = duration - current;
-            const remainingFormatted = remaining > 0 ? '-' + formatTime(remaining) : '-0:00';
-
-            document.getElementById('currentTime').textContent = currentFormatted;
-            document.getElementById('remainingTime').textContent = remainingFormatted;
-
-            const progressPercent = duration ? (current / duration) * 100 : 0;
-            document.getElementById('timeProgress').style.width = `${progressPercent}%`;
+            atualizarUI();
         };
-
-        function formatTime(s) {
-            const min = Math.floor(s / 60);
-            const seg = Math.floor(s % 60);
-            return `${min}:${seg < 10 ? '0' : ''}${seg}`;
-        }
 
         function toggleGenres() {
             const nav = document.getElementById('catNav');
@@ -315,7 +296,7 @@
             const gravadora = album.copyright || "Independente";
 
             document.getElementById('albumDetailContent').innerHTML = `
-                <div style="text-align:center; padding:30px; position:relative;">
+                <div style="text-align:center; padding:30px;">
                     <img src="${art.replace('100x100', '600x600')}" style="width:250px; border-radius:20px;">
                 </div>
                 
@@ -333,54 +314,32 @@
                 ${songs.map((m, i) => `
                     <div class="track-row" id="row_${id}_${i}" onclick="tocar('${id}', ${i}, '${art}')">
                         <span style="color:#777; width:30px;">${i+1}</span>
-                        <div style="flex:1; margin-left:12px; overflow:hidden;">
+                        <div style="flex:1; margin-left:12px;">
                             <div class="track-title" style="font-size:15px; color:white;">${m.trackName}</div>
-                            <div class="composer-name">${m.artistName}</div>
+                            <div style="font-size:13px; opacity:0.7;">${m.artistName}</div>
                         </div>
-                        <div class="track-actions">
-                            <i class="fas fa-download" style="color:#8e8e93; font-size:18px;" onclick="event.stopPropagation(); baixarMusica('${m.previewUrl}', '${m.trackName}')"></i>
-                            <i class="fas fa-play-circle track-play-icon" id="btn_list_${id}_${i}" style="font-size:24px; color:white;"></i>
+                        <div>
+                            <i class="fas fa-play-circle" style="font-size:24px; color:white;"></i>
                         </div>
-                    </div>`).join('')}<div style="height:180px;"></div>`;
+                    </div>`).join('')}<div style="height:100px;"></div>`;
             
             window.listaVisualizada = songs; 
-            atualizarUI();
         }
 
         function tocar(albumId, index, art) {
-            if (window.albumAtivoId === albumId && window.musicaIndex === index) {
-                togglePlay(); return;
-            }
-            window.albumAtivoId = albumId; window.musicaIndex = index;
-            window.listaTocando = window.listaVisualizada; window.capaAtiva = art;
-            const m = window.listaTocando[index];
+            const m = window.listaVisualizada[index];
             audio.src = m.previewUrl; 
             audio.play();
-            player.style.display = 'block';
-            showPlayer();
+
             document.getElementById('playerArt').src = art;
             document.getElementById('trackTitle').innerText = m.trackName;
             document.getElementById('trackArtist').innerText = m.artistName || '';
-            atualizarUI();
+            player.style.display = 'flex';
         }
 
-        function atualizarUI() {
-            document.querySelectorAll('.track-row').forEach(r => r.classList.remove('is-playing'));
-            document.querySelectorAll('.track-play-icon').forEach(ic => {
-                ic.className = 'fas fa-play-circle track-play-icon';
-                ic.style.color = 'white';
-            });
-
-            if (window.albumVisualizadoId === window.albumAtivoId) {
-                const row = document.getElementById(`row_${window.albumAtivoId}_${window.musicaIndex}`);
-                const icon = document.getElementById(`btn_list_${window.albumAtivoId}_${window.musicaIndex}`);
-                if(row) row.classList.add('is-playing');
-                if(icon) {
-                    icon.className = audio.paused ? 'fas fa-play-circle track-play-icon' : 'fas fa-pause-circle track-play-icon';
-                    icon.style.color = 'var(--playing-color)';
-                }
-            }
-            document.getElementById('playBtn').innerHTML = audio.paused ? '<i class="fas fa-play"></i>' : '<i class="fas fa-pause"></i>';
+        function togglePlay() {
+            if (audio.paused) audio.play();
+            else audio.pause();
         }
 
         async function baixarMusica(url, nome) {
@@ -392,15 +351,10 @@
             link.click();
         }
 
-        function togglePlay() { audio.paused ? audio.play() : audio.pause(); atualizarUI(); }
-        function proxima() { 
-            if(window.musicaIndex + 1 < window.listaTocando.length) 
-                tocar(window.albumAtivoId, window.musicaIndex + 1, window.capaAtiva); 
-        }
         function fecharPagina() { albumPage.style.display = 'none'; }
 
-        // Inicia escondido
-        player.classList.add('player-hidden');
+        // Inicia visível
+        player.style.display = 'flex';
         carregarPorGenero("Início");
     </script>
 </body>
