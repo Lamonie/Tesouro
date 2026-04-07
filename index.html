@@ -6,142 +6,164 @@
     <title>LAMONIÊ FLOW</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --primary: #94b3ce; --bg: #000; --card: #111; --text: #fff; }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--bg); color: var(--text); padding-bottom: 120px; }
-        header { padding: 25px 20px 10px; display: flex; justify-content: space-between; align-items: center; }
-        header h1 { color: var(--primary); font-size: 24px; font-weight: 900; }
-        
-        .search-area { padding: 10px 15px; }
-        .search-box { background: #1a1a1a; border-radius: 12px; display: flex; padding: 12px; border: 1px solid #333; align-items: center; }
-        .search-box input { background: none; border: none; color: #fff; flex: 1; outline: none; font-size: 16px; }
-        
-        .nav-container { display: flex; padding: 10px 15px; gap: 10px; overflow-x: auto; scrollbar-width: none; }
-        .cat-btn { background: #111; border: 1px solid #333; color: #777; padding: 8px 18px; border-radius: 20px; font-size: 13px; flex-shrink: 0; }
-        .cat-btn.active { background: var(--primary); color: #000; font-weight: bold; border-color: var(--primary); }
+        :root { --spotify-green: #1DB954; --bg-black: #121212; --card-gray: #181818; --text-white: #FFFFFF; --text-gray: #B3B3B3; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Circular Std', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background-color: #000; color: var(--text-white); padding-bottom: 120px; }
 
-        .main-grid { display: flex; flex-wrap: wrap; justify-content: space-between; padding: 15px; }
-        .card { width: 47%; background: var(--card); border-radius: 15px; padding: 10px; margin-bottom: 15px; border: 1px solid #222; position: relative; }
-        .card img { width: 100%; aspect-ratio: 1/1; border-radius: 10px; object-fit: cover; }
-        .card p { font-size: 12px; margin-top: 8px; font-weight: bold; height: 32px; overflow: hidden; }
-        .api-tag { position: absolute; top: 15px; right: 15px; background: rgba(0,0,0,0.7); font-size: 9px; padding: 2px 6px; border-radius: 4px; color: var(--primary); font-weight: 900; }
+        /* Estilo da Header das fotos */
+        header { padding: 20px; background: linear-gradient(to bottom, #222, #000); }
+        header h1 { font-size: 28px; font-weight: 900; letter-spacing: -1px; }
 
-        .player { position: fixed; bottom: 20px; left: 15px; right: 15px; background: rgba(25,25,25,0.9); backdrop-filter: blur(15px); padding: 12px; border-radius: 20px; border: 1px solid #444; display: none; z-index: 999; }
-        .full-page { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 1000; display: none; flex-direction: column; overflow-y: auto; }
-        .btn-voltar { margin: 20px; background: var(--primary); border: none; padding: 15px 30px; border-radius: 40px; font-weight: bold; color: #000; width: fit-content; }
-        .track-row { display: flex; align-items: center; padding: 18px 20px; border-bottom: 1px solid #111; }
+        /* Barra de Busca identica à foto */
+        .search-container { padding: 0 15px 20px; }
+        .search-bar { background: #282828; border-radius: 8px; display: flex; align-items: center; padding: 12px 15px; }
+        .search-bar input { background: none; border: none; color: white; flex: 1; outline: none; font-size: 14px; }
+        .search-bar i { color: var(--text-gray); margin-right: 10px; }
+
+        /* Botões de Gêneros */
+        .nav-scroll { display: flex; overflow-x: auto; gap: 10px; padding: 0 15px 20px; scrollbar-width: none; }
+        .nav-btn { background: #282828; border: none; color: white; padding: 8px 16px; border-radius: 20px; font-weight: bold; font-size: 13px; white-space: nowrap; }
+        .nav-btn.active { background: var(--spotify-green); color: black; }
+
+        /* Grade de Álbuns */
+        .album-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 0 15px; }
+        .album-card { background: var(--card-gray); padding: 15px; border-radius: 8px; transition: 0.3s; }
+        .album-card img { width: 100%; aspect-ratio: 1/1; border-radius: 4px; box-shadow: 0 8px 24px rgba(0,0,0,0.5); margin-bottom: 12px; }
+        .album-card h3 { font-size: 14px; margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .album-card p { font-size: 12px; color: var(--text-gray); }
+
+        /* Player Flutuante */
+        .mini-player { position: fixed; bottom: 80px; left: 10px; right: 10px; background: #282828; border-radius: 8px; padding: 10px; display: none; align-items: center; gap: 12px; z-index: 1000; }
+        .mini-player img { width: 45px; height: 45px; border-radius: 4px; }
+        .mini-player-info { flex: 1; overflow: hidden; }
+        .mini-player-info h4 { font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .mini-player-info p { font-size: 11px; color: var(--text-gray); }
+
+        /* Menu Inferior das fotos */
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; background: rgba(0,0,0,0.9); display: flex; justify-content: space-around; padding: 15px 0; border-top: 1px solid #222; }
+        .nav-item { color: var(--text-gray); text-align: center; font-size: 10px; cursor: pointer; }
+        .nav-item i { font-size: 20px; margin-bottom: 5px; display: block; }
+        .nav-item.active { color: white; }
+
+        /* Página de Músicas */
+        .full-page { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, #444, #121212); z-index: 2000; display: none; flex-direction: column; overflow-y: auto; }
+        .track-item { display: flex; align-items: center; padding: 15px 20px; gap: 15px; }
+        .track-name { font-weight: bold; font-size: 15px; }
+        .track-artist { color: var(--text-gray); font-size: 13px; }
     </style>
 </head>
 <body>
 
     <header><h1>LAMONIÊ FLOW</h1></header>
 
-    <div class="search-area">
-        <div class="search-box">
-            <input type="text" id="inputBusca" placeholder="O que vamos ouvir hoje?">
-            <i class="fas fa-search" style="color:var(--primary)" onclick="fazerBusca()"></i>
+    <div class="search-container">
+        <div class="search-bar">
+            <i class="fas fa-search"></i>
+            <input type="text" id="mainSearch" placeholder="Encontrar nesta página" onkeypress="handleSearch(event)">
         </div>
     </div>
 
-    <div class="nav-container" id="catNav"></div>
+    <div class="nav-scroll" id="genreNav"></div>
 
-    <div id="grid" class="main-grid"></div>
+    <div class="album-grid" id="mainGrid"></div>
 
-    <footer class="player" id="player">
-        <div style="display:flex; align-items:center; gap:15px;">
-            <img id="pArt" src="" style="width:50px; height:50px; border-radius:8px;">
-            <div style="flex:1; overflow:hidden;"><div id="pTitle" style="font-weight:bold; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Música</div></div>
-            <button onclick="togglePlay()" id="playBtn" style="background:none; border:none; color:#ffff00; font-size:28px;"><i class="fas fa-play"></i></button>
+    <div class="mini-player" id="player">
+        <img id="playerImg" src="">
+        <div class="mini-player-info">
+            <h4 id="playerTitle">Título</h4>
+            <p id="playerArtist">Artista</p>
         </div>
-    </footer>
+        <i class="fas fa-play" id="playIcon" style="font-size: 24px; padding-right: 10px;" onclick="togglePlay()"></i>
+    </div>
+
+    <nav class="bottom-nav">
+        <div class="nav-item active"><i class="fas fa-home"></i>Início</div>
+        <div class="nav-item"><i class="fas fa-search"></i>Buscar</div>
+        <div class="nav-item"><i class="fas fa-book"></i>Sua Biblioteca</div>
+        <div class="nav-item"><i class="fas fa-plus-square"></i>Criar</div>
+    </nav>
 
     <div id="albumPage" class="full-page">
-        <button class="btn-voltar" onclick="document.getElementById('albumPage').style.display='none'">← VOLTAR</button>
-        <div id="albumContent"></div>
+        <div style="padding: 20px;" onclick="closeAlbum()"><i class="fas fa-chevron-down"></i></div>
+        <div id="albumHeader" style="text-align: center; padding: 20px;"></div>
+        <div id="trackList"></div>
     </div>
 
-    <audio id="audio"></audio>
+    <audio id="mainAudio"></audio>
 
     <script>
-        const audio = document.getElementById('audio');
-        const grid = document.getElementById('grid');
-        const input = document.getElementById('inputBusca');
-        const generos = ["Início", "Forró", "Vaquejada", "Piseiro", "Sertanejo", "Brega", "Gospel"];
+        const audio = document.getElementById('mainAudio');
+        const grid = document.getElementById('mainGrid');
+        const genres = ["Tudo", "Sertanejo", "Forró", "Vaquejada", "Piseiro", "Gospel"];
 
-        document.getElementById('catNav').innerHTML = generos.map(g => 
-            `<button class="cat-btn" onclick="superBusca('${g}', this)">${g}</button>`
+        // Gerar Botões de Gênero
+        document.getElementById('genreNav').innerHTML = genres.map(g => 
+            `<button class="nav-btn ${g==='Tudo'?'active':''}" onclick="search('${g}', this)">${g}</button>`
         ).join('');
 
-        function fazerBusca() { if(input.value) superBusca(input.value); }
-        input.addEventListener('keypress', (e) => { if(e.key==='Enter') fazerBusca(); });
+        function handleSearch(e) { if(e.key === 'Enter') search(e.target.value); }
 
-        async function superBusca(termo, btn) {
+        async function search(query, btn) {
             if(btn) {
-                document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
             }
-            grid.innerHTML = "<p style='padding:20px; color:var(--primary);'>Sincronizando...</p>";
-            const busca = termo === "Início" ? "Luiz Gonzaga" : termo;
-            let cardsHtml = "";
-
+            grid.innerHTML = "<p style='padding:20px;'>Carregando...</p>";
+            const q = query === "Tudo" ? "Potência Sertaneja" : query;
+            
             try {
-                // iTunes (Músicas Famosas)
-                const resI = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(busca)}&entity=album&limit=15`).then(r=>r.json()).catch(()=>({results:[]}));
-                resI.results.forEach(t => {
-                    cardsHtml += `<div class="card" onclick="abrirAlbum('${t.collectionId}', '${t.artworkUrl100.replace('100x100','600x600')}', 'itunes')">
-                        <span class="api-tag">iTunes</span><img src="${t.artworkUrl100.replace('100x100','600x600')}"><p>${t.collectionName}</p></div>`;
-                });
-
-                // Jamendo (Músicas COMPLETAS)
-                const resJ = await fetch(`https://api.jamendo.com/v3.0/albums/?client_id=56d30cce&format=json&name=${encodeURIComponent(busca)}&limit=10`).then(r=>r.json()).catch(()=>({results:[]}));
-                resJ.results.forEach(t => {
-                    cardsHtml += `<div class="card" onclick="abrirAlbum('${t.id}', '${t.image}', 'jamendo')">
-                        <span class="api-tag">FULL</span><img src="${t.image}"><p>${t.name}</p></div>`;
-                });
-
-                grid.innerHTML = cardsHtml || "<p style='padding:20px;'>Nenhum resultado.</p>";
-            } catch(e) { grid.innerHTML = "<p style='padding:20px;'>Erro de conexão.</p>"; }
+                // Busca no iTunes (Estilo as fotos que mandou)
+                const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(q)}&entity=album&limit=20`);
+                const data = await res.json();
+                
+                grid.innerHTML = data.results.map(a => `
+                    <div class="album-card" onclick="openAlbum('${a.collectionId}', '${a.artworkUrl100.replace('100x100','600x600')}', '${a.collectionName}')">
+                        <img src="${a.artworkUrl100.replace('100x100','600x600')}">
+                        <h3>${a.collectionName}</h3>
+                        <p>${a.artistName}</p>
+                    </div>
+                `).join('');
+            } catch(e) { grid.innerHTML = "<p>Erro ao conectar. Tente novamente.</p>"; }
         }
 
-        async function abrirAlbum(id, capa, api) {
+        async function openAlbum(id, img, title) {
             const page = document.getElementById('albumPage');
-            const content = document.getElementById('albumContent');
             page.style.display = 'flex';
-            content.innerHTML = "<p style='padding:50px; text-align:center;'>Abrindo álbum...</p>";
+            document.getElementById('albumHeader').innerHTML = `<img src="${img}" style="width:200px; border-radius:8px; margin-bottom:15px;"><h2>${title}</h2>`;
+            
+            const res = await fetch(`https://itunes.apple.com/lookup?id=${id}&entity=song`);
+            const data = await res.json();
+            const tracks = data.results.slice(1);
 
-            try {
-                let faixas = [];
-                if(api === 'itunes') {
-                    const d = await fetch(`https://itunes.apple.com/lookup?id=${id}&entity=song`).then(r=>r.json());
-                    faixas = d.results.slice(1).map(m => ({ n: m.trackName, u: m.previewUrl, a: m.artistName }));
-                } else {
-                    const d = await fetch(`https://api.jamendo.com/v3.0/tracks/?client_id=56d30cce&album_id=${id}`).then(r=>r.json());
-                    faixas = d.results.map(m => ({ n: m.name, u: m.audio, a: m.artist_name }));
-                }
-
-                content.innerHTML = `<div style="text-align:center; padding:30px;"><img src="${capa}" style="width:250px; border-radius:15px; box-shadow: 0 20px 40px rgba(0,0,0,0.5);"></div>` +
-                    faixas.map(f => `<div class="track-row" onclick="tocar('${f.u}', '${f.n.replace(/'/g, "")}', '${capa}')">
-                        <div style="flex:1;"><div style="font-weight:bold;">${f.n}</div><div style="font-size:12px; color:#666;">${f.a}</div></div>
-                        <i class="fas fa-play-circle" style="color:var(--primary); font-size:24px;"></i>
-                    </div>`).join('');
-            } catch(e) { content.innerHTML = "<p>Erro ao carregar faixas.</p>"; }
+            document.getElementById('trackList').innerHTML = tracks.map(t => `
+                <div class="track-item" onclick="play('${t.previewUrl}', '${t.trackName}', '${t.artistName}', '${img}')">
+                    <div style="flex:1">
+                        <div class="track-name">${t.trackName}</div>
+                        <div class="track-artist">${t.artistName}</div>
+                    </div>
+                    <i class="fas fa-ellipsis-h"></i>
+                </div>
+            `).join('');
         }
 
-        function tocar(url, nome, capa) {
-            if(!url) return;
+        function play(url, title, artist, img) {
             audio.src = url; audio.play();
-            document.getElementById('player').style.display = 'block';
-            document.getElementById('pArt').src = capa;
-            document.getElementById('pTitle').innerText = nome;
-            document.getElementById('playBtn').innerHTML = '<i class="fas fa-pause"></i>';
+            document.getElementById('player').style.display = 'flex';
+            document.getElementById('playerImg').src = img;
+            document.getElementById('playerTitle').innerText = title;
+            document.getElementById('playerArtist').innerText = artist;
+            document.getElementById('playIcon').className = 'fas fa-pause';
         }
 
         function togglePlay() {
-            if(audio.paused) { audio.play(); document.getElementById('playBtn').innerHTML = '<i class="fas fa-pause"></i>'; }
-            else { audio.pause(); document.getElementById('playBtn').innerHTML = '<i class="fas fa-play"></i>'; }
+            if(audio.paused) { audio.play(); document.getElementById('playIcon').className = 'fas fa-pause'; }
+            else { audio.pause(); document.getElementById('playIcon').className = 'fas fa-play'; }
         }
 
-        superBusca("Início");
+        function closeAlbum() { document.getElementById('albumPage').style.display = 'none'; }
+
+        // Inicializa com o Sertanejo das suas fotos
+        search("Tudo");
     </script>
 </body>
 </html>
