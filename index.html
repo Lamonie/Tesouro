@@ -9,7 +9,7 @@
     <style>
         :root { --primary: #94b3ce; --bg: #000000; --text-main: #ffffff; --playing-color: #ffff00; --active-song: #007bff; }
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-        body { background: #000; color: #fff; font-family: -apple-system, sans-serif; min-height: 100vh; overflow-x: hidden; }
+        body { background: #000; color: #fff; font-family: -apple-system, sans-serif; min-height: 100vh; overflow-x: hidden; scroll-behavior: smooth; }
 
         header { padding: 20px; text-align: center; background: rgba(0,0,0,0.5); backdrop-filter: blur(10px); }
         .logo-inox { font-family: 'Great Vibes', cursive; font-size: 40px; background: linear-gradient(to bottom, #cfd8dc, #fff, #90a4ae); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
@@ -22,7 +22,7 @@
         .card { width: 47%; margin-bottom: 20px; background: #121212; padding: 10px; border-radius: 15px; }
         .card img { width: 100%; aspect-ratio: 1/1; border-radius: 10px; object-fit: cover; }
 
-        /* A BARRA DA IMAGEM (ESTILO CÁPSULA) */
+        /* BARRA FLUTUANTE ESTILO CÁPSULA (APPLE MUSIC) */
         .dock-container {
             position: fixed; bottom: 25px; left: 0; right: 0;
             display: flex; justify-content: center; align-items: center; gap: 8px;
@@ -46,7 +46,6 @@
         .track-info-mini b { display: block; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .track-info-mini span { font-size: 11px; opacity: 0.6; }
 
-        /* Esconde-esconde da barra */
         .dock-hidden { transform: translateY(120px); opacity: 0; }
 
         /* Pagina do Album */
@@ -57,7 +56,7 @@
         .composer-name { font-size: 11px; color: #777; }
         .btn-voltar { margin: 15px; background: #333; color: #fff; border: none; padding: 10px 20px; border-radius: 20px; width: fit-content; }
 
-        /* Busca */
+        /* Overlay de Busca */
         #searchOverlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 10010; padding: 20px; }
         .search-input { width: 100%; padding: 15px; border-radius: 10px; border: none; background: #222; color: #fff; margin-top: 50px; }
     </style>
@@ -70,9 +69,10 @@
 
     <div id="grid" class="main-grid"></div>
 
-    <!-- BARRA FLUTUANTE ESTILO IMAGEM -->
+    <!-- BARRA FLUTUANTE -->
     <div class="dock-container" id="dock">
-        <div class="dock-item btn-home" onclick="location.reload()"><i class="fas fa-home"></i></div>
+        <!-- BOTÃO HOME CORRIGIDO: Agora volta sem parar a música -->
+        <div class="dock-item btn-home" onclick="irParaInicio()"><i class="fas fa-home"></i></div>
         
         <div class="dock-item player-capsule" onclick="abrirAlbumAtivo()">
             <img id="playerArt" src="https://via.placeholder.com/40" class="mini-art">
@@ -88,7 +88,6 @@
         <div class="dock-item btn-search" onclick="toggleSearch()"><i class="fas fa-search"></i></div>
     </div>
 
-    <!-- Overlay de Busca -->
     <div id="searchOverlay">
         <button onclick="toggleSearch()" style="color:#fff; background:none; border:none; font-size:20px;">Fechar X</button>
         <input type="text" class="search-input" id="searchInput" placeholder="O que você quer ouvir?" onkeyup="if(event.key==='Enter') buscar(this.value)">
@@ -106,7 +105,13 @@
         const dock = document.getElementById('dock');
         let lastScrollY = window.scrollY;
 
-        // Efeito esconde-esconde
+        // FUNÇÃO DE VOLTAR PARA O INÍCIO SEM RECARREGAR
+        function irParaInicio() {
+            fecharPagina(); // Fecha a página de álbuns se estiver aberta
+            document.getElementById('searchOverlay').style.display = 'none'; // Fecha busca
+            window.scrollTo(0, 0); // Rola para o topo do grid original
+        }
+
         window.addEventListener('scroll', () => {
             if (window.scrollY > lastScrollY && window.scrollY > 100) dock.classList.add('dock-hidden');
             else dock.classList.remove('dock-hidden');
@@ -138,8 +143,8 @@
             document.getElementById('albumPage').style.display = 'flex';
             const res = await fetch(`https://itunes.apple.com/lookup?id=${id}&entity=song`);
             const data = await res.json();
-            const album = data.results[0];
             const songs = data.results.slice(1);
+            const album = data.results[0];
 
             document.getElementById('albumContent').innerHTML = `
                 <div style="text-align:center; padding:30px;">
