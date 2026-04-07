@@ -21,13 +21,12 @@
         .card { width: 47%; margin-bottom: 20px; background: #121212; padding: 10px; border-radius: 15px; }
         .card img { width: 100%; aspect-ratio: 1/1; border-radius: 10px; object-fit: cover; }
 
-        /* BARRA FLUTUANTE - EFEITO VIDRO BRILHANTE */
+        /* BARRA FLUTUANTE - VIDRO BRILHANTE */
         .dock-container {
             position: fixed; bottom: 25px; left: 0; right: 0;
             display: flex; justify-content: center; align-items: center; gap: 8px;
             z-index: 10005; transition: transform 0.4s ease, opacity 0.4s ease;
         }
-        
         .dock-item {
             background: rgba(255, 255, 255, 0.15); 
             backdrop-filter: blur(20px) saturate(180%) brightness(120%);
@@ -36,32 +35,48 @@
             display: flex; align-items: center; justify-content: center;
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
         }
-
         .btn-home { width: 60px; height: 60px; border-radius: 30px; font-size: 24px; color: #fff; cursor: pointer; }
         .btn-search { width: 60px; height: 60px; border-radius: 30px; font-size: 24px; color: #ff0000; cursor: pointer; }
         
-        .player-capsule {
-            width: 240px; height: 60px; border-radius: 30px;
-            padding: 0 15px; justify-content: flex-start; gap: 10px;
+        .player-capsule { width: 240px; height: 60px; border-radius: 30px; padding: 0 15px; justify-content: flex-start; gap: 10px; }
+        .mini-art { width: 40px; height: 40px; border-radius: 8px; object-fit: cover; }
+
+        /* OVERLAY DE BUSCA ESTILO APPLE MUSIC */
+        #searchOverlay { 
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.98); z-index: 10010; padding: 20px; 
+            overflow-y: auto;
         }
-        
-        .mini-art { width: 40px; height: 40px; border-radius: 8px; object-fit: cover; border: 1px solid rgba(255,255,255,0.2); }
-        .track-info-mini { flex: 1; overflow: hidden; line-height: 1.2; }
-        .track-info-mini b { display: block; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; }
-        .track-info-mini span { font-size: 11px; color: rgba(255,255,255,0.7); }
+        .search-header { display: flex; align-items: center; gap: 10px; margin-top: 20px; }
+        .search-input-wrapper { 
+            flex: 1; background: #1c1c1e; border-radius: 12px; 
+            display: flex; align-items: center; padding: 0 15px; 
+        }
+        .search-input-wrapper i { color: #ff0000; }
+        .search-input { 
+            width: 100%; padding: 12px; border: none; background: transparent; 
+            color: #fff; font-size: 16px; outline: none;
+        }
+        .btn-close-search { background: none; border: none; color: #ff0000; font-size: 16px; font-weight: bold; }
 
-        .dock-hidden { transform: translateY(120px); opacity: 0; }
+        /* LISTA DE SUGESTÕES */
+        #suggestionsList { margin-top: 20px; }
+        .suggestion-item { 
+            display: flex; align-items: center; gap: 15px; padding: 12px 0; 
+            border-bottom: 0.5px solid #222; cursor: pointer;
+        }
+        .suggestion-item i { color: #555; font-size: 14px; }
+        .suggestion-text { font-size: 16px; color: #fff; }
+        .suggestion-text span { color: #777; } /* Para o "gavião" no exemplo */
 
-        /* Pagina do Album (Sem o botão voltar no topo) */
+        /* Pagina do Album */
         .full-page { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 10001; display: none; flex-direction: column; overflow-y: auto; }
         .track-row { display: flex; align-items: center; padding: 15px; border-bottom: 1px solid #1c1c1e; }
         .track-row.is-playing .track-title { color: var(--active-song) !important; font-weight: bold; }
         .track-row.is-playing .track-play-icon { color: var(--playing-color) !important; }
         .composer-name { font-size: 11px; color: #777; }
 
-        /* Overlay de Busca */
-        #searchOverlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 10010; padding: 20px; }
-        .search-input { width: 100%; padding: 15px; border-radius: 10px; border: none; background: #222; color: #fff; margin-top: 50px; }
+        .dock-hidden { transform: translateY(120px); opacity: 0; }
     </style>
 </head>
 <body>
@@ -72,6 +87,7 @@
 
     <div id="grid" class="main-grid"></div>
 
+    <!-- BARRA FLUTUANTE -->
     <div class="dock-container" id="dock">
         <div class="dock-item btn-home" onclick="irParaInicio()"><i class="fas fa-home"></i></div>
         
@@ -89,12 +105,20 @@
         <div class="dock-item btn-search" onclick="toggleSearch()"><i class="fas fa-search"></i></div>
     </div>
 
+    <!-- BUSCA ATUALIZADA -->
     <div id="searchOverlay">
-        <button onclick="toggleSearch()" style="color:#fff; background:none; border:none; font-size:20px;">Fechar X</button>
-        <input type="text" class="search-input" id="searchInput" placeholder="O que você quer ouvir?" onkeyup="if(event.key==='Enter') buscar(this.value)">
+        <div class="search-header">
+            <div class="search-input-wrapper">
+                <i class="fas fa-search"></i>
+                <input type="text" class="search-input" id="searchInput" placeholder="Artistas, músicas ou álbuns" oninput="sugerir(this.value)">
+            </div>
+            <button class="btn-close-search" onclick="toggleSearch()">Cancelar</button>
+        </div>
+        <div id="suggestionsList">
+            <!-- As sugestões aparecerão aqui enquanto você digita -->
+        </div>
     </div>
 
-    <!-- Página do álbum sem o botão voltar no topo -->
     <div id="albumPage" class="full-page">
         <div id="albumContent"></div>
     </div>
@@ -104,7 +128,7 @@
     <script>
         const audio = document.getElementById('audioMain');
         const dock = document.getElementById('dock');
-        let lastScrollY = window.scrollY;
+        let searchTimeout;
 
         function irParaInicio() {
             fecharPagina();
@@ -112,18 +136,45 @@
             window.scrollTo(0, 0);
         }
 
-        window.addEventListener('scroll', () => {
-            if (window.scrollY > lastScrollY && window.scrollY > 100) dock.classList.add('dock-hidden');
-            else dock.classList.remove('dock-hidden');
-            lastScrollY = window.scrollY;
-        });
-
         function toggleSearch() {
             const s = document.getElementById('searchOverlay');
-            s.style.display = s.style.display === 'block' ? 'none' : 'block';
+            const isOpen = s.style.display === 'block';
+            s.style.display = isOpen ? 'none' : 'block';
+            if (!isOpen) document.getElementById('searchInput').focus();
         }
 
-        function buscar(val) { toggleSearch(); carregarPorGenero(val); }
+        // FUNÇÃO DE SUGESTÃO EM TEMPO REAL
+        async function sugerir(termo) {
+            if (termo.length < 2) {
+                document.getElementById('suggestionsList').innerHTML = "";
+                return;
+            }
+
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(async () => {
+                const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(termo)}&entity=album&limit=8`);
+                const data = await res.json();
+                
+                let html = data.results.map(item => `
+                    <div class="suggestion-item" onclick="selecionarSugestao('${item.collectionName}')">
+                        <i class="fas fa-search"></i>
+                        <div class="suggestion-text">${item.collectionName}</div>
+                    </div>
+                `).join('');
+                
+                // Botão de "Mostrar todos" em vermelho como na imagem
+                if(data.results.length > 0) {
+                    html += `<div style="color: #ff0000; padding: 20px 0; font-weight: bold;" onclick="selecionarSugestao('${termo}')">Mostrar todos os resultados</div>`;
+                }
+
+                document.getElementById('suggestionsList').innerHTML = html;
+            }, 300);
+        }
+
+        function selecionarSugestao(termo) {
+            toggleSearch();
+            carregarPorGenero(termo);
+        }
 
         const generos = ["Forró", "Vaquejada", "Piseiro", "Sertanejo", "Arrocha", "Pagode", "Gospel", "Pop", "Rock"];
         document.getElementById('catNav').innerHTML = generos.map(g => `<button class="cat-btn" onclick="carregarPorGenero('${g}')">${g}</button>`).join('');
@@ -136,6 +187,7 @@
                     <img src="${t.artworkUrl100.replace('100x100', '400x400')}">
                     <p style="margin-top:10px; font-weight:bold; font-size:13px;">${t.collectionName}</p>
                 </div>`).join('');
+            window.scrollTo(0, 0);
         }
 
         async function abrirAlbum(id, art) {
