@@ -17,14 +17,24 @@
             background: #000000; z-index: -1;
         }
 
-        header { padding: 30px 20px 15px; background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.1); text-align: center; }
-        
-        /* NOVA CLASSE PARA O LOGO EM IMAGEM */
-        .logo-image {
-            max-height: 50px; /* Ajuste a altura máxima conforme necessário */
-            width: auto;
-            display: inline-block;
-            vertical-align: middle;
+        /* Ajuste no Header para centralizar a imagem */
+        header { 
+            padding: 20px 20px 10px; 
+            background: rgba(255, 255, 255, 0.03); 
+            backdrop-filter: blur(20px); 
+            -webkit-backdrop-filter: blur(20px); 
+            border-bottom: 1px solid rgba(255,255,255,0.1); 
+            display: flex;
+            justify-content: center; /* Centraliza horizontalmente */
+            align-items: center;    /* Centraliza verticalmente */
+        }
+
+        /* Estilo para a imagem do Logo de Diamante */
+        .logo-diamante {
+            max-width: 80%;       /* Garante que não estoure a tela em celulares pequenos */
+            height: auto;          /* Mantém a proporção */
+            max-height: 60px;     /* Define uma altura máxima elegante */
+            object-fit: contain;  /* Garante que a imagem caiba sem cortes */
         }
 
         .nav-container { 
@@ -111,7 +121,7 @@
 <body>
 
     <header>
-        <img src="image_15.png" alt="Lamonie Flow" class="logo-image">
+        <img src="image_17.png" alt="Lamonie Flow" class="logo-diamante">
     </header>
 
     <div class="nav-container">
