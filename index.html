@@ -84,14 +84,14 @@
         .card { width: 47%; background: rgba(255,255,255,0.04); border-radius: 15px; padding: 8px; margin-bottom: 20px; }
         .card img { width: 100%; aspect-ratio: 1/1; border-radius: 12px; object-fit: cover; }
 
-        /* ==================== BARRA INFERIOR COM EFEITO DE VIDRO TRANSPARENTE ==================== */
+        /* Barra inferior com efeito vidro transparente */
         .player { 
             position: fixed; 
             bottom: 12px; 
             left: 12px; 
             right: 12px; 
-            background: rgba(255, 255, 255, 0.08);   /* Fundo quase transparente */
-            backdrop-filter: blur(30px);             /* Efeito vidro forte */
+            background: rgba(255, 255, 255, 0.08); 
+            backdrop-filter: blur(30px); 
             -webkit-backdrop-filter: blur(30px);
             border-radius: 50px; 
             padding: 8px 12px; 
@@ -195,14 +195,12 @@
     </div>
     <div id="grid" class="main-grid"></div>
 
-    <!-- Barra inferior com efeito vidro transparente -->
-    <footer class="player" id="player">
-        <!-- Botão Home -->
-        <div class="nav-bottom-btn" onclick="voltarParaInicio()">
+    <!-- Barra inferior -->
+    <footer class="player" id="player" onclick="abrirAlbumAtual()">
+        <div class="nav-bottom-btn" onclick="event.stopImmediatePropagation(); voltarParaInicio()">
             <i class="fas fa-home"></i>
         </div>
 
-        <!-- Centro: Capa + Informações -->
         <div class="player-center">
             <img id="playerArt" src="" class="mini-art">
             <div class="track-info">
@@ -211,13 +209,11 @@
             </div>
         </div>
 
-        <!-- Botão Play/Pause -->
-        <button onclick="togglePlay()" id="playBtn" style="background:none; border:none; color:var(--playing-color); font-size:28px; padding:8px;">
+        <button onclick="event.stopImmediatePropagation(); togglePlay()" id="playBtn" style="background:none; border:none; color:var(--playing-color); font-size:28px; padding:8px;">
             <i class="fas fa-pause"></i>
         </button>
 
-        <!-- Botão Busca -->
-        <div class="nav-bottom-btn" onclick="focarBusca()">
+        <div class="nav-bottom-btn" onclick="event.stopImmediatePropagation(); focarBusca()">
             <i class="fas fa-search"></i>
         </div>
     </footer>
@@ -233,6 +229,10 @@
         const audio = document.getElementById('audioMain');
         const player = document.getElementById('player');
 
+        // Variáveis globais para controlar o álbum atual
+        window.albumAtualId = null;
+        window.capaAtual = null;
+
         function voltarParaInicio() {
             document.getElementById('albumPage').style.display = 'none';
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -241,6 +241,12 @@
         function focarBusca() {
             document.getElementById('searchInput').focus();
             window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function abrirAlbumAtual() {
+            if (window.albumAtualId && window.capaAtual) {
+                abrirAlbum(window.albumAtualId, window.capaAtual);
+            }
         }
 
         function toggleGenres() {
@@ -277,6 +283,9 @@
         }
 
         async function abrirAlbum(id, art) {
+            window.albumAtualId = id;        // ← Salva o álbum atual
+            window.capaAtual = art;          // ← Salva a capa atual
+
             window.albumVisualizadoId = id;
             albumPage.style.display = 'flex';
             const res = await fetch(`https://itunes.apple.com/lookup?id=${id}&entity=song`);
