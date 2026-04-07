@@ -89,7 +89,7 @@
         .track-row.is-playing .track-play-icon { color: var(--playing-color) !important; }
         .album-meta { background: rgba(255,255,255,0.06); margin: 15px; padding: 20px; border-radius: 18px; font-size: 13px; color: #bbb; text-align: center; line-height: 1.6; }
         .composer-name { font-size: 11px; color: #777; margin-top: 2px; }
-        .error-message { text-align: center; color: #ff4d4d; padding: 20px; }
+        .error-message { text-align: center; color: #ff4d4d; padding: 20px; background: rgba(255,0,0,0.1); border-radius: 15px; margin: 15px;}
     </style>
 </head>
 <body>
@@ -133,21 +133,17 @@
         const grid = document.getElementById('grid');
         const albumDetailContent = document.getElementById('albumDetailContent');
 
-        // Função para exibir erros na tela
         function showError(element, message) {
             element.innerHTML = `<div class="error-message"><h3>Ocorreu um erro</h3><p>${message}</p></div>`;
         }
-
-        // Função para fazer a chamada à API do Deezer usando um proxy confiável
+        
+        // **NOVA FUNÇÃO DE API**
         async function fetchDeezer(endpoint) {
-            // Este proxy é mais estável para a API do Deezer.
-            const proxy = 'https://cors-anywhere.herokuapp.com/';
+            // Trocando para um proxy mais confiável
+            const proxy = 'https://thingproxy.freeboard.io/fetch/';
             const apiUrl = `https://api.deezer.com/${endpoint}`;
-            
             try {
-                const response = await fetch(proxy + apiUrl, {
-                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
-                });
+                const response = await fetch(proxy + apiUrl);
                 if (!response.ok) {
                     throw new Error(`A requisição falhou: ${response.statusText} (status: ${response.status})`);
                 }
@@ -158,7 +154,6 @@
                 return data;
             } catch (error) {
                 console.error('Erro ao buscar dados do Deezer:', error);
-                // Retorna o erro para que a função que chamou possa tratá-lo
                 return { error: true, message: error.message };
             }
         }
@@ -180,15 +175,19 @@
             lastScrollY = albumPage.scrollTop;
         });
         function ativarMicrofone() {
-            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-            recognition.lang = 'pt-BR'; recognition.start();
-            document.getElementById('micBtn').style.color = '#ff3b30';
-            recognition.onresult = (event) => {
-                const texto = event.results[0][0].transcript;
-                document.getElementById('searchInput').value = texto;
-                carregarPorGenero(texto);
-            };
-            recognition.onend = () => { document.getElementById('micBtn').style.color = '#8e8e93'; };
+            try {
+                const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+                recognition.lang = 'pt-BR'; recognition.start();
+                document.getElementById('micBtn').style.color = '#ff3b30';
+                recognition.onresult = (event) => {
+                    const texto = event.results[0][0].transcript;
+                    document.getElementById('searchInput').value = texto;
+                    carregarPorGenero(texto);
+                };
+                recognition.onend = () => { document.getElementById('micBtn').style.color = '#8e8e93'; };
+            } catch (e) {
+                alert('O reconhecimento de voz não é suportado neste navegador.');
+            }
         }
         function realizarBuscaManual() {
             const valor = document.getElementById('searchInput').value;
@@ -198,6 +197,9 @@
             const duration = audio.duration || 0;
             document.getElementById('timeInfo').innerText = `${formatTime(audio.currentTime)} / ${formatTime(duration)}`;
             atualizarUI();
+        };
+        audio.onended = () => {
+            proxima();
         };
         function formatTime(s) {
             const min = Math.floor(s / 60); const seg = Math.floor(s % 60);
@@ -213,7 +215,7 @@
             const data = await fetchDeezer(`search/album?q=${encodeURIComponent(termo)}&limit=100`);
             
             if (data.error) {
-                showError(grid, "Não foi possível buscar os álbuns. Verifique sua conexão ou tente mais tarde.");
+                showError(grid, "Não foi possível buscar os álbuns. O serviço pode estar temporariamente indisponível. Tente novamente mais tarde.");
                 return;
             }
 
@@ -242,7 +244,7 @@
             
             const album = data;
             const songs = data.tracks.data;
-            window.capaAtiva = album.cover_big; // Salva a capa para usar no player
+            window.capaAtiva = album.cover_big;
             
             const dataLancamento = new Date(album.release_date).toLocaleDateString('pt-BR');
             const gravadora = album.label || "Independente";
@@ -308,17 +310,20 @@
         }
         
         async function baixarMusica(url, nome) {
-            // O download de arquivos via proxy pode ser instável ou bloqueado.
-            // Esta função pode não funcionar de forma consistente.
             try {
+                // Para o download funcionar, não podemos usar o proxy.
+                // Isso pode falhar em alguns navegadores/redes dependendo da segurança.
                 const res = await fetch(url); 
                 const blob = await res.blob();
                 const link = document.createElement('a'); 
                 link.href = window.URL.createObjectURL(blob);
                 link.download = `${nome}.mp3`; 
+                document.body.appendChild(link);
                 link.click();
+                document.body.removeChild(link);
             } catch(e) {
-                alert("Não foi possível iniciar o download. O áudio pode estar protegido.");
+                console.error("Erro ao baixar:", e);
+                alert("Não foi possível iniciar o download. O áudio pode estar protegido ou o navegador bloqueou a ação.");
             }
         }
 
@@ -329,7 +334,7 @@
         }
 
         function proxima() { 
-            if(window.listaTocando && window.musicaIndex + 1 < window.listaTocando.length) {
+            if(window.listaTocando && (window.musicaIndex + 1) < window.listaTocando.length) {
                 tocar(window.albumAtivoId, window.musicaIndex + 1); 
             }
         }
