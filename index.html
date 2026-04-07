@@ -14,7 +14,6 @@
         header { padding: 20px; text-align: center; background: rgba(0,0,0,0.5); backdrop-filter: blur(10px); }
         .logo-inox { font-family: 'Great Vibes', cursive; font-size: 40px; background: linear-gradient(to bottom, #cfd8dc, #fff, #90a4ae); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
-        /* Categorias */
         .nav-container { padding: 10px; display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none; }
         .cat-btn { background: #1c1c1e; border: 1px solid #333; color: #fff; padding: 8px 16px; border-radius: 20px; font-size: 13px; white-space: nowrap; }
 
@@ -22,29 +21,38 @@
         .card { width: 47%; margin-bottom: 20px; background: #121212; padding: 10px; border-radius: 15px; }
         .card img { width: 100%; aspect-ratio: 1/1; border-radius: 10px; object-fit: cover; }
 
-        /* BARRA FLUTUANTE ESTILO CÁPSULA (APPLE MUSIC) */
+        /* BARRA FLUTUANTE - EFEITO VIDRO BRILHANTE */
         .dock-container {
             position: fixed; bottom: 25px; left: 0; right: 0;
             display: flex; justify-content: center; align-items: center; gap: 8px;
             z-index: 10005; transition: transform 0.4s ease, opacity 0.4s ease;
         }
+        
         .dock-item {
-            background: rgba(28, 28, 30, 0.85);
-            backdrop-filter: blur(25px) saturate(150%);
-            -webkit-backdrop-filter: blur(25px) saturate(150%);
-            border: 1px solid rgba(255,255,255,0.1);
+            /* Fundo de vidro transparente e brilhoso */
+            background: rgba(255, 255, 255, 0.15); 
+            backdrop-filter: blur(20px) saturate(180%) brightness(120%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%) brightness(120%);
+            /* Borda fina para dar efeito de brilho no vidro */
+            border: 1px solid rgba(255, 255, 255, 0.3);
             display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
         }
-        .btn-home, .btn-search { width: 60px; height: 60px; border-radius: 30px; font-size: 24px; color: #fff; cursor: pointer; }
+
+        .btn-home { width: 60px; height: 60px; border-radius: 30px; font-size: 24px; color: #fff; cursor: pointer; }
+        
+        /* Cor da Lupinha em Vermelho */
+        .btn-search { width: 60px; height: 60px; border-radius: 30px; font-size: 24px; color: #ff0000; cursor: pointer; }
         
         .player-capsule {
             width: 240px; height: 60px; border-radius: 30px;
             padding: 0 15px; justify-content: flex-start; gap: 10px;
         }
-        .mini-art { width: 40px; height: 40px; border-radius: 8px; object-fit: cover; }
+        
+        .mini-art { width: 40px; height: 40px; border-radius: 8px; object-fit: cover; border: 1px solid rgba(255,255,255,0.2); }
         .track-info-mini { flex: 1; overflow: hidden; line-height: 1.2; }
-        .track-info-mini b { display: block; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .track-info-mini span { font-size: 11px; opacity: 0.6; }
+        .track-info-mini b { display: block; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; }
+        .track-info-mini span { font-size: 11px; color: rgba(255,255,255,0.7); }
 
         .dock-hidden { transform: translateY(120px); opacity: 0; }
 
@@ -54,7 +62,7 @@
         .track-row.is-playing .track-title { color: var(--active-song) !important; font-weight: bold; }
         .track-row.is-playing .track-play-icon { color: var(--playing-color) !important; }
         .composer-name { font-size: 11px; color: #777; }
-        .btn-voltar { margin: 15px; background: #333; color: #fff; border: none; padding: 10px 20px; border-radius: 20px; width: fit-content; }
+        .btn-voltar { margin: 15px; background: rgba(255,255,255,0.2); color: #fff; border: 1px solid rgba(255,255,255,0.3); padding: 10px 20px; border-radius: 20px; width: fit-content; backdrop-filter: blur(10px); }
 
         /* Overlay de Busca */
         #searchOverlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 10010; padding: 20px; }
@@ -69,9 +77,8 @@
 
     <div id="grid" class="main-grid"></div>
 
-    <!-- BARRA FLUTUANTE -->
+    <!-- BARRA FLUTUANTE ESTILO VIDRO BRILHANTE -->
     <div class="dock-container" id="dock">
-        <!-- BOTÃO HOME CORRIGIDO: Agora volta sem parar a música -->
         <div class="dock-item btn-home" onclick="irParaInicio()"><i class="fas fa-home"></i></div>
         
         <div class="dock-item player-capsule" onclick="abrirAlbumAtivo()">
@@ -105,11 +112,10 @@
         const dock = document.getElementById('dock');
         let lastScrollY = window.scrollY;
 
-        // FUNÇÃO DE VOLTAR PARA O INÍCIO SEM RECARREGAR
         function irParaInicio() {
-            fecharPagina(); // Fecha a página de álbuns se estiver aberta
-            document.getElementById('searchOverlay').style.display = 'none'; // Fecha busca
-            window.scrollTo(0, 0); // Rola para o topo do grid original
+            fecharPagina();
+            document.getElementById('searchOverlay').style.display = 'none';
+            window.scrollTo(0, 0);
         }
 
         window.addEventListener('scroll', () => {
