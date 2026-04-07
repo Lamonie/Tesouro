@@ -37,10 +37,10 @@
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
         }
 
-        .btn-home { width: 60px; height: 60px; border-radius: 30px; font-size: 24px; color: #fff; }
-        .btn-search { width: 60px; height: 60px; border-radius: 30px; font-size: 24px; color: #ff0000; }
+        .btn-home { width: 60px; height: 60px; border-radius: 30px; font-size: 24px; color: #fff; cursor: pointer; }
+        .btn-search { width: 60px; height: 60px; border-radius: 30px; font-size: 24px; color: #ff0000; cursor: pointer; }
         
-        .player-capsule { width: 220px; height: 60px; border-radius: 30px; padding: 0 12px; gap: 10px; overflow: hidden; }
+        .player-capsule { width: 220px; height: 60px; border-radius: 30px; padding: 0 12px; gap: 10px; overflow: hidden; cursor: pointer; }
         .mini-art { width: 40px; height: 40px; border-radius: 8px; flex-shrink: 0; object-fit: cover; }
         .track-info-mini { flex: 1; display: flex; flex-direction: column; justify-content: center; overflow: hidden; white-space: nowrap; }
         .track-info-mini b { font-size: 12px; color: #fff; text-overflow: ellipsis; overflow: hidden; }
@@ -108,11 +108,12 @@
         const audio = document.getElementById('audioMain');
         let searchTimeout;
 
-        // AJUSTADO: Função Início limpa tudo e reseta para o padrão
+        // SOLUÇÃO DEFINITIVA PARA VOLTAR AO INÍCIO REAL
         function irParaInicio() {
             fecharPagina(); 
             fecharBusca();
-            carregarPorGenero("Forró"); // Volta para a lista inicial
+            // Recarrega o gênero inicial (Forró) para limpar a pesquisa do grid
+            carregarPorGenero("Forró"); 
             window.scrollTo({top: 0, behavior: 'smooth'});
         }
 
@@ -145,7 +146,7 @@
         }
 
         function selecionarSugestao(termo) {
-            fecharPagina(); // Garante que se tiver um álbum aberto, ele feche
+            fecharPagina(); 
             fecharBusca(); 
             carregarPorGenero(termo);
         }
@@ -215,7 +216,7 @@
         function abrirAlbumAtivo() { if(window.albumAtivoId) abrirAlbum(window.albumAtivoId, window.capaAtiva); }
 
         audio.onplay = atualizarUI; audio.onpause = atualizarUI;
-        carregarPorGenero("Forró");
+        carregarPorGenero("Forró"); // Inicializa com Forró
     </script>
 </body>
 </html>
