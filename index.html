@@ -26,13 +26,11 @@
         .logo-inox {
             font-family: 'Great Vibes', cursive;
             font-size: 52px;
-            font-weight: 400;
             letter-spacing: 3px;
             background: linear-gradient(white, #ddd);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             text-shadow: 0 0 30px rgba(255,255,255,0.8);
-            filter: drop-shadow(0 0 20px rgba(255,255,255,0.6));
         }
 
         .api-tabs {
@@ -49,7 +47,6 @@
             border-radius: 25px;
             font-size: 15px;
             cursor: pointer;
-            transition: all 0.3s;
         }
         .api-tab.active {
             background: #94b3ce;
@@ -62,10 +59,7 @@
             display: flex;
             gap: 10px;
             overflow-x: auto;
-            scrollbar-width: none;
         }
-        .nav-container::-webkit-scrollbar { display: none; }
-
         .genres-btn, .cat-btn {
             background: #1a1a1a;
             border: 1px solid #333;
@@ -76,11 +70,8 @@
             font-size: 14px;
             cursor: pointer;
         }
-        .genres-btn { font-weight: bold; }
 
-        .search-container {
-            padding: 10px 15px;
-        }
+        .search-container { padding: 10px 15px; }
         .search-box {
             display: flex;
             background: #1f1f1f;
@@ -109,9 +100,7 @@
             border-radius: 16px;
             overflow: hidden;
             cursor: pointer;
-            transition: transform 0.2s;
         }
-        .card:hover { transform: scale(1.04); }
         .card img {
             width: 100%;
             aspect-ratio: 1/1;
@@ -134,13 +123,37 @@
             bottom: 0;
             left: 0;
             right: 0;
-            background: rgba(20,20,20,0.95);
+            background: rgba(20,20,20,0.98);
             backdrop-filter: blur(20px);
             padding: 12px 15px;
             display: none;
             align-items: center;
             gap: 12px;
             z-index: 1000;
+            border-top: 1px solid #333;
+        }
+        .player img {
+            width: 55px;
+            height: 55px;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+        .player-info {
+            flex: 1;
+            overflow: hidden;
+        }
+        .player-info div:first-child {
+            font-weight: 600;
+            font-size: 15px;
+        }
+        .player-info div:last-child {
+            font-size: 13px;
+            opacity: 0.8;
+        }
+        .preview-notice {
+            font-size: 11px;
+            color: #ffcc00;
+            margin-top: 4px;
         }
     </style>
 </head>
@@ -170,13 +183,15 @@
 
     <div id="grid" class="main-grid"></div>
 
+    <!-- Player melhorado -->
     <div id="player" class="player">
-        <img id="playerArt" src="" style="width:55px; height:55px; border-radius:8px; object-fit:cover;">
-        <div style="flex:1; overflow:hidden;">
-            <div id="playerTitle" style="font-weight:600; font-size:15px;">Título</div>
-            <div id="playerArtist" style="font-size:13px; opacity:0.8;">Artista</div>
+        <img id="playerArt" src="">
+        <div class="player-info">
+            <div id="playerTitle">Título da Música</div>
+            <div id="playerArtist">Artista</div>
+            <div class="preview-notice">Prévia de 30 segundos (músicas completas exigem assinatura)</div>
         </div>
-        <audio id="audioPlayer" controls style="width:130px;"></audio>
+        <audio id="audioPlayer" controls style="width: 160px;"></audio>
     </div>
 
     <script>
@@ -197,30 +212,30 @@
 
         function toggleGenres() {
             const nav = document.getElementById('catNav');
-            nav.style.display = nav.style.display === 'flex' ? 'none' : 'flex';
+            nav.style.display = (nav.style.display === 'flex') ? 'none' : 'flex';
         }
 
         async function buscarGeral(termo = "Forró") {
-            document.getElementById('grid').innerHTML = `<p style="grid-column:1/-1; text-align:center; padding:50px;">Buscando em iTunes e Deezer...</p>`;
+            document.getElementById('grid').innerHTML = `<p style="grid-column:1/-1; text-align:center; padding:60px; color:#888;">Buscando...</p>`;
 
             let allResults = [];
 
-            // iTunes
+            // iTunes (melhor para previews)
             if (currentSource === 'all' || currentSource === 'itunes') {
                 try {
-                    const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(termo)}&entity=album&limit=30&country=BR`);
+                    const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(termo)}&entity=song&limit=40&country=BR`);
                     const data = await res.json();
                     allResults.push(...data.results.map(item => ({...item, source: 'iTunes'})));
-                } catch(e) {}
+                } catch(e) { console.log("Erro iTunes", e); }
             }
 
             // Deezer
             if (currentSource === 'all' || currentSource === 'deezer') {
                 try {
-                    const res = await fetch(`https://api.deezer.com/search/album?q=${encodeURIComponent(termo)}&limit=20`);
+                    const res = await fetch(`https://api.deezer.com/search/track?q=${encodeURIComponent(termo)}&limit=30`);
                     const data = await res.json();
                     allResults.push(...(data.data || []).map(item => ({...item, source: 'Deezer'})));
-                } catch(e) {}
+                } catch(e) { console.log("Erro Deezer", e); }
             }
 
             mostrarResultados(allResults);
@@ -236,50 +251,59 @@
             grid.innerHTML = '';
 
             if (items.length === 0) {
-                grid.innerHTML = '<p style="grid-column:1/-1; text-align:center; padding:50px;">Nenhum resultado encontrado.</p>';
+                grid.innerHTML = '<p style="grid-column:1/-1; text-align:center; padding:60px;">Nenhum resultado encontrado.</p>';
                 return;
             }
 
             items.forEach(item => {
-                let img = '', title = '', artist = '';
-                
+                let img = '', title = '', artist = '', previewUrl = '';
+
                 if (item.source === 'iTunes') {
                     img = (item.artworkUrl100 || '').replace('100x100', '400x400');
-                    title = item.collectionName || item.trackName || 'Sem título';
+                    title = item.trackName || 'Sem título';
                     artist = item.artistName || '';
-                } else {
-                    img = item.cover_big || item.cover_medium || 'https://via.placeholder.com/300';
+                    previewUrl = item.previewUrl || '';
+                } else { // Deezer
+                    img = item.album ? item.album.cover_big || item.album.cover_medium : '';
                     title = item.title || 'Sem título';
                     artist = item.artist ? item.artist.name : '';
+                    previewUrl = item.preview || '';
                 }
 
-                const cardHTML = `
-                    <div class="card" onclick="tocarMusica('${img}', '${title.replace(/'/g, "\\'")}', '${artist.replace(/'/g, "\\'")}')">
-                        <img src="${img}" onerror="this.src='https://via.placeholder.com/300x300/222/fff?text=Sem+Imagem'">
-                        <div class="card-info">
-                            <div class="source">${item.source}</div>
-                            <div style="font-weight:600; font-size:14px; margin-bottom:4px;">${title}</div>
-                            <div style="font-size:13px; opacity:0.8;">${artist}</div>
-                        </div>
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <img src="${img || 'https://via.placeholder.com/300x300/222/fff?text=Sem+Imagem'}" onerror="this.src='https://via.placeholder.com/300x300/222/fff?text=Sem+Imagem'">
+                    <div class="card-info">
+                        <div class="source">${item.source}</div>
+                        <div style="font-weight:600; font-size:14px;">${title}</div>
+                        <div style="font-size:13px; opacity:0.8;">${artist}</div>
                     </div>
                 `;
-                grid.innerHTML += cardHTML;
+                card.onclick = () => tocarPreview(previewUrl, img, title, artist);
+                grid.appendChild(card);
             });
         }
 
-        function tocarMusica(art, title, artist) {
+        function tocarPreview(previewUrl, art, title, artist) {
             const player = document.getElementById('player');
+            const audio = document.getElementById('audioPlayer');
+
             document.getElementById('playerArt').src = art;
             document.getElementById('playerTitle').textContent = title;
             document.getElementById('playerArtist').textContent = artist;
+
+            if (previewUrl) {
+                audio.src = previewUrl;
+                audio.play().catch(() => {});
+            } else {
+                alert("Prévia não disponível para esta música.");
+            }
+
             player.style.display = 'flex';
-            
-            // Toca preview se disponível (iTunes tem previewUrl, Deezer não direto aqui)
-            const audio = document.getElementById('audioPlayer');
-            audio.src = ''; // por enquanto só mostra o player
         }
 
-        // Inicia automaticamente
+        // Inicia com busca padrão
         window.onload = () => buscarGeral("Forró");
     </script>
 </body>
