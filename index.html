@@ -1,199 +1,136 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>LAMONIÊ FLOW - RÁDIO & MÚSICA</title>
-    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        :root { --playing-color: #ffff00; --radio-color: #00ff00; }
-        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-        body { background: #000; color: #fff; font-family: -apple-system, sans-serif; min-height: 100vh; overflow-x: hidden; }
+<!-- Atualize sua Nav Container -->
+<div class="nav-container" id="catNav">
+    <button class="cat-btn radio-active" onclick="carregarRadios('BR')"><i class="fas fa-broadcast-tower"></i> Rádios Brasil</button>
+    <button class="cat-btn" style="border-color: #4285f4; color: #4285f4;" onclick="carregarRadios('US')"><i class="fas fa-flag-usa"></i> Rádios USA</button>
+</div>
 
-        header { padding: 20px; text-align: center; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 1000; }
-        .logo-inox { font-family: 'Great Vibes', cursive; font-size: clamp(30px, 8vw, 45px); background: linear-gradient(to bottom, #cfd8dc, #fff, #90a4ae); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+<script>
+    const audio = document.getElementById('audioMain');
+    let buscaAtiva = false;
+    let modoRadio = false;
 
-        .nav-container { padding: 10px; display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none; }
-        .cat-btn { background: #1c1c1e; border: 1px solid #333; color: #fff; padding: 10px 20px; border-radius: 25px; font-size: 14px; white-space: nowrap; cursor: pointer; }
-        .cat-btn.radio-active { border-color: var(--radio-color); color: var(--radio-color); font-weight: bold; }
+    // Banco de dados expandido com logos Reais
+    const radios = {
+        BR: [
+            { name: "Jovem Pan FM", url: "https://servidor31.brlogic.com:8300/live", logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Logo_Jovem_Pan_FM.png/1200px-Logo_Jovem_Pan_FM.png" },
+            { name: "Metropolitana FM", url: "https://servidor22.brlogic.com:8032/live", logo: "https://metropolitanafm.com.br/wp-content/uploads/2021/11/metropolitana_logo_cor_fundo_transparente.png" },
+            { name: "Mix FM SP", url: "https://mixfm.crossradio.com.br/stream", logo: "https://upload.wikimedia.org/wikipedia/pt/2/26/Logo_Mix_FM.png" },
+            { name: "Alpha FM", url: "https://23113.live.streamtheworld.com/ALPHAFM_SC", logo: "https://www.alphafm.com.br/assets/images/logo-alpha.png" },
+            { name: "Band FM", url: "https://evpp.mm.uol.com.br/band/bandfm_sp/playlist.m3u8", logo: "https://upload.wikimedia.org/wikipedia/commons/4/47/Band_FM_logo.png" },
+            { name: "Transamérica", url: "https://transamerica.crossradio.com.br/stream", logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Logo_Rede_Transam%C3%A9rica.png/1200px-Logo_Rede_Transam%C3%A9rica.png" },
+            { name: "Nova Brasil FM", url: "https://25613.live.streamtheworld.com/NOVABRASIL_FM_SP_SC", logo: "https://novabrasilfm.com.br/wp-content/themes/novabrasil-2022/assets/images/logo.png" },
+            { name: "89 FM A Rádio Rock", url: "https://26533.live.streamtheworld.com/RADIO_89FMSC", logo: "https://upload.wikimedia.org/wikipedia/pt/5/52/89_FM_A_R%C3%A1dio_Rock_logo.png" },
+            { name: "Gazeta FM", url: "https://servidor39.brlogic.com:8052/live", logo: "https://www.gazetafm.com.br/wp-content/uploads/2019/05/logo_gazeta_fm.png" }
+        ],
+        US: [
+            { name: "Hot 97 NY", url: "https://stream.revma.ihub.com/v1/t00c0f/9u9u9u/hls.m3u8", logo: "https://upload.wikimedia.org/wikipedia/en/3/3d/Hot_97_logo.png" },
+            { name: "KISS FM LA", url: "https://stream.revma.ihub.com/v1/t00c0f/wkqiyk/hls.m3u8", logo: "https://upload.wikimedia.org/wikipedia/en/thumb/d/d3/KIIS_FM_logo.svg/1200px-KIIS_FM_logo.svg.png" },
+            { name: "Jazz24", url: "https://live.jazz24.org/jazz24", logo: "https://www.jazz24.org/wp-content/uploads/2014/11/jazz24-logo-horizontal.png" },
+            { name: "WNYC", url: "https://wnyc.stream.publicradio.org/wnyc", logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/WNYC_logo.svg/1200px-WNYC_logo.svg.png" }
+        ]
+    };
 
-        .main-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; padding: 15px 15px 150px; max-width: 1400px; margin: 0 auto; }
-        .card { background: #121212; padding: 12px; border-radius: 15px; cursor: pointer; text-align: center; }
-        .card img { width: 100%; aspect-ratio: 1/1; border-radius: 10px; object-fit: cover; }
-        .card .radio-icon { width: 100%; aspect-ratio: 1/1; border-radius: 10px; display: flex; align-items: center; justify-content: center; background: linear-gradient(45deg, #111, #333); font-size: 50px; color: var(--radio-color); }
+    function carregarRadios(pais = 'BR') {
+        buscaAtiva = true;
+        const grid = document.getElementById('grid');
+        const lista = radios[pais];
+        
+        // Atualiza estilo dos botões
+        document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('radio-active'));
+        event?.currentTarget?.classList.add('radio-active');
 
-        /* DOCK PLAYER */
-        .dock-container { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 10px; z-index: 30000; width: 95%; max-width: 500px; }
-        .dock-item { background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(25px); border: 1px solid rgba(255, 255, 255, 0.3); display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8); }
-        .btn-home, .btn-search { width: 55px; height: 55px; border-radius: 50%; font-size: 22px; color: #fff; cursor: pointer; flex-shrink: 0; }
-        .player-capsule { flex: 1; height: 55px; border-radius: 30px; padding: 0 12px; gap: 10px; overflow: hidden; cursor: pointer; }
-        .mini-art { width: 38px; height: 38px; border-radius: 6px; object-fit: cover; }
-        .track-info-mini { flex: 1; display: flex; flex-direction: column; justify-content: center; overflow: hidden; }
-        .track-info-mini b { font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-        /* FULL PAGE */
-        .full-page { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 15000; display: none; flex-direction: column; overflow-y: auto; }
-        .track-row { display: flex; align-items: center; padding: 15px; border-bottom: 1px solid #1c1c1e; }
-        .is-playing { color: var(--playing-color) !important; font-weight: bold; }
-
-        /* SEARCH */
-        #searchOverlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 40000; padding: 20px; }
-    </style>
-</head>
-<body>
-
-    <header><div class="logo-inox">LamoniêFlow</div></header>
-    
-    <div class="nav-container" id="catNav">
-        <!-- O Botão de rádio agora é fixo -->
-        <button class="cat-btn radio-active" onclick="carregarRadios()"><i class="fas fa-broadcast-tower"></i> Rádios Ao Vivo</button>
-    </div>
-    
-    <main id="grid" class="main-grid"></main>
-
-    <div class="dock-container">
-        <div class="dock-item btn-home" onclick="logicaBotaoHome()"><i class="fas fa-home"></i></div>
-        <div class="dock-item player-capsule" onclick="abrirAlbumAtivo()">
-            <img id="playerArt" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" class="mini-art">
-            <div class="track-info-mini">
-                <b id="trackTitle">Selecione o som</b>
-                <span id="trackArtist" style="font-size:10px; color:rgba(255,255,255,0.6)">Lamoniê Flow</span>
+        grid.innerHTML = lista.map(r => `
+            <div class="card" onclick="tocarRadio('${r.url}', '${r.name}', '${r.logo}')">
+                <img src="${r.logo}" onerror="this.innerHTML='<i class=\'fas fa-broadcast-tower\'></i>'; this.type='div';">
+                <p style="margin-top:10px; font-weight:bold; font-size: 14px;">${r.name}</p>
+                <span style="font-size:10px; color:var(--radio-color)">🔴 AO VIVO</span>
             </div>
-            <button onclick="event.stopPropagation(); togglePlay();" id="playBtn" style="background:none; border:none; color:#fff; font-size:20px;"><i class="fas fa-play"></i></button>
-        </div>
-        <div class="dock-item btn-search" onclick="abrirBusca()"><i class="fas fa-search"></i></div>
-    </div>
+        `).join('');
+    }
 
-    <div id="searchOverlay">
-        <input type="text" id="searchInput" placeholder="Buscar rádio ou artista..." 
-               style="width:80%; padding:15px; background:#1c1c1e; border:none; color:#fff; border-radius:10px;"
-               oninput="sugerir(this.value)">
-        <button onclick="fecharBusca()" style="color:red; background:none; border:none; margin-left:10px;">X</button>
-        <div id="suggestionsList" style="margin-top:20px;"></div>
-    </div>
+    function tocarRadio(url, nome, logo) {
+        modoRadio = true;
+        audio.src = url;
+        audio.play().catch(e => alert("Erro ao carregar rádio. O link pode estar offline."));
+        
+        // Atualiza o Player
+        document.getElementById('trackTitle').innerText = nome;
+        document.getElementById('trackArtist').innerText = "Rádio ao Vivo";
+        
+        const playerArt = document.getElementById('playerArt');
+        playerArt.src = logo;
+        playerArt.style.display = 'block'; 
+        
+        atualizarUI();
+    }
 
-    <div id="albumPage" class="full-page">
-        <div id="albumHeader" style="padding:60px 20px 20px; text-align:center;"></div>
-        <div id="albumTracks"></div>
-    </div>
+    async function carregarPorGenero(g) {
+        modoRadio = false;
+        const grid = document.getElementById('grid');
+        grid.innerHTML = "<p style='padding:20px'>Carregando...</p>";
+        
+        const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(g)}&entity=album&limit=40`);
+        const data = await res.json();
+        
+        grid.innerHTML = data.results.map(t => `
+            <div class="card" onclick="abrirAlbum('${t.collectionId}', '${t.artworkUrl100}')">
+                <img src="${t.artworkUrl100.replace('100x100', '400x400')}">
+                <p style="margin-top:10px; font-size:13px; font-weight:bold; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${t.collectionName}</p>
+            </div>`).join('');
+    }
 
-    <audio id="audioMain"></audio>
+    // Mantendo suas outras funções originais (abrirAlbum, tocarMusica, etc)
+    async function abrirAlbum(id, art) {
+        document.getElementById('albumPage').style.display = 'flex';
+        const res = await fetch(`https://itunes.apple.com/lookup?id=${id}&entity=song`);
+        const data = await res.json();
+        const songs = data.results.slice(1);
+        const album = data.results[0];
 
-    <script>
-        const audio = document.getElementById('audioMain');
-        let buscaAtiva = false;
-        let modoRadio = false;
+        document.getElementById('albumHeader').innerHTML = `
+            <img src="${art.replace('100x100', '600x600')}" style="width:180px; border-radius:15px;">
+            <h2 style="margin-top:15px;">${album.collectionName}</h2>
+            <button onclick="fecharPagina()" style="background:none; border:1px solid #fff; color:#fff; padding:5px 15px; border-radius:20px; margin-top:10px;">Voltar</button>
+        `;
+        document.getElementById('albumTracks').innerHTML = songs.map((m, i) => `
+            <div class="track-row" onclick="tocarMusica('${m.previewUrl}', '${m.trackName}', '${m.artistName}', '${art}')">
+                <span style="margin-right:15px; color:#555;">${i+1}</span>
+                <div>${m.trackName}</div>
+            </div>
+        `).join('');
+    }
 
-        // Lista de algumas rádios brasileiras (Exemplo - podem ser expandidas)
-        const radiosBR = [
-            { name: "Jovem Pan FM", url: "https://servidor31.brlogic.com:8300/live", logo: "📻" },
-            { name: "Rádio Mix FM", url: "https://mixfm.crossradio.com.br/stream", logo: "📻" },
-            { name: "Rádio Gazeta", url: "https://servidor39.brlogic.com:8052/live", logo: "📻" },
-            { name: "Band News FM", url: "https://evpp.mm.uol.com.br/band/bandnewsfm_sp/playlist.m3u8", logo: "📻" },
-            { name: "Alpha FM", url: "https://23113.live.streamtheworld.com/ALPHAFM_SC", logo: "📻" },
-            { name: "Sertaneja FM", url: "https://servidor34.brlogic.com:7010/live", logo: "📻" }
-        ];
+    function tocarMusica(url, nome, artista, art) {
+        modoRadio = false;
+        audio.src = url;
+        audio.play();
+        document.getElementById('playerArt').src = art;
+        document.getElementById('trackTitle').innerText = nome;
+        document.getElementById('trackArtist').innerText = artista;
+        atualizarUI();
+    }
 
-        function logicaBotaoHome() {
-            if (document.getElementById('albumPage').style.display === 'flex') {
-                fecharPagina();
-            } else {
-                carregarPorGenero("Forró");
-                buscaAtiva = false;
-                window.scrollTo({top: 0, behavior: 'smooth'});
-            }
-        }
+    function togglePlay() { audio.paused ? audio.play() : audio.pause(); atualizarUI(); }
+    
+    function atualizarUI() {
+        const btn = document.getElementById('playBtn');
+        btn.innerHTML = audio.paused ? '<i class="fas fa-play"></i>' : '<i class="fas fa-pause"></i>';
+    }
 
-        function carregarRadios() {
-            buscaAtiva = true;
-            const grid = document.getElementById('grid');
-            grid.innerHTML = radiosBR.map(r => `
-                <div class="card" onclick="tocarRadio('${r.url}', '${r.name}')">
-                    <div class="radio-icon"><i class="fas fa-broadcast-tower"></i></div>
-                    <p style="margin-top:10px; font-weight:bold;">${r.name}</p>
-                    <span style="font-size:10px; color:var(--radio-color)">AO VIVO</span>
-                </div>
-            `).join('');
-        }
+    function fecharPagina() { document.getElementById('albumPage').style.display = 'none'; }
+    function abrirBusca() { document.getElementById('searchOverlay').style.display = 'block'; }
+    function fecharBusca() { document.getElementById('searchOverlay').style.display = 'none'; }
 
-        function tocarRadio(url, nome) {
-            modoRadio = true;
-            audio.src = url;
-            audio.play();
-            document.getElementById('trackTitle').innerText = nome;
-            document.getElementById('trackArtist').innerText = "Rádio ao Vivo";
-            document.getElementById('playerArt').style.display = 'none'; 
-            // Mostra um ícone de rádio no lugar da foto no player
-            atualizarUI();
-        }
+    // Inicialização
+    const generosExtras = ["Forró", "Sertanejo", "Pagode"];
+    const nav = document.getElementById('catNav');
+    generosExtras.forEach(g => {
+        const btn = document.createElement('button');
+        btn.className = 'cat-btn';
+        btn.innerText = g;
+        btn.onclick = () => carregarPorGenero(g);
+        nav.appendChild(btn);
+    });
 
-        async function carregarPorGenero(g) {
-            modoRadio = false;
-            document.getElementById('playerArt').style.display = 'block';
-            const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(g)}&entity=album&limit=40`);
-            const data = await res.json();
-            document.getElementById('grid').innerHTML = data.results.map(t => `
-                <div class="card" onclick="abrirAlbum('${t.collectionId}', '${t.artworkUrl100}')">
-                    <img src="${t.artworkUrl100.replace('100x100', '400x400')}">
-                    <p style="margin-top:10px; font-size:13px; font-weight:bold; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${t.collectionName}</p>
-                </div>`).join('');
-        }
-
-        async function abrirAlbum(id, art) {
-            document.getElementById('albumPage').style.display = 'flex';
-            const res = await fetch(`https://itunes.apple.com/lookup?id=${id}&entity=song`);
-            const data = await res.json();
-            const songs = data.results.slice(1);
-            const album = data.results[0];
-
-            document.getElementById('albumHeader').innerHTML = `
-                <img src="${art.replace('100x100', '600x600')}" style="width:180px; border-radius:15px;">
-                <h2 style="margin-top:15px;">${album.collectionName}</h2>
-            `;
-            document.getElementById('albumTracks').innerHTML = songs.map((m, i) => `
-                <div class="track-row" onclick="tocarMusica('${m.previewUrl}', '${m.trackName}', '${m.artistName}', '${art}')">
-                    <span style="margin-right:15px; color:#555;">${i+1}</span>
-                    <div>${m.trackName}</div>
-                </div>
-            `).join('');
-        }
-
-        function tocarMusica(url, nome, artista, art) {
-            modoRadio = false;
-            audio.src = url;
-            audio.play();
-            document.getElementById('playerArt').style.display = 'block';
-            document.getElementById('playerArt').src = art;
-            document.getElementById('trackTitle').innerText = nome;
-            document.getElementById('trackArtist').innerText = artista;
-            atualizarUI();
-        }
-
-        function togglePlay() { audio.paused ? audio.play() : audio.pause(); atualizarUI(); }
-        function atualizarUI() {
-            const btn = document.getElementById('playBtn');
-            btn.innerHTML = audio.paused ? '<i class="fas fa-play"></i>' : '<i class="fas fa-pause"></i>';
-            if(modoRadio) btn.style.color = 'var(--radio-color)';
-            else btn.style.color = '#fff';
-        }
-
-        function abrirBusca() { document.getElementById('searchOverlay').style.display = 'block'; }
-        function fecharBusca() { document.getElementById('searchOverlay').style.display = 'none'; }
-        function fecharPagina() { document.getElementById('albumPage').style.display = 'none'; }
-
-        // Inicialização
-        const generosExtras = ["Forró", "Sertanejo", "Pagode", "Piseiro"];
-        const nav = document.getElementById('catNav');
-        generosExtras.forEach(g => {
-            const btn = document.createElement('button');
-            btn.className = 'cat-btn';
-            btn.innerText = g;
-            btn.onclick = () => carregarPorGenero(g);
-            nav.appendChild(btn);
-        });
-
-        carregarPorGenero("Forró");
-    </script>
-</body>
-</html>
+    carregarPorGenero("Forró");
+</script>
