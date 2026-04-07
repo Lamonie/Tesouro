@@ -37,34 +37,20 @@
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
         }
 
-        .btn-home { width: 60px; height: 60px; border-radius: 30px; font-size: 24px; color: #fff; }
-        .btn-search { width: 60px; height: 60px; border-radius: 30px; font-size: 24px; color: #ff0000; }
+        .btn-home { width: 60px; height: 60px; border-radius: 30px; font-size: 24px; color: #fff; cursor: pointer; }
+        .btn-search { width: 60px; height: 60px; border-radius: 30px; font-size: 24px; color: #ff0000; cursor: pointer; }
         
-        .player-capsule {
-            width: 220px; height: 60px; border-radius: 30px;
-            padding: 0 12px; gap: 10px; overflow: hidden;
-        }
-        
+        .player-capsule { width: 220px; height: 60px; border-radius: 30px; padding: 0 12px; gap: 10px; overflow: hidden; cursor: pointer; }
         .mini-art { width: 40px; height: 40px; border-radius: 8px; flex-shrink: 0; object-fit: cover; }
         
-        .track-info-mini { 
-            flex: 1; 
-            display: flex; 
-            flex-direction: column; 
-            justify-content: center;
-            overflow: hidden; 
-            white-space: nowrap;
-        }
+        .track-info-mini { flex: 1; display: flex; flex-direction: column; justify-content: center; overflow: hidden; white-space: nowrap; }
         .track-info-mini b { font-size: 12px; color: #fff; text-overflow: ellipsis; overflow: hidden; }
         .track-info-mini span { font-size: 10px; color: rgba(255,255,255,0.6); text-overflow: ellipsis; overflow: hidden; }
 
         /* TELAS FULL */
         .full-page { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 10001; display: none; flex-direction: column; overflow-y: auto; }
         .track-row { display: flex; align-items: center; padding: 15px; border-bottom: 1px solid #1c1c1e; }
-        
-        /* Destaque para a música tocando */
         .track-row.is-playing .track-title { color: var(--playing-color) !important; font-weight: bold; }
-        .track-row.is-playing .track-number { color: var(--playing-color) !important; }
 
         /* BUSCA */
         #searchOverlay { 
@@ -100,11 +86,14 @@
         <div class="dock-item btn-search" onclick="abrirBusca()"><i class="fas fa-search"></i></div>
     </div>
 
+    <!-- BUSCA -->
     <div id="searchOverlay">
         <div class="search-header">
             <div class="search-input-wrapper">
                 <i class="fas fa-search" style="color: #ff0000;"></i>
-                <input type="text" class="search-input" id="searchInput" placeholder="O que você quer ouvir?" oninput="sugerir(this.value)">
+                <input type="text" class="search-input" id="searchInput" placeholder="O que você quer ouvir?" 
+                       oninput="sugerir(this.value)" 
+                       onkeydown="if(event.key==='Enter') selecionarSugestao(this.value)">
             </div>
             <button onclick="fecharBusca()" style="background:none; border:none; color:#ff0000; font-weight:bold;">Cancelar</button>
         </div>
@@ -155,12 +144,14 @@
             }, 300);
         }
 
+        // CORREÇÃO: Fecha o álbum atual antes de carregar a busca no grid principal
         function selecionarSugestao(termo) {
-            fecharBusca();
-            carregarPorGenero(termo);
+            fecharPagina(); // Fecha a tela do álbum se estiver aberta
+            fecharBusca();  // Fecha a tela de busca
+            carregarPorGenero(termo); // Carrega os novos álbuns no fundo
         }
 
-        const generos = ["Forró", "Vaquejada", "Piseiro", "Sertanejo", "Arrocha", "Pagode", "Gospel"];
+        const generos = ["Forró", "Vaquejada", "Piseiro", "Sertanejo", "Arrocha", "Pagode"];
         document.getElementById('catNav').innerHTML = generos.map(g => `<button class="cat-btn" onclick="carregarPorGenero('${g}')">${g}</button>`).join('');
 
         async function carregarPorGenero(g) {
@@ -171,6 +162,7 @@
                     <img src="${t.artworkUrl100.replace('100x100', '400x400')}">
                     <p style="margin-top:10px; font-weight:bold; font-size:13px;">${t.collectionName}</p>
                 </div>`).join('');
+            window.scrollTo(0, 0);
         }
 
         async function abrirAlbum(id, art) {
@@ -184,14 +176,13 @@
             document.getElementById('albumContent').innerHTML = `
                 <div style="text-align:center; padding:50px 30px 30px 30px;">
                     <img src="${art.replace('100x100', '600x600')}" style="width:220px; border-radius:15px; box-shadow: 0 10px 30px rgba(0,0,0,0.8);">
-                    <h2 style="margin-top:20px; font-size:22px;">${album.collectionName}</h2>
-                    <p style="color:#777; margin-top:5px;">${album.artistName}</p>
+                    <h2 style="margin-top:20px;">${album.collectionName}</h2>
                 </div>
                 ${songs.map((m, i) => `
                     <div class="track-row" id="row_${id}_${i}" onclick="tocar('${id}', ${i}, '${art}')">
-                        <span class="track-number" style="color:#555; width:40px; text-align:center; font-size:14px;">${i+1}</span>
+                        <span style="color:#555; width:40px; text-align:center;">${i+1}</span>
                         <div style="flex:1; overflow:hidden;">
-                            <div class="track-title" style="color:#fff; font-size:16px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${m.trackName}</div>
+                            <div class="track-title" style="color:#fff;">${m.trackName}</div>
                             <div style="font-size:12px; color:#555;">${m.artistName}</div>
                         </div>
                     </div>
