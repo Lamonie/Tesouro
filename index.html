@@ -103,13 +103,18 @@
             border-radius: 20px; 
             border: 1px solid rgba(255, 255, 255, 0.2); 
             z-index: 10002; 
-            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s;
+            transition: opacity 0.4s ease;
+            opacity: 1;
         }
-        .player-hidden { transform: translateY(100px); opacity: 0; }
+        .player-hidden { 
+            opacity: 0; 
+            pointer-events: none;
+        }
+
         .player-controls { display: flex; align-items: center; gap: 15px; }
         .mini-art { width: 50px; height: 50px; border-radius: 10px; object-fit: cover; }
 
-        /* Contador de tempo no estilo da imagem */
+        /* Contador de tempo */
         .time-bar-container {
             width: 100%;
             margin: 8px 0 12px 0;
@@ -181,7 +186,7 @@
     </div>
     <div id="grid" class="main-grid"></div>
 
-    <footer class="player" id="player" style="display:none;" onclick="voltarParaAlbumAtivo()">
+    <footer class="player" id="player">
         <div class="player-controls">
             <img id="playerArt" src="" class="mini-art">
             <div style="flex:1; overflow:hidden;">
@@ -190,7 +195,6 @@
             </div>
         </div>
 
-        <!-- Contador de tempo no estilo da imagem -->
         <div class="time-bar-container">
             <div class="time-bar">
                 <div class="time-progress" id="timeProgress"></div>
@@ -216,8 +220,28 @@
 
     <script>
         const audio = document.getElementById('audioMain');
-        const playerBar = document.getElementById('player');
-        const albumPage = document.getElementById('albumPage');
+        const player = document.getElementById('player');
+
+        let hideTimeout;
+        let lastScrollY = window.scrollY;
+
+        function hidePlayer() {
+            player.classList.add('player-hidden');
+        }
+
+        function showPlayer() {
+            player.classList.remove('player-hidden');
+            clearTimeout(hideTimeout);
+            hideTimeout = setTimeout(hidePlayer, 3000); // some após 3 segundos sem rolar
+        }
+
+        // Detecta movimento de rolagem
+        window.addEventListener('scroll', () => {
+            if (Math.abs(window.scrollY - lastScrollY) > 5) {
+                showPlayer();
+            }
+            lastScrollY = window.scrollY;
+        });
 
         // Atualiza o contador de tempo
         audio.ontimeupdate = () => {
@@ -233,8 +257,6 @@
 
             const progressPercent = duration ? (current / duration) * 100 : 0;
             document.getElementById('timeProgress').style.width = `${progressPercent}%`;
-
-            atualizarUI();
         };
 
         function formatTime(s) {
@@ -247,19 +269,6 @@
             const nav = document.getElementById('catNav');
             nav.style.display = (nav.style.display === 'flex') ? 'none' : 'flex';
         }
-
-        let lastScrollY = window.scrollY;
-        window.addEventListener('scroll', () => {
-            if (window.scrollY > lastScrollY && window.scrollY > 50) { playerBar.classList.add('player-hidden'); }
-            else { playerBar.classList.remove('player-hidden'); }
-            lastScrollY = window.scrollY;
-        });
-
-        albumPage.addEventListener('scroll', () => {
-            if (albumPage.scrollTop > lastScrollY && albumPage.scrollTop > 50) { playerBar.classList.add('player-hidden'); }
-            else { playerBar.classList.remove('player-hidden'); }
-            lastScrollY = albumPage.scrollTop;
-        });
 
         function ativarMicrofone() {
             const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
@@ -347,8 +356,8 @@
             const m = window.listaTocando[index];
             audio.src = m.previewUrl; 
             audio.play();
-            playerBar.style.display = 'block';
-            playerBar.classList.remove('player-hidden');
+            player.style.display = 'block';
+            showPlayer();
             document.getElementById('playerArt').src = art;
             document.getElementById('trackTitle').innerText = m.trackName;
             document.getElementById('trackArtist').innerText = m.artistName || '';
@@ -389,6 +398,9 @@
                 tocar(window.albumAtivoId, window.musicaIndex + 1, window.capaAtiva); 
         }
         function fecharPagina() { albumPage.style.display = 'none'; }
+
+        // Inicia escondido
+        player.classList.add('player-hidden');
         carregarPorGenero("Início");
     </script>
 </body>
