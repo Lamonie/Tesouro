@@ -229,7 +229,7 @@
         const audio = document.getElementById('audioMain');
         const player = document.getElementById('player');
 
-        // Variáveis para controlar o álbum atual da barra
+        // Variáveis globais para o álbum atual da barra
         window.albumAtualId = null;
         window.capaAtual = null;
 
@@ -243,7 +243,7 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // Clique na barra → abre o álbum que está tocando
+        // Clique na barra inferior → abre o álbum que está tocando
         function abrirAlbumDaBarra() {
             if (window.albumAtualId && window.capaAtual) {
                 abrirAlbum(window.albumAtualId, window.capaAtual);
@@ -284,8 +284,8 @@
         }
 
         async function abrirAlbum(id, art) {
-            window.albumAtualId = id;      // Salva o álbum atual
-            window.capaAtual = art;        // Salva a capa atual
+            window.albumAtualId = id;
+            window.capaAtual = art;
 
             window.albumVisualizadoId = id;
             albumPage.style.display = 'flex';
@@ -334,13 +334,13 @@
             audio.src = m.previewUrl; 
             audio.play();
 
+            // Atualiza a barra com o álbum e capa corretos
+            window.albumAtualId = albumId;
+            window.capaAtual = art;
+
             document.getElementById('playerArt').src = art;
             document.getElementById('trackTitle').innerText = m.trackName;
             document.getElementById('trackArtist').innerText = m.artistName || '';
-
-            // Atualiza o álbum atual da barra
-            window.albumAtualId = albumId;
-            window.capaAtual = art;
         }
 
         function togglePlay() {
