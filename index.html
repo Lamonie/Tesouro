@@ -2,54 +2,76 @@
     const audio = document.getElementById('audioMain');
     const grid = document.getElementById('grid');
     
-    function toggleGenres() {
-        const nav = document.getElementById('catNav');
-        nav.style.display = (nav.style.display === 'flex') ? 'none' : 'flex';
+    // Lista de gêneros organizada
+    const generos = ["Início", "Forró", "Vaquejada", "Piseiro", "Sertanejo", "Brega", "Arrocha", "Pagode", "Gospel", "Rock"];
+    
+    // Renderiza os botões de categoria
+    const catNav = document.getElementById('catNav');
+    if(catNav) {
+        catNav.innerHTML = generos.map(g => `<button class="cat-btn" onclick="buscarSuperApi('${g}', this)">${g}</button>`).join('');
     }
 
-    const generos = ["Início", "Forró", "Vaquejada", "Piseiro", "Sertanejo", "Brega", "Arrocha", "Pagode", "Gospel", "Rock"];
-    document.getElementById('catNav').innerHTML = generos.map(g => `<button class="cat-btn" onclick="buscarSuperApi('${g}', this)">${g}</button>`).join('');
-
     async function buscarSuperApi(termo, btn) {
+        // Estilo do botão ativo
         if(btn) {
             document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
         }
-        grid.innerHTML = "<p style='padding:20px; color:#555;'>Sincronizando bibliotecas...</p>";
+        
+        grid.innerHTML = "<p style='padding:20px; color:#94b3ce;'>Sincronizando bibliotecas...</p>";
         const busca = termo === "Início" ? "Luiz Gonzaga" : termo;
 
-        // Criamos uma lista de promessas que não travam o código se uma falhar
-        const promessas = [
-            fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(busca)}&entity=album&limit=15`).then(r => r.json()).catch(() => ({results: []})),
-            fetch(`https://api.allorigins.win/get?url=${encodeURIComponent('https://api.deezer.com/search/album?q=' + busca)}`).then(r => r.json()).then(d => JSON.parse(d.contents)).catch(() => ({data: []})),
-            fetch(`https://api.jamendo.com/v3.0/albums/?client_id=56d30cce&format=json&name=${encodeURIComponent(busca)}&limit=10`).then(r => r.json()).catch(() => ({results: []}))
-        ];
-
         try {
-            const [dataiTunes, dataDeezer, dataJamendo] = await Promise.all(promessas);
+            // Executa as buscas de forma independente para não travar
+            const piTunes = fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(busca)}&entity=album&limit=15`)
+                .then(r => r.json()).catch(() => ({results: []}));
+                
+            const pDeezer = fetch(`https://api.allorigins.win/get?url=${encodeURIComponent('https://api.deezer.com/search/album?q=' + busca)}`)
+                .then(r => r.json()).then(d => JSON.parse(d.contents)).catch(() => ({data: []}));
+                
+            const pJamendo = fetch(`https://api.jamendo.com/v3.0/albums/?client_id=56d30cce&format=json&name=${encodeURIComponent(busca)}&limit=10`)
+                .then(r => r.json()).catch(() => ({results: []}));
+
+            const [dataiTunes, dataDeezer, dataJamendo] = await Promise.all([piTunes, pDeezer, pJamendo]);
 
             let cards = "";
 
-            // iTunes
-            if(dataiTunes.results) {
-                dataiTunes.results.forEach(t => cards += criarCard(t.collectionName, t.artworkUrl100.replace('100x100', '400x400'), t.collectionId, 'itunes'));
+            // Montagem dos cards com verificação de segurança
+            if(dataiTunes && dataiTunes.results) {
+                dataiTunes.results.forEach(t => {
+                    cards += criarCard(t.collectionName, t.artworkUrl100.replace('100x100', '400x400'), t.collectionId, 'itunes');
+                });
             }
 
-            // Deezer
-            if(dataDeezer.data) {
-                dataDeezer.data.forEach(t => cards += criarCard(t.title, t.cover_medium, t.id, 'deezer'));
+            if(dataDeezer && dataDeezer.data) {
+                dataDeezer.data.forEach(t => {
+                    cards += criarCard(t.title, t.cover_medium, t.id, 'deezer');
+                });
             }
 
-            // Jamendo
-            if(dataJamendo.results) {
-                dataJamendo.results.forEach(t => cards += criarCard(t.name, t.image || 'https://via.placeholder.com/400', t.id, 'jamendo'));
+            if(dataJamendo && dataJamendo.results) {
+                dataJamendo.results.forEach(t => {
+                    cards += criarCard(t.name, t.image || 'https://via.placeholder.com/400', t.id, 'jamendo');
+                });
             }
 
-            grid.innerHTML = cards || "<p style='padding:20px;'>Nenhum resultado encontrado nesta busca.</p>";
-        } catch (e) { 
-            grid.innerHTML = "<p style='padding:20px;'>Erro ao conectar com os servidores. Tente novamente.</p>"; 
+            grid.innerHTML = cards || "<p style='padding:20px;'>Nenhum álbum encontrado.</p>";
+
+        } catch (error) {
+            console.error("Erro na busca:", error);
+            grid.innerHTML = "<p style='padding:20px;'>Erro ao carregar músicas. Tente novamente.</p>";
         }
     }
 
-    // ... mantenha as funções criarCard, abrirAlbum e tocar como estavam ...
+    function criarCard(titulo, capa, id, api) {
+        return `
+            <div class="card" onclick="abrirAlbum('${id}', '${capa}', '${api}')">
+                <span class="api-tag" style="position:absolute; top:5px; right:5px; background:rgba(0,0,0,0.6); font-size:9px; padding:2px 5px; border-radius:4px;">${api}</span>
+                <img src="${capa}" loading="lazy">
+                <p style="margin-top:10px; font-weight:bold; font-size:12px; height:30px; overflow:hidden;">${titulo}</p>
+            </div>`;
+    }
+
+    // Inicia a página
+    buscarSuperApi("Início");
 </script>
