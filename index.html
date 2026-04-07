@@ -151,25 +151,6 @@
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
         }
 
-        .share-album-btn {
-            position: absolute;
-            top: 35px;
-            right: 35px;
-            width: 52px;
-            height: 52px;
-            background: rgba(0, 0, 0, 0.75);
-            border: 2px solid rgba(255, 255, 255, 0.6);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 26px;
-            color: white;
-            cursor: pointer;
-            z-index: 10;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
-        }
-
         .track-row { display: flex; align-items: center; padding: 18px; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; }
         .track-row.is-playing .track-title { color: var(--active-song) !important; font-weight: bold; }
         .track-row.is-playing .track-play-icon { color: var(--playing-color) !important; }
@@ -228,7 +209,6 @@
 
     <div id="albumPage" class="full-page">
         <button class="btn-voltar" onclick="fecharPagina()">← VOLTAR</button>
-        
         <div id="albumDetailContent" style="position:relative;"></div>
     </div>
 
@@ -251,7 +231,6 @@
             document.getElementById('currentTime').textContent = currentFormatted;
             document.getElementById('remainingTime').textContent = remainingFormatted;
 
-            // Barra de progresso
             const progressPercent = duration ? (current / duration) * 100 : 0;
             document.getElementById('timeProgress').style.width = `${progressPercent}%`;
 
@@ -326,12 +305,9 @@
             const dataLancamento = new Date(album.releaseDate).toLocaleDateString('pt-BR');
             const gravadora = album.copyright || "Independente";
 
-            window.currentAlbumLink = `https://music.apple.com/br/album/${id}`;
-
             document.getElementById('albumDetailContent').innerHTML = `
                 <div style="text-align:center; padding:30px; position:relative;">
                     <img src="${art.replace('100x100', '600x600')}" style="width:250px; border-radius:20px;">
-                    <div class="share-album-btn" onclick="compartilharAlbum()" title="Compartilhar álbum">↑</div>
                 </div>
                 
                 <div style="text-align:center; margin-top:-20px;">
@@ -360,20 +336,6 @@
             
             window.listaVisualizada = songs; 
             atualizarUI();
-        }
-
-        function compartilharAlbum() {
-            const link = window.currentAlbumLink || "https://music.apple.com";
-            if (navigator.share) {
-                navigator.share({ title: "Confira este álbum", text: "Ouça agora!", url: link });
-            } else {
-                const whatsappUrl = `https://wa.me/?text=${encodeURIComponent("Ouça este álbum: " + link)}`;
-                if (confirm("Abrir no WhatsApp?\n\nOu OK para copiar link.")) {
-                    window.open(whatsappUrl, '_blank');
-                } else {
-                    navigator.clipboard.writeText(link).then(() => alert("Link copiado!"));
-                }
-            }
         }
 
         function tocar(albumId, index, art) {
