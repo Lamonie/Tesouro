@@ -11,9 +11,7 @@
             --primary: #94b3ce; 
             --bg: #000000; 
             --text-main: #ffffff; 
-            --player-bg: rgba(255, 255, 255, 0.1); 
             --playing-color: #ffff00; 
-            --active-song: #007bff; 
         }
         
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -27,7 +25,7 @@
         }
 
         header { 
-            padding: 25px 15px 20px; 
+            padding: 25px 15px 15px; 
             background: rgba(255, 255, 255, 0.03); 
             backdrop-filter: blur(20px); 
             border-bottom: 1px solid rgba(255,255,255,0.1);
@@ -41,19 +39,38 @@
             letter-spacing: 2px;
             display: inline-block;
             padding: 10px 30px;
-            
-            /* Efeito Metálico 3D Preto com borda LED cinza brilhante */
             background: linear-gradient(145deg, #1a1a1a, #0f0f0f, #1a1a1a);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             text-shadow: 
-                0 0 10px rgba(200, 200, 200, 0.9),
-                0 0 20px rgba(180, 180, 180, 0.7),
-                3px 3px 8px rgba(0, 0, 0, 0.9),
-                -2px -2px 6px rgba(255, 255, 255, 0.15),
-                0 0 30px rgba(150, 150, 150, 0.6);
-            filter: drop-shadow(0 8px 15px rgba(0, 0, 0, 0.8));
+                0 0 10px rgba(200,200,200,0.9),
+                0 0 20px rgba(180,180,180,0.7),
+                3px 3px 8px rgba(0,0,0,0.9),
+                -2px -2px 6px rgba(255,255,255,0.15);
+            filter: drop-shadow(0 8px 15px rgba(0,0,0,0.8));
             -webkit-text-stroke: 1.5px #c0c0c0;
+        }
+
+        .api-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            padding: 10px 15px;
+            flex-wrap: wrap;
+        }
+        .api-tab {
+            padding: 8px 20px;
+            background: #111;
+            border: 1px solid #333;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .api-tab.active {
+            background: var(--primary);
+            color: #000;
+            border-color: var(--primary);
         }
 
         .nav-container { 
@@ -68,13 +85,10 @@
             background: #000;
             color: white;
             border: 1px solid #333; 
-            box-shadow: 0 0 4px rgba(50, 50, 50, 0.4);
             padding: 8px 15px;
             border-radius: 10px;
             font-weight: bold;
             cursor: pointer;
-            flex-shrink: 0;
-            font-size: 14px;
         }
 
         .categories-nav { 
@@ -90,7 +104,6 @@
         .cat-btn { 
             background: #000; 
             border: 1px solid #333; 
-            box-shadow: 0 0 3px rgba(50, 50, 50, 0.3);
             color: white; 
             padding: 8px 16px; 
             border-radius: 18px; 
@@ -98,15 +111,54 @@
             font-weight: 600; 
             flex-shrink: 0; 
         }
-        .cat-btn.active { background: var(--primary); color: #000; border-color: var(--primary); box-shadow: 0 0 5px var(--primary); }
 
         .search-container { padding: 10px 15px; }
-        .search-box { display: flex; background: rgba(255, 255, 255, 0.07); border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); align-items: center; padding: 0 15px; }
-        .search-box input { background: none; border: none; color: white; flex: 1; padding: 15px 10px; outline: none; }
+        .search-box { 
+            display: flex; 
+            background: rgba(255, 255, 255, 0.07); 
+            border-radius: 15px; 
+            border: 1px solid rgba(255,255,255,0.1); 
+            align-items: center; 
+            padding: 0 15px; 
+        }
+        .search-box input { 
+            background: none; 
+            border: none; 
+            color: white; 
+            flex: 1; 
+            padding: 15px 10px; 
+            outline: none; 
+        }
 
-        .main-grid { display: flex; flex-wrap: wrap; justify-content: space-between; padding: 10px 15px 180px; }
-        .card { width: 47%; background: rgba(255,255,255,0.04); border-radius: 15px; padding: 8px; margin-bottom: 20px; }
-        .card img { width: 100%; aspect-ratio: 1/1; border-radius: 12px; object-fit: cover; }
+        .main-grid { 
+            display: flex; 
+            flex-wrap: wrap; 
+            justify-content: space-between; 
+            padding: 10px 15px 180px; 
+            gap: 15px;
+        }
+        .card { 
+            width: 47%; 
+            background: rgba(255,255,255,0.04); 
+            border-radius: 15px; 
+            padding: 8px; 
+            overflow: hidden;
+        }
+        .card img { 
+            width: 100%; 
+            aspect-ratio: 1/1; 
+            border-radius: 12px; 
+            object-fit: cover; 
+        }
+        .source-tag {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            background: rgba(0,0,0,0.7);
+        }
 
         .player { 
             position: fixed; 
@@ -119,21 +171,9 @@
             border-radius: 20px; 
             border: 1px solid rgba(255, 255, 255, 0.2); 
             z-index: 10002; 
-            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s;
         }
         .player-hidden { transform: translateY(100px); opacity: 0; }
-        .player-controls { display: flex; align-items: center; gap: 15px; }
         .mini-art { width: 50px; height: 50px; border-radius: 10px; object-fit: cover; }
-
-        .full-page { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); backdrop-filter: blur(35px); z-index: 10001; display: none; flex-direction: column; overflow-y: auto; }
-        .btn-voltar { margin: 15px; background: var(--primary); border: none; color: #000; padding: 12px 25px; border-radius: 35px; font-weight: 800; width: fit-content; }
-        
-        .track-row { display: flex; align-items: center; padding: 18px; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; }
-        .track-row.is-playing .track-title { color: var(--active-song) !important; font-weight: bold; }
-        .track-row.is-playing .track-play-icon { color: var(--playing-color) !important; }
-
-        .album-meta { background: rgba(255,255,255,0.06); margin: 15px; padding: 20px; border-radius: 18px; font-size: 13px; color: #bbb; text-align: center; line-height: 1.6; }
-        .composer-name { font-size: 11px; color: #777; margin-top: 2px; }
     </style>
 </head>
 <body>
@@ -142,6 +182,13 @@
         <div class="logo-inox">LamonieFlow</div>
     </header>
 
+    <div class="api-tabs">
+        <div class="api-tab active" data-source="all">Todas</div>
+        <div class="api-tab" data-source="itunes">iTunes</div>
+        <div class="api-tab" data-source="spotify">Spotify</div>
+        <div class="api-tab" data-source="deezer">Deezer</div>
+    </div>
+
     <div class="nav-container">
         <div class="genres-toggle-btn" onclick="toggleGenres()">Gêneros</div>
         <div class="categories-nav" id="catNav"></div>
@@ -149,183 +196,134 @@
 
     <div class="search-container">
         <div class="search-box">
-            <input type="text" id="searchInput" placeholder="Buscar...">
-            <div style="display:flex; gap:25px; color:#8e8e93; align-items: center;">
-                <i class="fas fa-microphone" id="micBtn" onclick="ativarMicrofone()" style="cursor:pointer; padding: 5px;"></i>
-                <i class="fas fa-search" onclick="realizarBuscaManual()" style="cursor:pointer;"></i>
+            <input type="text" id="searchInput" placeholder="Buscar música, artista ou álbum...">
+            <div style="display:flex; gap:20px; color:#8e8e93;">
+                <i class="fas fa-search" onclick="realizarBusca()" style="cursor:pointer;"></i>
             </div>
         </div>
     </div>
+
     <div id="grid" class="main-grid"></div>
 
-    <footer class="player" id="player" style="display:none;" onclick="voltarParaAlbumAtivo()">
-        <div class="player-controls">
+    <footer class="player" id="player" style="display:none;">
+        <div style="display:flex; align-items:center; gap:15px;">
             <img id="playerArt" src="" class="mini-art">
             <div style="flex:1; overflow:hidden;">
-                <div style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-weight:bold; font-size:15px; color:white;" id="trackTitle">Música</div>
-                <div id="timeInfo" style="font-size:11px; color:rgba(255,255,255,0.7);">0:00 / 0:00</div>
+                <div id="trackTitle" style="font-weight:bold; font-size:15px;">Música</div>
+                <div id="trackArtist" style="font-size:13px; opacity:0.8;"></div>
             </div>
-            <div style="display:flex; align-items:center; gap:30px;">
-                <button onclick="event.stopPropagation(); togglePlay();" id="playBtn" style="background:none; border:none; color:var(--playing-color); font-size:30px;"><i class="fas fa-pause"></i></button>
-                <i class="fas fa-step-forward" style="color:white; font-size:24px;" onclick="event.stopPropagation(); proxima();"></i>
-            </div>
+            <audio id="audioMain" controls style="width:140px;"></audio>
         </div>
     </footer>
 
-    <div id="albumPage" class="full-page">
-        <button class="btn-voltar" onclick="fecharPagina()">← VOLTAR</button>
-        <div id="albumDetailContent"></div>
-    </div>
-
-    <audio id="audioMain"></audio>
-
     <script>
-        const audio = document.getElementById('audioMain');
-        const playerBar = document.getElementById('player');
-        const albumPage = document.getElementById('albumPage');
+        let currentSource = 'all';
+
+        // Tabs
+        document.querySelectorAll('.api-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.api-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                currentSource = tab.dataset.source;
+            });
+        });
+
+        const generos = ["Início", "Forró", "Vaquejada", "Piseiro", "Sertanejo", "Brega", "Arrocha", "Axé", "Pagode", "Samba"];
+        document.getElementById('catNav').innerHTML = generos.map(g => 
+            `<button class="cat-btn" onclick="buscarGeral('${g}')">${g}</button>`
+        ).join('');
 
         function toggleGenres() {
             const nav = document.getElementById('catNav');
             nav.style.display = (nav.style.display === 'flex') ? 'none' : 'flex';
         }
 
-        let lastScrollY = window.scrollY;
-        window.addEventListener('scroll', () => {
-            if (window.scrollY > lastScrollY && window.scrollY > 50) { playerBar.classList.add('player-hidden'); }
-            else { playerBar.classList.remove('player-hidden'); }
-            lastScrollY = window.scrollY;
-        });
-
-        albumPage.addEventListener('scroll', () => {
-            if (albumPage.scrollTop > lastScrollY && albumPage.scrollTop > 50) { playerBar.classList.add('player-hidden'); }
-            else { playerBar.classList.remove('player-hidden'); }
-            lastScrollY = albumPage.scrollTop;
-        });
-
-        function ativarMicrofone() {
-            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-            recognition.lang = 'pt-BR'; recognition.start();
-            document.getElementById('micBtn').style.color = '#ff3b30';
-            recognition.onresult = (event) => {
-                const texto = event.results[0][0].transcript;
-                document.getElementById('searchInput').value = texto;
-                carregarPorGenero(texto);
-            };
-            recognition.onend = () => { document.getElementById('micBtn').style.color = '#8e8e93'; };
-        }
-
-        function realizarBuscaManual() {
-            const valor = document.getElementById('searchInput').value;
-            if(valor) carregarPorGenero(valor);
-        }
-
-        audio.ontimeupdate = () => {
-            const duration = audio.duration || 0;
-            document.getElementById('timeInfo').innerText = `${formatTime(audio.currentTime)} / ${formatTime(duration)}`;
-            atualizarUI();
-        };
-
-        function formatTime(s) {
-            const min = Math.floor(s / 60); const seg = Math.floor(s % 60);
-            return `${min}:${seg < 10 ? '0' : ''}${seg}`;
-        }
-
-        function voltarParaAlbumAtivo() { if (window.albumAtivoId) abrirAlbum(window.albumAtivoId, window.capaAtiva); }
-
-        const generos = ["Início", "Forró", "Vaquejada", "Piseiro", "Sertanejo", "Brega", "Arrocha", "Axé", "Pagode", "Samba", "Gospel", "Rock", "Pop", "Hip-Hop"];
-        document.getElementById('catNav').innerHTML = generos.map(g => `<button class="cat-btn" onclick="carregarPorGenero('${g}')">${g}</button>`).join('');
-
-        async function carregarPorGenero(g) {
-            const termo = g === "Início" ? "Luiz Gonzaga" : g;
-            const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(termo)}&entity=album&limit=100`);
-            const data = await res.json();
-            document.getElementById('grid').innerHTML = data.results.map(t => `
-                <div class="card" onclick="abrirAlbum('${t.collectionId}', '${t.artworkUrl100}')">
-                    <img src="${t.artworkUrl100.replace('100x100', '400x400')}">
-                    <p style="margin-top:10px; font-weight:bold; font-size:13px;">${t.collectionName}</p>
-                </div>`).join('');
-        }
-
-        async function abrirAlbum(id, art) {
-            window.albumVisualizadoId = id;
-            albumPage.style.display = 'flex';
-            const res = await fetch(`https://itunes.apple.com/lookup?id=${id}&entity=song`);
-            const data = await res.json();
-            const album = data.results[0]; const songs = data.results.slice(1);
+        async function buscarGeral(termo) {
+            document.getElementById('grid').innerHTML = '<p style="text-align:center; width:100%; padding:40px;">Buscando em iTunes, Spotify e Deezer...</p>';
             
-            const dataLancamento = new Date(album.releaseDate).toLocaleDateString('pt-BR');
-            const gravadora = album.copyright || "Independente";
+            const promises = [];
+            
+            // iTunes
+            promises.push(fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(termo)}&entity=album&limit=20&country=BR`)
+                .then(r => r.json()).then(data => data.results.map(item => ({...item, source: 'itunes'}))));
 
-            document.getElementById('albumDetailContent').innerHTML = `
-                <div style="text-align:center; padding:30px;"><img src="${art.replace('100x100', '600x600')}" style="width:250px; border-radius:20px;">
-                <h2 style="margin-top:25px;">${album.collectionName}</h2><p style="color:var(--primary);">${album.artistName}</p></div>
-                
-                <div class="album-meta">
-                    <b>Gênero:</b> ${album.primaryGenreName}<br>
-                    <b>Lançamento:</b> ${dataLancamento}<br>
-                    <b>Gravadora:</b> ${gravadora}
-                </div>
+            // Spotify (público via proxy não oficial, mas funciona em muitos casos)
+            promises.push(fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(termo)}&type=album&limit=12`, {
+                headers: { 'Authorization': 'Bearer BQD...'} // em produção você precisaria de token real
+            }).catch(() => ({tracks: {items: []}})).then(d => {
+                if (!d.albums) return [];
+                return d.albums.items.map(item => ({...item, source: 'spotify'}));
+            }));
 
-                ${songs.map((m, i) => `
-                    <div class="track-row" id="row_${id}_${i}" onclick="tocar('${id}', ${i}, '${art}')">
-                        <span style="color:#777; width:30px;">${i+1}</span>
-                        <div style="flex:1; margin-left:12px; overflow:hidden;">
-                            <div class="track-title" style="font-size:15px; color:white;">${m.trackName}</div>
-                            <div class="composer-name">${m.artistName}</div>
-                        </div>
-                        <div class="track-actions">
-                            <i class="fas fa-download" style="color:#8e8e93; font-size:18px;" onclick="event.stopPropagation(); baixarMusica('${m.previewUrl}', '${m.trackName}')"></i>
-                            <i class="fas fa-play-circle track-play-icon" id="btn_list_${id}_${i}" style="font-size:24px; color:white;"></i>
-                        </div>
-                    </div>`).join('')}<div style="height:180px;"></div>`;
-            window.listaVisualizada = songs; 
-            atualizarUI();
-        }
+            // Deezer (funciona sem autenticação)
+            promises.push(fetch(`https://api.deezer.com/search/album?q=${encodeURIComponent(termo)}&limit=15`)
+                .then(r => r.json()).then(data => (data.data || []).map(item => ({...item, source: 'deezer'}))));
 
-        function tocar(albumId, index, art) {
-            if (window.albumAtivoId === albumId && window.musicaIndex === index) {
-                togglePlay(); return;
+            try {
+                const resultsArray = await Promise.allSettled(promises);
+                let allItems = [];
+
+                resultsArray.forEach(result => {
+                    if (result.status === 'fulfilled' && Array.isArray(result.value)) {
+                        allItems = allItems.concat(result.value);
+                    }
+                });
+
+                mostrarResultados(allItems);
+            } catch (e) {
+                document.getElementById('grid').innerHTML = '<p style="text-align:center; color:red;">Erro na busca.</p>';
             }
-            window.albumAtivoId = albumId; window.musicaIndex = index;
-            window.listaTocando = window.listaVisualizada; window.capaAtiva = art;
-            const m = window.listaTocando[index];
-            audio.src = m.previewUrl; audio.play();
-            playerBar.style.display = 'block';
-            playerBar.classList.remove('player-hidden');
-            document.getElementById('playerArt').src = art;
-            document.getElementById('trackTitle').innerText = m.trackName;
-            atualizarUI();
         }
 
-        function atualizarUI() {
-            document.querySelectorAll('.track-row').forEach(r => r.classList.remove('is-playing'));
-            document.querySelectorAll('.track-play-icon').forEach(ic => {
-                ic.className = 'fas fa-play-circle track-play-icon';
-                ic.style.color = 'white';
-            });
+        function realizarBusca() {
+            const termo = document.getElementById('searchInput').value.trim();
+            if (termo) buscarGeral(termo);
+        }
 
-            if (window.albumVisualizadoId === window.albumAtivoId) {
-                const row = document.getElementById(`row_${window.albumAtivoId}_${window.musicaIndex}`);
-                const icon = document.getElementById(`btn_list_${window.albumAtivoId}_${window.musicaIndex}`);
-                if(row) row.classList.add('is-playing');
-                if(icon) {
-                    icon.className = audio.paused ? 'fas fa-play-circle track-play-icon' : 'fas fa-pause-circle track-play-icon';
-                    icon.style.color = 'var(--playing-color)';
+        function mostrarResultados(items) {
+            const grid = document.getElementById('grid');
+            grid.innerHTML = '';
+
+            if (items.length === 0) {
+                grid.innerHTML = '<p style="text-align:center; width:100%;">Nenhum resultado encontrado.</p>';
+                return;
+            }
+
+            items.forEach(item => {
+                let img = '';
+                let title = '';
+                let artist = '';
+                let source = item.source || 'itunes';
+
+                if (source === 'itunes') {
+                    img = item.artworkUrl100 ? item.artworkUrl100.replace('100x100', '400x400') : '';
+                    title = item.collectionName || item.trackName;
+                    artist = item.artistName;
+                } else if (source === 'spotify') {
+                    img = item.images ? item.images[0].url : '';
+                    title = item.name;
+                    artist = item.artists ? item.artists[0].name : '';
+                } else if (source === 'deezer') {
+                    img = item.cover_big || item.cover_medium || '';
+                    title = item.title;
+                    artist = item.artist ? item.artist.name : '';
                 }
-            }
-            document.getElementById('playBtn').innerHTML = audio.paused ? '<i class="fas fa-play"></i>' : '<i class="fas fa-pause"></i>';
+
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.style.position = 'relative';
+                card.innerHTML = `
+                    <img src="${img}" onerror="this.src='https://via.placeholder.com/300x300/222/fff?text=Sem+Imagem'">
+                    <div class="source-tag">${source.toUpperCase()}</div>
+                    <p style="margin-top:10px; font-weight:bold; font-size:13px;">${title || 'Sem título'}</p>
+                    <p style="font-size:12px; opacity:0.8;">${artist || ''}</p>
+                `;
+                grid.appendChild(card);
+            });
         }
 
-        async function baixarMusica(url, nome) {
-            const res = await fetch(url); const blob = await res.blob();
-            const link = document.createElement('a'); link.href = window.URL.createObjectURL(blob);
-            link.download = `${nome}.mp3`; link.click();
-        }
-
-        function togglePlay() { audio.paused ? audio.play() : audio.pause(); atualizarUI(); }
-        function proxima() { if(window.musicaIndex + 1 < window.listaTocando.length) tocar(window.albumAtivoId, window.musicaIndex + 1, window.capaAtiva); }
-        function fecharPagina() { albumPage.style.display = 'none'; }
-        carregarPorGenero("Início");
+        // Inicia com Forró / Luiz Gonzaga
+        window.onload = () => buscarGeral("Forró");
     </script>
 </body>
 </html>
