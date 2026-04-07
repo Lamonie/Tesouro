@@ -29,19 +29,15 @@
         }
         
         .dock-item {
-            /* Fundo de vidro transparente e brilhoso */
             background: rgba(255, 255, 255, 0.15); 
             backdrop-filter: blur(20px) saturate(180%) brightness(120%);
             -webkit-backdrop-filter: blur(20px) saturate(180%) brightness(120%);
-            /* Borda fina para dar efeito de brilho no vidro */
             border: 1px solid rgba(255, 255, 255, 0.3);
             display: flex; align-items: center; justify-content: center;
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
         }
 
         .btn-home { width: 60px; height: 60px; border-radius: 30px; font-size: 24px; color: #fff; cursor: pointer; }
-        
-        /* Cor da Lupinha em Vermelho */
         .btn-search { width: 60px; height: 60px; border-radius: 30px; font-size: 24px; color: #ff0000; cursor: pointer; }
         
         .player-capsule {
@@ -56,13 +52,12 @@
 
         .dock-hidden { transform: translateY(120px); opacity: 0; }
 
-        /* Pagina do Album */
+        /* Pagina do Album (Sem o botão voltar no topo) */
         .full-page { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 10001; display: none; flex-direction: column; overflow-y: auto; }
         .track-row { display: flex; align-items: center; padding: 15px; border-bottom: 1px solid #1c1c1e; }
         .track-row.is-playing .track-title { color: var(--active-song) !important; font-weight: bold; }
         .track-row.is-playing .track-play-icon { color: var(--playing-color) !important; }
         .composer-name { font-size: 11px; color: #777; }
-        .btn-voltar { margin: 15px; background: rgba(255,255,255,0.2); color: #fff; border: 1px solid rgba(255,255,255,0.3); padding: 10px 20px; border-radius: 20px; width: fit-content; backdrop-filter: blur(10px); }
 
         /* Overlay de Busca */
         #searchOverlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 10010; padding: 20px; }
@@ -77,7 +72,6 @@
 
     <div id="grid" class="main-grid"></div>
 
-    <!-- BARRA FLUTUANTE ESTILO VIDRO BRILHANTE -->
     <div class="dock-container" id="dock">
         <div class="dock-item btn-home" onclick="irParaInicio()"><i class="fas fa-home"></i></div>
         
@@ -100,8 +94,8 @@
         <input type="text" class="search-input" id="searchInput" placeholder="O que você quer ouvir?" onkeyup="if(event.key==='Enter') buscar(this.value)">
     </div>
 
+    <!-- Página do álbum sem o botão voltar no topo -->
     <div id="albumPage" class="full-page">
-        <button class="btn-voltar" onclick="fecharPagina()">← VOLTAR</button>
         <div id="albumContent"></div>
     </div>
 
@@ -153,19 +147,19 @@
             const album = data.results[0];
 
             document.getElementById('albumContent').innerHTML = `
-                <div style="text-align:center; padding:30px;">
-                    <img src="${art.replace('100x100', '600x600')}" style="width:200px; border-radius:15px;">
-                    <h2 style="margin-top:15px;">${album.collectionName}</h2>
+                <div style="text-align:center; padding:50px 30px 30px 30px;">
+                    <img src="${art.replace('100x100', '600x600')}" style="width:250px; border-radius:20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+                    <h2 style="margin-top:20px; font-size:24px;">${album.collectionName}</h2>
                 </div>
                 ${songs.map((m, i) => `
                     <div class="track-row" id="row_${id}_${i}" onclick="tocar('${id}', ${i}, '${art}')">
-                        <span style="color:#555; width:30px;">${i+1}</span>
+                        <span style="color:#555; width:30px; font-size:14px;">${i+1}</span>
                         <div style="flex:1;">
-                            <div class="track-title" style="color:#fff;">${m.trackName}</div>
+                            <div class="track-title" style="color:#fff; font-size:16px;">${m.trackName}</div>
                             <div class="composer-name">${m.artistName}</div>
                         </div>
                         <i class="fas fa-download" style="color:#555; margin-right:20px;" onclick="event.stopPropagation(); baixar('${m.previewUrl}', '${m.trackName}')"></i>
-                        <i class="fas fa-play-circle track-play-icon" id="btn_list_${id}_${i}" style="font-size:22px;"></i>
+                        <i class="fas fa-play-circle track-play-icon" id="btn_list_${id}_${i}" style="font-size:24px;"></i>
                     </div>
                 `).join('')}<div style="height:150px;"></div>`;
             window.listaVisualizada = songs;
