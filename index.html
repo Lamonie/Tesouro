@@ -3,100 +3,31 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LAMONIÊ FLOW</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<title>Lamoniê Rádio PRO</title>
 
 <style>
-body{
-background:#000;
-color:#fff;
-font-family:Arial;
-margin:0;
-}
-
-header{
-text-align:center;
-padding:20px;
-}
-
-.logo{
-font-family:'Great Vibes';
-font-size:35px;
-background:linear-gradient(#fff,#aaa);
--webkit-background-clip:text;
--webkit-text-fill-color:transparent;
-}
-
-.grid{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:15px;
-padding:15px;
-}
-
-.card{
-background:#111;
-border-radius:15px;
-padding:15px;
-text-align:center;
-cursor:pointer;
-}
-
-.card:hover{
-background:#1a1a1a;
-}
-
-.radio{
-font-size:40px;
-margin-bottom:10px;
-}
-
-.live{
-color:#00ff00;
-font-size:12px;
-}
-
-.player{
-position:fixed;
-bottom:10px;
-left:50%;
-transform:translateX(-50%);
-width:90%;
-background:#111;
-padding:10px;
-border-radius:20px;
-display:flex;
-justify-content:space-between;
-align-items:center;
-}
-
-button{
-background:none;
-border:none;
-color:#fff;
-font-size:25px;
-}
-
+body{background:#000;color:#fff;font-family:Arial;margin:0}
+header{text-align:center;padding:20px;font-size:25px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:15px;padding:15px}
+.card{background:#111;padding:15px;border-radius:15px;text-align:center;cursor:pointer}
+.player{position:fixed;bottom:10px;left:50%;transform:translateX(-50%);width:90%;background:#111;padding:10px;border-radius:20px;display:flex;justify-content:space-between}
+button{background:none;border:none;color:#fff;font-size:25px}
 </style>
 </head>
 
 <body>
 
-<header>
-<div class="logo">Lamoniê Flow</div>
-</header>
+<header>📻 Lamoniê Rádio</header>
 
-<div class="grid" id="grid"></div>
+<div id="grid" class="grid"></div>
 
 <div class="player">
 <div>
-<b id="titulo">Selecione uma rádio</b><br>
-<small id="desc">AO VIVO</small>
+<b id="t">Selecione</b><br>
+<small>AO VIVO</small>
 </div>
 <button onclick="toggle()">
-<i id="icon" class="fas fa-play"></i>
+▶
 </button>
 </div>
 
@@ -106,65 +37,32 @@ font-size:25px;
 
 const audio = document.getElementById("audio")
 
-const radios = [
-{
-nome:"Jovem Pan FM",
-url:"https://playerservices.streamtheworld.com/api/livestream-redirect/JP_FM_SC",
-icon:"📻"
-},
-{
-nome:"Mix FM",
-url:"https://26583.live.streamtheworld.com/MIXFM_SC",
-icon:"🎧"
-},
-{
-nome:"89 Rock",
-url:"https://playerservices.streamtheworld.com/api/livestream-redirect/RADIO_89FMSC",
-icon:"🤘"
-},
-{
-nome:"Alpha FM",
-url:"https://playerservices.streamtheworld.com/api/livestream-redirect/ALPHAFM_SC",
-icon:"🎷"
-}
-]
+async function carregar(){
 
-function carregar(){
+let res = await fetch("https://de1.api.radio-browser.info/json/stations/bycountry/brazil?limit=20")
+let data = await res.json()
+
 document.getElementById("grid").innerHTML =
-radios.map(r=>`
-<div class="card" onclick="playRadio('${r.url}','${r.nome}','${r.icon}')">
-<div class="radio">${r.icon}</div>
-<b>${r.nome}</b>
-<div class="live">● AO VIVO</div>
+data.map(r=>`
+<div class="card" onclick="play('${r.url_resolved}','${r.name}')">
+📻
+<b>${r.name}</b>
 </div>
 `).join("")
+
 }
 
-function playRadio(url,nome,icon){
-
-audio.pause()
-
+function play(url,nome){
 audio.src = url
 audio.load()
-
-audio.play().then(()=>{
-document.getElementById("titulo").innerText = nome
-document.getElementById("desc").innerText = "Rádio ao vivo"
-document.getElementById("icon").className = "fas fa-pause"
-}).catch(()=>{
-alert("Erro ao tocar rádio 😢 (stream bloqueado)")
+audio.play().catch(()=>{
+alert("Essa rádio não liberou o stream 😢")
 })
-
+document.getElementById("t").innerText = nome
 }
 
 function toggle(){
-if(audio.paused){
-audio.play()
-document.getElementById("icon").className = "fas fa-pause"
-}else{
-audio.pause()
-document.getElementById("icon").className = "fas fa-play"
-}
+audio.paused ? audio.play() : audio.pause()
 }
 
 carregar()
